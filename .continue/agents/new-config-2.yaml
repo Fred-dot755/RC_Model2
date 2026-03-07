@@ -1,0 +1,33 @@
+# This is an example configuration file
+# To learn more, see the full config.yaml reference: https://docs.continue.dev/reference
+
+name: Example Config
+version: 1.0.0
+schema: v1
+
+# Define which models can be used
+# https://docs.continue.dev/customization/models
+models:
+
+# 为 Kimi 添加系统提示词（可选）
+  - name: Kimi 128K
+    provider: openai
+    model: moonshot-v1-128k
+    apiKey: sk-0GfL4GeID6UQeLk6HKy1Sgi1E0Ya9RvARp4Dl4sD908OgqeQ
+    apiBase: https://api.moonshot.cn/v1
+
+
+
+  - name: my gpt-5
+    provider: openai
+    model: gpt-5
+    apiKey: YOUR_OPENAI_API_KEY_HERE
+  - uses: ollama/qwen2.5-coder-7b
+  - uses: anthropic/claude-4-sonnet
+    with:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+# MCP Servers that Continue can access
+# https://docs.continue.dev/customization/mcp-tools
+mcpServers:
+  - uses: anthropic/memory-mcp
