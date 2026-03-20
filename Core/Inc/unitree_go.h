@@ -70,6 +70,7 @@ typedef struct
     RIS_Mode_t mode; // 电机控制模式  1Byte
     RIS_Fbk_t fbk;   // 电机反馈数据 11Byte
     uint16_t CRC16;  // CRC          2Byte
+    // uint8_t data[16];
 } RIS_MotorData_t;   // 电机返回数据     16Byte
 #pragma pack(pop)
 
@@ -117,6 +118,7 @@ extern UnitreeMotorCmd_t unitree_cmd[UNITREE_MOTOR_NUM];
 extern UnitreeMotorData_t unitree_data[UNITREE_MOTOR_NUM];
 
 extern int error_unitree;
+extern float unitree_angle_init[UNITREE_MOTOR_NUM] ;
 extern int unitree_flag[UNITREE_MOTOR_NUM];
 
 // 函数声明
@@ -132,5 +134,11 @@ uint16_t unitree_crc_ccitt(uint16_t crc, uint8_t const *buffer, size_t len);
 
 // 调试函数
 void unitree_print_motor_data(uint8_t motor_id);
+
+typedef struct
+{
+    uint8_t data[30];
+}DataRecive_t;
+extern DataRecive_t unitree_data_receive[UNITREE_MOTOR_NUM];
 
 #endif /* __UNITREE_GO_H */

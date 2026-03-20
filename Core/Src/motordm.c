@@ -26,10 +26,17 @@ static float dm_uint_to_float(int x_int, float x_min, float x_max, int bits) {
     return ((float)x_int) * span / ((float)((1 << bits) - 1)) + x_min;
 }
 
+static int dm_float_to_uint(float x_float, float x_min, float x_max, int bits) {
+    /* Converts a float to an unsigned int, given range and number of bits */
+    float span = x_max - x_min;
+    float offset = x_min;
+    return (int) ((x_float - offset) * ((float)((1 << bits) - 1)) / span);
+}
+
 /* USER CODE END Private defines */
 
 /* USER CODE BEGIN Private variables */
-DM4310_Feedback_t dm4310_fb = {0};
+DM4310_Feedback_t dm4310_fb[2] = {0};
 
 /* USER CODE END Private variables */
 
@@ -41,17 +48,38 @@ DM4310_Feedback_t dm4310_fb = {0};
   */
 void DM_Motor_Init(void)
 {
-    dm4310_fb.id = 0;
-    dm4310_fb.error = 0;
-    dm4310_fb.pos_raw = 0;
-    dm4310_fb.vel_raw = 0;
-    dm4310_fb.tor_raw = 0;
-    dm4310_fb.pos_offset_rad = 0.0f;
-    dm4310_fb.is_initialized = 0;
-    dm4310_fb.position_deg = 0.0f;
-    dm4310_fb.position_rad = 0.0f;
-    dm4310_fb.velocity_rads = 0.0f;
-    dm4310_fb.torque_Nm = 0.0f;
+    dm4310_fb[0].id = 0;
+    dm4310_fb[0].error = 0;
+    dm4310_fb[0].pos_raw = 0;
+    dm4310_fb[0].vel_raw = 0;
+    dm4310_fb[0].tor_raw = 0;
+    dm4310_fb[0].pos_offset_rad = 0.0f;
+    dm4310_fb[0].is_initialized = 0;
+    dm4310_fb[0].position_deg = 0.0f;
+    dm4310_fb[0].position_rad = 0.0f;
+    dm4310_fb[0].velocity_rads = 0.0f;
+    dm4310_fb[0].torque_Nm = 0.0f;
+
+    dm4310_fb[1].id = 0;
+    dm4310_fb[1].error = 0;
+    dm4310_fb[1].pos_raw = 0;
+    dm4310_fb[1].vel_raw = 0;
+    dm4310_fb[1].tor_raw = 0;
+    dm4310_fb[1].pos_offset_rad = 0.0f;
+    dm4310_fb[1].is_initialized = 0;
+    dm4310_fb[1].position_deg = 0.0f;
+    dm4310_fb[1].position_rad = 0.0f;
+    dm4310_fb[1].velocity_rads = 0.0f;
+    dm4310_fb[1].torque_Nm = 0.0f;
+
+    DM_CAN_Enable_Motor(2);
+    HAL_Delay(100);
+    DM_CAN_Enable_Motor(3);
+    HAL_Delay(100);
+    DM_CAN_Save_Zero_Motor(2);
+    HAL_Delay(100);
+    DM_CAN_Save_Zero_Motor(3);
+    HAL_Delay(100);
 }
 
 /**
@@ -62,30 +90,58 @@ void DM_Motor_Init(void)
   */
 void DM_Process_Rx_Message(uint32_t StdId, uint8_t* data)
 {
+  if (StdId == 0x02 ) 
+    {
+      dm4310_fb[0].id    = data[0] & 0x0F;
+      dm4310_fb[0].error = (data[0] >> 4) & 0x0F;
+
+      // POS: 16位，D[1]高字节，D[2]低字节
+      uint16_t p_int = (uint16_t)((data[1] << 8) | data[2]);
+
+      // VEL: 12位，D[3]全8位为高8位，D[4]高4位为低4位
+      uint16_t v_int = (uint16_t)((data[3] << 4) | (data[4] >> 4));
+
+      // TOR: 12位，D[4]低4位为高4位，D[5]全8位为低8位
+      uint16_t t_int = (uint16_t)(((data[4] & 0x0F) << 8) | data[5]);
+
+      float current_abs_rad = dm_uint_to_float(p_int, DM_P_MIN, DM_P_MAX, 16);
+
+      if (dm4310_fb[0].is_initialized == 0) {
+          dm4310_fb[0].pos_offset_rad = current_abs_rad;
+          dm4310_fb[0].is_initialized = 1;
+      }
+      
+
+      dm4310_fb[0].position_rad  = current_abs_rad - dm4310_fb[0].pos_offset_rad;//角度???
+      dm4310_fb[0].position_deg  = (dm4310_fb[0].position_rad - current_abs_rad) * (180.0f / DM_PI);
+      dm4310_fb[0].velocity_rads = dm_uint_to_float(v_int, DM_V_MIN, DM_V_MAX, 12);
+      dm4310_fb[0].torque_Nm     = dm_uint_to_float(t_int, DM_T_MIN, DM_T_MAX, 12);
+      }
     if (StdId == 0x03 ) 
     {
-        dm4310_fb.id = data[0];
-        dm4310_fb.error = (data[1] >> 4) & 0x0F;
+      dm4310_fb[1].id    = data[0] & 0x0F;
+      dm4310_fb[1].error = (data[0] >> 4) & 0x0F;
 
+      // POS: 16位，D[1]高字节，D[2]低字节
+      uint16_t p_int = (uint16_t)((data[1] << 8) | data[2]);
 
-        uint16_t p_int = (uint16_t)((data[2] << 8) | data[3]);
-        
-        uint16_t v_int = (uint16_t)(((data[4] & 0x0F) << 8) | data[5]);
-        
-        uint16_t t_int = (uint16_t)(((data[6] & 0x0F) << 8) | data[7]);
+      // VEL: 12位，D[3]全8位为高8位，D[4]高4位为低4位
+      uint16_t v_int = (uint16_t)((data[3] << 4) | (data[4] >> 4));
 
-        float current_abs_rad = dm_uint_to_float(p_int, DM_P_MIN, DM_P_MAX, 16);
+      // TOR: 12位，D[4]低4位为高4位，D[5]全8位为低8位
+      uint16_t t_int = (uint16_t)(((data[4] & 0x0F) << 8) | data[5]);
 
-        if (dm4310_fb.is_initialized == 0) {
-            dm4310_fb.pos_offset_rad = current_abs_rad; // 记录上电时的绝对位置
-            dm4310_fb.is_initialized = 1;
-        }
+      float current_abs_rad = dm_uint_to_float(p_int, DM_P_MIN, DM_P_MAX, 16);
 
-        dm4310_fb.position_rad = current_abs_rad - dm4310_fb.pos_offset_rad;
-        dm4310_fb.position_deg = dm4310_fb.position_rad * (180.0f / DM_PI);
-        
-        dm4310_fb.velocity_rads = dm_uint_to_float(v_int, DM_V_MIN, DM_V_MAX, 12);
-        dm4310_fb.torque_Nm     = dm_uint_to_float(t_int, DM_T_MIN, DM_T_MAX, 12);
+      if (dm4310_fb[1].is_initialized == 0) {
+          dm4310_fb[1].pos_offset_rad = current_abs_rad;
+          dm4310_fb[1].is_initialized = 1;
+      }
+
+      dm4310_fb[1].position_rad  = current_abs_rad - dm4310_fb[1].pos_offset_rad;
+      dm4310_fb[1].position_deg  = (dm4310_fb[1].position_rad - current_abs_rad) * (180.0f / DM_PI);
+      dm4310_fb[1].velocity_rads = dm_uint_to_float(v_int, DM_V_MIN, DM_V_MAX, 12);
+      dm4310_fb[1].torque_Nm     = dm_uint_to_float(t_int, DM_T_MIN, DM_T_MAX, 12);
     }
 }
 
@@ -98,9 +154,18 @@ void DM_Process_Rx_Message(uint32_t StdId, uint8_t* data)
   */
 void DM_CAN_Send_PosVel_Mode(float p_des_deg, float v_des_deg, uint8_t CAN_ID)
 {
-    float p_target_abs = (p_des_deg * (DM_PI / 180.0f)) + dm4310_fb.pos_offset_rad;
+    // 检查电机是否已初始化
+    // if (CAN_ID < 2 || CAN_ID > 3 || dm4310_fb[CAN_ID - 2].is_initialized == 0) {
+    //     return;
+    // }
+    if (CAN_ID < 2 || CAN_ID > 3) {
+        return;
+    }
+    
+    float p_target_abs = (p_des_deg * (DM_PI / 180.0f));
     float v_limit_rad = v_des_deg * (DM_PI / 180.0f);
 
+    // 根据参考代码，位置速度模式ID = 0x100 + CAN_ID
     FDCAN_TxHeaderTypeDef header;
     uint8_t data[8];
     
@@ -114,6 +179,7 @@ void DM_CAN_Send_PosVel_Mode(float p_des_deg, float v_des_deg, uint8_t CAN_ID)
     header.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
     header.MessageMarker = 0;
     
+    // 参考代码pos_ctrl函数：直接发送浮点数的字节表示
     float *p_ptr = (float *)&data[0];
     float *v_ptr = (float *)&data[4];
     *p_ptr = p_target_abs;
@@ -133,19 +199,20 @@ void DM_CAN_Send_Vel_Mode(float v_des_deg, uint8_t CAN_ID)
     float v_limit_rad = v_des_deg * (DM_PI / 180.0f);
 
     FDCAN_TxHeaderTypeDef header;
-    uint8_t data[8] = {0};
+    uint8_t data[4];
     
-    header.Identifier = 0x100 + CAN_ID;
+    // 根据参考代码，速度模式ID = 0x200 + CAN_ID
+    header.Identifier = 0x200 + CAN_ID;
     header.IdType = FDCAN_STANDARD_ID;
     header.TxFrameType = FDCAN_DATA_FRAME;
-    header.DataLength = FDCAN_DLC_BYTES_8;
+    header.DataLength = FDCAN_DLC_BYTES_4;
     header.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
     header.BitRateSwitch = FDCAN_BRS_OFF;
     header.FDFormat = FDCAN_CLASSIC_CAN;
     header.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
     header.MessageMarker = 0;
     
-    // 速度模式：发送速度值
+    // 参考代码spd_ctrl函数：只发送4字节速度值
     float *v_ptr = (float *)&data[0];
     *v_ptr = v_limit_rad;
     
@@ -175,49 +242,41 @@ void DM_CAN_Enable_Motor(uint8_t CAN_ID)
     HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan2, &header, data);
 }
 
-/**
-  * @brief  获取当前位置（度）
-  * @retval 当前位置（度）
-  */
-float DM_Get_Position_Deg(void)
+void DM_CAN_Disable_Motor(uint8_t CAN_ID) 
 {
-    return dm4310_fb.position_deg;
+    FDCAN_TxHeaderTypeDef header;
+    uint8_t data[8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFD};
+
+    header.Identifier = 0x100 + CAN_ID;
+    header.IdType = FDCAN_STANDARD_ID;
+    header.TxFrameType = FDCAN_DATA_FRAME;
+    header.DataLength = FDCAN_DLC_BYTES_8;
+    header.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
+    header.BitRateSwitch = FDCAN_BRS_OFF;
+    header.FDFormat = FDCAN_CLASSIC_CAN;
+    header.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
+    header.MessageMarker = 0;
+
+    HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan2, &header, data);
 }
 
-/**
-  * @brief  获取当前位置（弧度）
-  * @retval 当前位置（弧度）
-  */
-float DM_Get_Position_Rad(void)
+void DM_CAN_Save_Zero_Motor(uint8_t CAN_ID) 
 {
-    return dm4310_fb.position_rad;
+    FDCAN_TxHeaderTypeDef header;
+    uint8_t data[8] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE};
+
+    header.Identifier = 0x100 + CAN_ID;
+    header.IdType = FDCAN_STANDARD_ID;
+    header.TxFrameType = FDCAN_DATA_FRAME;
+    header.DataLength = FDCAN_DLC_BYTES_8;
+    header.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
+    header.BitRateSwitch = FDCAN_BRS_OFF;
+    header.FDFormat = FDCAN_CLASSIC_CAN;
+    header.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
+    header.MessageMarker = 0;
+
+    HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan2, &header, data);
 }
 
-/**
-  * @brief  获取当前速度（弧度/秒）
-  * @retval 当前速度（弧度/秒）
-  */
-float DM_Get_Velocity_RadS(void)
-{
-    return dm4310_fb.velocity_rads;
-}
-
-/**
-  * @brief  获取当前扭矩（Nm）
-  * @retval 当前扭矩（Nm）
-  */
-float DM_Get_Torque_Nm(void)
-{
-    return dm4310_fb.torque_Nm;
-}
-
-/**
-  * @brief  获取错误状态
-  * @retval 错误状态
-  */
-uint8_t DM_Get_Error_Status(void)
-{
-    return dm4310_fb.error;
-}
 
 /* USER CODE END Exported functions */

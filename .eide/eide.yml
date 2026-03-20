@@ -5,6 +5,7 @@ deviceName: null
 packDir: null
 srcDirs:
   - Core
+  - Middlewares
   - Drivers
 virtualFolder:
   name: <virtual_root>
@@ -28,6 +29,9 @@ targets:
         - Drivers/STM32H7xx_HAL_Driver/Inc/Legacy
         - Drivers/CMSIS/Device/ST/STM32H7xx/Include
         - Drivers/CMSIS/Include
+        - Middlewares/Third_Party/FreeRTOS/Source/include
+        - Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2
+        - Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
       libList: []
     excludeList: []
     toolchain: GCC
@@ -43,8 +47,6 @@ targets:
             ASM_FLAGS: -DDEBUG
           beforeBuildTasks: []
           c/cpp-compiler:
-            CXX_FLAGS: ""
-            C_FLAGS: ""
             language-c: c11
             language-cpp: c++11
             one-elf-section-per-data: true
@@ -53,17 +55,18 @@ targets:
             warnings: all-warnings
           global:
             $float-abi-type: hard
-            misc-control: []
+            arm-thumb-mode: thumb
             not-use-syscalls: true
             output-debug-info: enable
             use-newlib-nano: true
           linker:
             $outputTaskExcludes:
               - .bin
-            LD_FLAGS: ""
-            LIB_FLAGS: ""
+            $toolName: auto
             output-format: elf
             remove-unused-input-sections: true
+            use-float-printf: true
+            use-float-scanf: true
         scatterFilePath: STM32H723VGTX_FLASH.ld
         storageLayout:
           RAM: []
@@ -107,6 +110,9 @@ targets:
         - Drivers/STM32H7xx_HAL_Driver/Inc/Legacy
         - Drivers/CMSIS/Device/ST/STM32H7xx/Include
         - Drivers/CMSIS/Include
+        - Middlewares/Third_Party/FreeRTOS/Source/include
+        - Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2
+        - Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
       libList: []
     excludeList: []
     toolchain: GCC

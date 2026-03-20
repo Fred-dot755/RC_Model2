@@ -9,4 +9,6 @@
 extern SPI_HandleTypeDef WS2812_SPI_UNIT;
  
 void WS2812_Ctrl(uint8_t r, uint8_t g, uint8_t b);
+void RGB_Color_Ctrl(uint8_t r, uint8_t g, uint8_t b);
+
 #endif

@@ -38,6 +38,8 @@ extern UART_HandleTypeDef huart2;
 
 extern UART_HandleTypeDef huart3;
 
+extern UART_HandleTypeDef huart10;
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
@@ -45,8 +47,13 @@ extern UART_HandleTypeDef huart3;
 void MX_USART1_UART_Init(void);
 void MX_USART2_UART_Init(void);
 void MX_USART3_UART_Init(void);
+void MX_USART10_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
+void USER_UART_IRQHandler(UART_HandleTypeDef *huart);
+void USAR_UART10_IDLECallback(UART_HandleTypeDef *huart);
+
+
 
 /* USER CODE END Prototypes */
 

@@ -48,6 +48,12 @@ extern "C" {
 #include "ws2812.h"
 #include "unitree_go.h"
 #include "motordm.h"
+#include "remote.h"
+#include "chassic.h"
+
+
+#include "cmsis_os.h"
+
 
 /* USER CODE END Includes */
 
@@ -58,7 +64,26 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-#define PI 3.14159265358979323846f
+// #define PI 3.14159265358979323846f
+extern int q;
+extern uint8_t q_2;
+extern int unitree_angle_turn;
+extern int unitree_lift;
+extern int dm_arm;
+extern int dm_wrist;
+
+extern int lift;
+extern int down;
+
+extern int angle;
+extern int speed;
+extern int span;
+extern int span_t;
+extern int lift;
+extern int down;
+
+
+extern int remote_mode;
 
 /* USER CODE END EC */
 

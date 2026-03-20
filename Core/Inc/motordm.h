@@ -70,7 +70,7 @@ typedef struct {
 /* USER CODE END Exported types */
 
 /* USER CODE BEGIN Exported variables */
-extern DM4310_Feedback_t dm4310_fb;
+extern DM4310_Feedback_t dm4310_fb[2];
 
 /* USER CODE END Exported variables */
 
@@ -83,6 +83,9 @@ void DM_Motor_Init(void);
 void DM_CAN_Send_PosVel_Mode(float p_des, float v_des, uint8_t CAN_ID);
 void DM_CAN_Send_Vel_Mode(float v_des, uint8_t CAN_ID);
 void DM_CAN_Enable_Motor(uint8_t CAN_ID);
+void DM_CAN_Disable_Motor(uint8_t CAN_ID) ;
+void DM_CAN_Save_Zero_Motor(uint8_t CAN_ID) ;
+
 
 // 反馈处理函数（需要在FDCAN回调中调用）
 void DM_Process_Rx_Message(uint32_t StdId, uint8_t* data);

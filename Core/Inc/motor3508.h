@@ -13,8 +13,7 @@ typedef struct
 	int   target_distance;		//目标距离
 	int   accumulated_distance;	//累计距离
 
-	pid_struct pid_speed;		//速度PID
-	pid_struct pid_loc;			//位置PID
+
 
     float ExpectAngle;			//期望角度 可通过脉冲数转换
     float OutSpeed;				//PID控制器输出

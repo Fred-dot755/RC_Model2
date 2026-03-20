@@ -1,6 +1,17 @@
-#include "main.h"
+#include "pid.h"
 
-pid_struct pid_3508[8] = {0};
+float pid_3508[6];
+pid_struct pid_3508_speed[6];		//速度PID
+pid_struct pid_3508_loc[6];			//位置PID
+
+void PID_Init_All(void)
+{
+    for(int i=0;i<6;i++)
+    {
+        PID_Init(&pid_3508_speed[i]);
+        PID_Init(&pid_3508_loc[i]);
+    }
+}
 
 void PID_Init(pid_struct *pid)
 {
@@ -103,4 +114,5 @@ void position_accumulation(int ID)
 		}
 	
 }
+
 

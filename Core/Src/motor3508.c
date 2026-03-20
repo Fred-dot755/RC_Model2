@@ -129,10 +129,34 @@ void Motor3508_Process_Rx_Message(FDCAN_HandleTypeDef *hfdcan, FDCAN_RxHeaderTyp
                 position_accumulation(0);
                 break;
             case 0x202:
+                motor[1].NowSpeed = (int16_t)(RxData[2] << 8 | RxData[3]);
+                motor[1].LastEnconder = motor[1].NowEnconder;
+                motor[1].NowEnconder = (uint16_t)(RxData[0] << 8 | RxData[1]);
+                position_accumulation(1);
                 break;
             case 0x203:
+                motor[2].NowSpeed = (int16_t)(RxData[2] << 8 | RxData[3]);
+                motor[2].LastEnconder = motor[2].NowEnconder;
+                motor[2].NowEnconder = (uint16_t)(RxData[0] << 8 | RxData[1]);
+                position_accumulation(2);
                 break;
             case 0x204:
+                motor[3].NowSpeed = (int16_t)(RxData[2] << 8 | RxData[3]);
+                motor[3].LastEnconder = motor[3].NowEnconder;
+                motor[3].NowEnconder = (uint16_t)(RxData[0] << 8 | RxData[1]);
+                position_accumulation(3);
+                break;
+            case 0x205:
+                motor[4].NowSpeed = (int16_t)(RxData[2] << 8 | RxData[3]);
+                motor[4].LastEnconder = motor[4].NowEnconder;
+                motor[4].NowEnconder = (uint16_t)(RxData[0] << 8 | RxData[1]);
+                position_accumulation(4);
+                break;
+            case 0x206:
+                motor[5].NowSpeed = (int16_t)(RxData[2] << 8 | RxData[3]);
+                motor[5].LastEnconder = motor[5].NowEnconder;
+                motor[5].NowEnconder = (uint16_t)(RxData[0] << 8 | RxData[1]);
+                position_accumulation(5);
                 break;
             default:
                 // printf("未知ID:%x ", RxHeader->Identifier);

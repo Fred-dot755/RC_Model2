@@ -5,6 +5,7 @@
  * @date 2026-03-07
  * 
  * @note 基于Unitree官方协议，适配STM32H723平台，使用硬件RS485(USART2)
+ * @note 直接输入角度(数据已处理)
  */
 
 #include "unitree_go.h"
@@ -24,6 +25,7 @@ UnitreeMotorCmd_t unitree_cmd[UNITREE_MOTOR_NUM];
 UnitreeMotorData_t unitree_data[UNITREE_MOTOR_NUM];
 float unitree_angle_init[UNITREE_MOTOR_NUM] = {0};
 int unitree_flag[UNITREE_MOTOR_NUM] = {0};
+DataRecive_t unitree_data_receive[UNITREE_MOTOR_NUM] = {0};
 
 uint32_t unitree_rx_timeout = 0;
 
@@ -127,25 +129,25 @@ void unitree_extract_data(UnitreeMotorData_t *motor_r)
 }
 
 /**
- * @brief 创建电机命令
+ * @brief 创建电机命令（角度单位）
  * @param cmd 命令结构体指针
  * @param id 电机ID (0-14)
  * @param mode 工作模式 (0:锁定 1:FOC控制 2:编码器校准)
  * @param K_P 位置刚度系数 (0-25.599)
  * @param K_W 速度刚度系数 (0-25.599)
- * @param Pos 期望位置 (rad)
- * @param W 期望速度 (rad/s)
+ * @param Pos_deg 期望位置 (度)
+ * @param W_deg_s 期望速度 (度/秒)
  * @param T 期望扭矩 (Nm)
  */
 void unitree_cmd_create(UnitreeMotorCmd_t *cmd, uint8_t id, uint8_t mode, 
-                        float K_P, float K_W, float Pos, float W, float T)
+                        float K_P, float K_W, float Pos_deg, float W_deg_s, float T)
 {
     cmd->id = id;
     cmd->mode = mode;
     cmd->K_P = K_P;
     cmd->K_W = K_W;
-    cmd->Pos = Pos;
-    cmd->W = W;
+    cmd->Pos = Pos_deg;      // 存储角度值
+    cmd->W = W_deg_s;        // 存储角度/秒值
     cmd->T = T;
 }
 
@@ -179,7 +181,9 @@ HAL_StatusTypeDef unitree_receive_feedback(uint8_t motor_id)
         
     // 使用DMA接收数据
     return HAL_UARTEx_ReceiveToIdle_DMA(&huart2, (uint8_t *)&unitree_data[motor_id].motor_recv_data, 
-                                       sizeof(unitree_data[motor_id].motor_recv_data) + 1);//手动对齐
+                                       sizeof(unitree_data[motor_id].motor_recv_data)+1);
+    // return HAL_UART_Receive(&huart2, (uint8_t *)&unitree_data_receive[motor_id].data, 
+    //                         sizeof(unitree_data_receive[motor_id].data), 100);
 }
 
 /**
@@ -205,6 +209,7 @@ HAL_StatusTypeDef unitree_communicate(uint8_t motor_id)
         return status;
         
     // 解析数据
+    // memcpy(&unitree_data[motor_id].motor_recv_data, unitree_data_receive[motor_id].data, sizeof(RIS_MotorData_t));
     unitree_extract_data(&unitree_data[motor_id]);
     
     return HAL_OK;

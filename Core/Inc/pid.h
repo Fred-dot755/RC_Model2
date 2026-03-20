@@ -1,18 +1,7 @@
-/*********************************************************************************************************************
-* 文件名称          pid.h
-* 学校名称          沈阳工业大学
-* 组织名称          MEIC
-* 开发环境          Keil5
-* 适用平台          STM32 F407
-* 修改记录
-* 日期              作者                备注
-* 2025-01-11        LZJ.            first version
-**********************************************************************************************************************/
 #ifndef __PID_H
 #define __PID_H
+
 #include "main.h"
-
-
 
 typedef struct
 {
@@ -31,8 +20,11 @@ typedef struct
 	int   pid_loc_result;   //位置PID计算结果
 }pid_struct;
 
-extern pid_struct pid_3508[8];
+extern float pid_3508[6];
+extern pid_struct pid_3508_speed[6];	
+extern pid_struct pid_3508_loc[6];	
 
+void PID_Init_All(void);
 void PID_Init(pid_struct *pid);
 
 float PID_Calc(pid_struct *pid,float kp,float ki,float kd,float speed,float feedback_speed);
@@ -40,4 +32,3 @@ float PID_Calc(pid_struct *pid,float kp,float ki,float kd,float speed,float feed
 void position_accumulation(int ID);
 
 #endif
-

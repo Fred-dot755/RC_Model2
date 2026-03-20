@@ -21,3 +21,8 @@ void WS2812_Ctrl(uint8_t r, uint8_t g, uint8_t b)
         HAL_SPI_Transmit(&WS2812_SPI_UNIT, &res, 1, 0xFFFF);
     }
 }
+
+void RGB_Color_Ctrl(uint8_t r, uint8_t g, uint8_t b)
+{
+    WS2812_Ctrl(r, g, b);
+}
