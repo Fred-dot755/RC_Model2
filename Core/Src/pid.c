@@ -1,19 +1,28 @@
+//written by Fred Xiao
+
 #include "pid.h"
 
-float pid_3508[6];
-pid_struct pid_3508_speed[6];		//速度PID
-pid_struct pid_3508_loc[6];			//位置PID
+float pid_3508[12];
+pid_str pid_3508_speed[12];		//速度PID
+pid_str pid_3508_loc[12];			//位置PID
+
+pid_str pid_span;
+float pid_span_result;
+
+int motor_angle1;
+int motor_angle2;
 
 void PID_Init_All(void)
 {
-    for(int i=0;i<6;i++)
+    for(int i=0;i<12;i++)
     {
         PID_Init(&pid_3508_speed[i]);
         PID_Init(&pid_3508_loc[i]);
     }
+	PID_Init(&pid_span);
 }
 
-void PID_Init(pid_struct *pid)
+void PID_Init(pid_str *pid)
 {
     pid->Kp				=	0;
     pid->Ki				=	0;
@@ -35,7 +44,7 @@ void PID_Init(pid_struct *pid)
 }
 
 
-float PID_Calc(pid_struct *pid,float kp,float ki,float kd,float speed,float feedback_speed)
+float PID_Calc(pid_str *pid,float kp,float ki,float kd,float speed,float feedback_speed)
 {
     pid->Kp				=	kp;
     pid->Ki				=	ki;
@@ -114,5 +123,201 @@ void position_accumulation(int ID)
 		}
 	
 }
+
+
+void PID_Calc_All(void)
+{
+	pid_3508[0] = PID_Calc(&pid_3508_speed[0], 5.0f, 0.025f, 0.0f, result.motor1.out, motor[0].NowSpeed);
+    pid_3508[1] = -PID_Calc(&pid_3508_speed[1], 5.0f, 0.025f, 0.0f, result.motor2.out, -motor[1].NowSpeed);
+    pid_3508[2] = -PID_Calc(&pid_3508_speed[2], 5.0f, 0.025f, 0.0f, result.motor3.out, -motor[2].NowSpeed);
+    pid_3508[3] = PID_Calc(&pid_3508_speed[3], 5.0f, 0.025f, 0.0f, result.motor4.out, motor[3].NowSpeed);
+    pid_3508[4] = -PID_Calc(&pid_3508_speed[4], 3.0f, 0.015f, 0.0f, result.motor5.out, -motor[4].NowSpeed);
+    pid_3508[5] = PID_Calc(&pid_3508_speed[5], 3.0f, 0.015f, 0.0f, result.motor6.out, motor[5].NowSpeed);
+	pid_3508[6] = PID_Calc(&pid_3508_speed[6], 3.0f, 0.015f, 0.0f, result.motor7.out, motor[6].NowSpeed);
+	pid_3508[7] = -PID_Calc(&pid_3508_speed[7], 3.0f, 0.015f, 0.0f, result.motor8.out, -motor[7].NowSpeed);
+
+	pid_3508[8] = PID_Calc(&pid_3508_loc[8], 1.40, 0.10, 0.70, PID_Calc(&pid_3508_speed[8], 0.55, 0, 0.20, motor[8].ExpectAngle, motor[8].accumulated_distance), motor[8].NowSpeed);
+	pid_3508[9] = PID_Calc(&pid_3508_loc[9], 1.40, 0.10, 0.70, PID_Calc(&pid_3508_speed[9], 0.55, 0, 0.20, motor[9].ExpectAngle, motor[9].accumulated_distance), motor[9].NowSpeed);
+
+	pid_3508[10] = PID_Calc(&pid_3508_loc[10], 0.80, 0.10, 0.40, PID_Calc(&pid_3508_speed[10], 0.55, 0, 0.20, motor[10].ExpectAngle, motor[10].accumulated_distance), motor[10].NowSpeed);
+	pid_3508[11] = PID_Calc(&pid_3508_loc[11], 0.80, 0.10, 0.40, PID_Calc(&pid_3508_speed[11], 0.55, 0, 0.20, motor[11].ExpectAngle, motor[11].accumulated_distance), motor[11].NowSpeed);
+
+}
+
+
+
+
+
+Chassis_Force_Controller_t chassis_controller;
+#define SQRT2 1.4142135f
+
+
+/**
+ * @brief 浮点数限位函数
+ */
+static inline float Clamp(float val, float min, float max) {
+    if (val > max) return max;
+    if (val < min) return min;
+    return val;
+}
+
+
+void Chassis_Force_Control_Init(Chassis_Force_Controller_t *chassis) {
+    // 初始化底盘物理参数
+    chassis->params.wheel_radius = 0.076f;      /* 麦克纳姆轮半径 76mm */
+    chassis->params.half_length  = 0.155f;      /* 半长 a */
+    chassis->params.half_width   = 0.177f;      /* 半宽 b */
+    chassis->params.k_param      = 0.332f;      /* k = a + b */
+    chassis->params.mass         = 25.0f;       /* 底盘质量 */
+    chassis->params.inertia      = 0.461f;      /* 转动惯量 J */
+    chassis->params.torque_max   = 80.0f;        /* 最大扭矩 */
+
+    // 初始化航向角位置环 PID 参数
+    chassis->pid_theta.Kp = 10.0f;  chassis->pid_theta.Ki = 0.1f; chassis->pid_theta.Kd = 3.0f;
+    chassis->pid_theta.I_Max = 1.0f; chassis->pid_theta.V_Max = 6.0f;  /* 输出限幅 rad/s */
+
+    // 初始化目标加速度 PID 参数
+    // vx
+    chassis->pid_vx.Kp = 10.0f;  chassis->pid_vx.Ki = 0.05f; chassis->pid_vx.Kd = 0.0f;
+    chassis->pid_vx.I_Max = 2.0f; chassis->pid_vx.V_Max = 10.0f;
+    // vy
+    chassis->pid_vy.Kp = 10.0f;  chassis->pid_vy.Ki = 0.05f; chassis->pid_vy.Kd = 0.0f;
+    chassis->pid_vy.I_Max = 2.0f; chassis->pid_vy.V_Max = 10.0f;
+    // wz
+    chassis->pid_wz.Kp = 8.0f;  chassis->pid_wz.Ki = 0.0f; chassis->pid_wz.Kd = 0.0f;
+    chassis->pid_wz.I_Max = 2.0f; chassis->pid_wz.V_Max = 15.0f;
+
+    // 初始化位置环状态
+    chassis->state.target_theta = 0.0f;
+    chassis->state.theta_est    = 0.0f;
+
+    chassis->pid_wheel1.Kp = 5.0f; chassis->pid_wheel1.Ki = 0.025f; chassis->pid_wheel1.Kd = 0.0f;
+    chassis->pid_wheel1.I_Max = 1.0f; chassis->pid_wheel1.V_Max = 50;
+    
+    chassis->pid_wheel2.Kp = 5.0f; chassis->pid_wheel2.Ki = 0.025f; chassis->pid_wheel2.Kd = 0.0f;
+    chassis->pid_wheel2.I_Max = 1.0f; chassis->pid_wheel2.V_Max = 50;
+    
+    chassis->pid_wheel3.Kp = 5.0f; chassis->pid_wheel3.Ki = 0.025f; chassis->pid_wheel3.Kd = 0.0f;
+    chassis->pid_wheel3.I_Max = 1.0f; chassis->pid_wheel3.V_Max = 50;
+    
+    chassis->pid_wheel4.Kp = 5.0f; chassis->pid_wheel4.Ki = 0.025f; chassis->pid_wheel4.Kd = 0.0f;
+    chassis->pid_wheel4.I_Max = 1.0f; chassis->pid_wheel4.V_Max = 50;
+}
+
+void Chassis_Force_Control_Update(Chassis_Force_Controller_t *chassis) {
+    float r = chassis->params.wheel_radius;
+    float k = chassis->params.k_param;
+    float m = chassis->params.mass;
+    float J = chassis->params.inertia;
+    
+    chassis->state.w1_real = (float)motor[0].NowSpeed * RPM_TO_RADS;
+    chassis->state.w2_real = (float)-motor[1].NowSpeed * RPM_TO_RADS;
+    chassis->state.w3_real = (float)-motor[2].NowSpeed * RPM_TO_RADS;
+    chassis->state.w4_real = (float)motor[3].NowSpeed * RPM_TO_RADS;
+
+    float w1 =  chassis->state.w1_real;
+    float w2 =  chassis->state.w2_real;   
+    float w3 =  chassis->state.w3_real;   
+    float w4 =  chassis->state.w4_real;
+
+    float sqrt2_r_4 = (SQRT2 * r) / 4.0f;
+
+
+    chassis->state.vx_obs =  sqrt2_r_4 * (w1 + w2 + w3 + w4);
+    chassis->state.vy_obs =  sqrt2_r_4 * (-w1 + w2 - w3 + w4);
+    chassis->state.wz_obs =  sqrt2_r_4 * (1.0f / k) * (w1 - w2 - w3 + w4);
+
+
+    float theta_feedback = ops.HIPNUCAngleZ * PI / 180.0f;
+    
+    float theta_err = chassis->state.target_theta - theta_feedback;
+    while (theta_err >  PI) theta_err -= 2.0f * PI;
+    while (theta_err < -PI) theta_err += 2.0f * PI;
+    
+    chassis->state.target_wz = -PID_Calc(&chassis->pid_theta,
+                                          chassis->pid_theta.Kp, chassis->pid_theta.Ki, chassis->pid_theta.Kd,
+                                          theta_err, 0.0f);
+
+
+    float ax = PID_Calc(&chassis->pid_vx, chassis->pid_vx.Kp, chassis->pid_vx.Ki, chassis->pid_vx.Kd, 
+                        chassis->state.target_vx, chassis->state.vx_obs);
+    
+    float ay = PID_Calc(&chassis->pid_vy, chassis->pid_vy.Kp, chassis->pid_vy.Ki, chassis->pid_vy.Kd, 
+                        chassis->state.target_vy, chassis->state.vy_obs);
+    
+    float alpha = PID_Calc(&chassis->pid_wz, chassis->pid_wz.Kp, chassis->pid_wz.Ki, chassis->pid_wz.Kd, 
+                           chassis->state.target_wz, chassis->state.wz_obs);
+
+
+    float p1_dot_a = -ax + ay;
+    float p2_dot_a = -ax - ay;
+    float p3_dot_a =  ax - ay;
+    float p4_dot_a =  ax + ay;
+
+    float torque_theta = (J / k) * alpha;
+
+    float tau_ff1 = -sqrt2_r_4 * (m * p1_dot_a + torque_theta);
+    float tau_ff2 = -sqrt2_r_4 * (m * p2_dot_a + torque_theta);
+    float tau_ff3 = -sqrt2_r_4 * (m * p3_dot_a + torque_theta);
+    float tau_ff4 = -sqrt2_r_4 * (m * p4_dot_a + torque_theta);
+
+
+    float sqrt2_invR = SQRT2 / r;
+    float w1_exp = sqrt2_invR * ( chassis->state.target_vx - chassis->state.target_vy + k * chassis->state.target_wz);
+    float w2_exp = sqrt2_invR * ( chassis->state.target_vx + chassis->state.target_vy - k * chassis->state.target_wz);
+    float w3_exp = sqrt2_invR * ( chassis->state.target_vx - chassis->state.target_vy - k * chassis->state.target_wz);
+    float w4_exp = sqrt2_invR * ( chassis->state.target_vx + chassis->state.target_vy + k * chassis->state.target_wz);
+
+    float tau_pid1 = PID_Calc(&chassis->pid_wheel1, chassis->pid_wheel1.Kp, chassis->pid_wheel1.Ki, chassis->pid_wheel1.Kd, 
+                              w1_exp, w1);
+    float tau_pid2 = PID_Calc(&chassis->pid_wheel2, chassis->pid_wheel2.Kp, chassis->pid_wheel2.Ki, chassis->pid_wheel2.Kd, 
+                              w2_exp, w2);
+    float tau_pid3 = PID_Calc(&chassis->pid_wheel3, chassis->pid_wheel3.Kp, chassis->pid_wheel3.Ki, chassis->pid_wheel3.Kd, 
+                              w3_exp, w3);
+    float tau_pid4 = PID_Calc(&chassis->pid_wheel4, chassis->pid_wheel4.Kp, chassis->pid_wheel4.Ki, chassis->pid_wheel4.Kd, 
+                              w4_exp, w4);
+
+    float t_max = chassis->params.torque_max;
+    
+    chassis->state.tau_out1 =  Clamp(tau_ff1 + tau_pid1, -t_max, t_max);
+    chassis->state.tau_out2 = -Clamp(tau_ff2 + tau_pid2, -t_max, t_max);  
+    chassis->state.tau_out3 = -Clamp(tau_ff3 + tau_pid3, -t_max, t_max); 
+    chassis->state.tau_out4 =  Clamp(tau_ff4 + tau_pid4, -t_max, t_max);
+
+
+    pid_3508[0] = (int)(chassis->state.tau_out1 * TORQUE_TO_CAN_RATIO);
+    pid_3508[1] = (int)(chassis->state.tau_out2 * TORQUE_TO_CAN_RATIO);
+    pid_3508[2] = (int)(chassis->state.tau_out3 * TORQUE_TO_CAN_RATIO);
+    pid_3508[3] = (int)(chassis->state.tau_out4 * TORQUE_TO_CAN_RATIO);
+
+}
+
+
+#define MAX_CHASSIS_SPEED  0.5f   
+#define MAX_CHASSIS_WZ     3.0f  
+
+void RC_Data_To_Chassis_Target(void) {
+    
+    float target_speed = rc_data.distance;
+    float target_angle = rc_data.angle;
+    
+    float angle_rad = target_angle * PI / 180.0f;
+    
+    float vx = target_speed * cosf(angle_rad);
+    float vy = -target_speed * sinf(angle_rad);
+    
+    float speed_mag = sqrtf(vx * vx + vy * vy);
+    if (speed_mag > MAX_CHASSIS_SPEED) {
+        float scale = MAX_CHASSIS_SPEED / speed_mag;
+        vx *= scale;
+        vy *= scale;
+    }
+    chassis_controller.state.target_vx = vx;
+    chassis_controller.state.target_vy = vy;
+
+    chassis_controller.state.target_theta = R2_Extern.angle_balance * PI / 180.0f;
+}
+
+
 
 

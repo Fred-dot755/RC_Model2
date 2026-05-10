@@ -1,4 +1,6 @@
 /* USER CODE BEGIN Header */
+//written by Fred Xiao
+
 /**
   ******************************************************************************
   * @file    motordm.c
@@ -113,10 +115,11 @@ void DM_Process_Rx_Message(uint32_t StdId, uint8_t* data)
       
 
       dm4310_fb[0].position_rad  = current_abs_rad - dm4310_fb[0].pos_offset_rad;//角度???
-      dm4310_fb[0].position_deg  = (dm4310_fb[0].position_rad - current_abs_rad) * (180.0f / DM_PI);
+      dm4310_fb[0].position_deg  = -dm4310_fb[0].position_rad * (180.0f / DM_PI);
       dm4310_fb[0].velocity_rads = dm_uint_to_float(v_int, DM_V_MIN, DM_V_MAX, 12);
       dm4310_fb[0].torque_Nm     = dm_uint_to_float(t_int, DM_T_MIN, DM_T_MAX, 12);
       }
+      
     if (StdId == 0x03 ) 
     {
       dm4310_fb[1].id    = data[0] & 0x0F;
@@ -139,7 +142,7 @@ void DM_Process_Rx_Message(uint32_t StdId, uint8_t* data)
       }
 
       dm4310_fb[1].position_rad  = current_abs_rad - dm4310_fb[1].pos_offset_rad;
-      dm4310_fb[1].position_deg  = (dm4310_fb[1].position_rad - current_abs_rad) * (180.0f / DM_PI);
+      dm4310_fb[1].position_deg  = -dm4310_fb[1].position_rad * (180.0f / DM_PI);
       dm4310_fb[1].velocity_rads = dm_uint_to_float(v_int, DM_V_MIN, DM_V_MAX, 12);
       dm4310_fb[1].torque_Nm     = dm_uint_to_float(t_int, DM_T_MIN, DM_T_MAX, 12);
     }

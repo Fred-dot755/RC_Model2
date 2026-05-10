@@ -1,6 +1,8 @@
+//written by Fred Xiao
+
 #include "motor3508.h" 
 
-DJmotor_struct motor[8];
+DJmotor_struct motor[12];
 
 // 底盘电机控制数据结构
 uint8_t chassis_fdcan1_send_data_0x200[8] = {0};
@@ -14,6 +16,13 @@ FDCAN_TxHeaderTypeDef chassis_tx_message_fdcan2_0x200;
 
 uint8_t chassis_fdcan2_send_data_0x1FF[8] = {0};
 FDCAN_TxHeaderTypeDef chassis_tx_message_fdcan2_0x1FF;
+
+uint8_t chassis_fdcan3_send_data_0x200[8] = {0};
+FDCAN_TxHeaderTypeDef chassis_tx_message_fdcan3_0x200;
+
+uint8_t chassis_fdcan3_send_data_0x1FF[8] = {0};
+FDCAN_TxHeaderTypeDef chassis_tx_message_fdcan3_0x1FF;
+
 
 // FDCAN1 发送函数
 void FDCAN_cmd_chassis_fdcan1_0x200(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4)
@@ -113,6 +122,57 @@ void FDCAN_cmd_chassis_fdcan2_0x1FF(int16_t motor1, int16_t motor2, int16_t moto
     HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan2, &chassis_tx_message_fdcan2_0x1FF, chassis_fdcan2_send_data_0x1FF);
 }
 
+
+// FDCAN3 发送函数
+void FDCAN_cmd_chassis_fdcan3_0x200(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4)
+{
+    chassis_tx_message_fdcan3_0x200.Identifier = 0x200;
+    chassis_tx_message_fdcan3_0x200.IdType = FDCAN_STANDARD_ID;
+    chassis_tx_message_fdcan3_0x200.TxFrameType = FDCAN_DATA_FRAME;
+    chassis_tx_message_fdcan3_0x200.DataLength = FDCAN_DLC_BYTES_8;
+    chassis_tx_message_fdcan3_0x200.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
+    chassis_tx_message_fdcan3_0x200.BitRateSwitch = FDCAN_BRS_OFF;
+    chassis_tx_message_fdcan3_0x200.FDFormat = FDCAN_CLASSIC_CAN;
+    chassis_tx_message_fdcan3_0x200.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
+    chassis_tx_message_fdcan3_0x200.MessageMarker = 0;
+    
+    chassis_fdcan3_send_data_0x200[0] = (uint8_t)(motor1 >> 8);
+    chassis_fdcan3_send_data_0x200[1] = (uint8_t)(motor1 & 0xFF);
+    chassis_fdcan3_send_data_0x200[2] = (uint8_t)(motor2 >> 8);
+    chassis_fdcan3_send_data_0x200[3] = (uint8_t)(motor2 & 0xFF);
+    chassis_fdcan3_send_data_0x200[4] = (uint8_t)(motor3 >> 8);
+    chassis_fdcan3_send_data_0x200[5] = (uint8_t)(motor3 & 0xFF);
+    chassis_fdcan3_send_data_0x200[6] = (uint8_t)(motor4 >> 8);
+    chassis_fdcan3_send_data_0x200[7] = (uint8_t)(motor4 & 0xFF);
+    
+    HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan3, &chassis_tx_message_fdcan3_0x200, chassis_fdcan3_send_data_0x200);
+}
+
+void FDCAN_cmd_chassis_fdcan3_0x1FF(int16_t motor1, int16_t motor2, int16_t motor3, int16_t motor4)
+{
+    chassis_tx_message_fdcan3_0x1FF.Identifier = 0x1FF;
+    chassis_tx_message_fdcan3_0x1FF.IdType = FDCAN_STANDARD_ID;
+    chassis_tx_message_fdcan3_0x1FF.TxFrameType = FDCAN_DATA_FRAME;
+    chassis_tx_message_fdcan3_0x1FF.DataLength = FDCAN_DLC_BYTES_8;
+    chassis_tx_message_fdcan3_0x1FF.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
+    chassis_tx_message_fdcan3_0x1FF.BitRateSwitch = FDCAN_BRS_OFF;
+    chassis_tx_message_fdcan3_0x1FF.FDFormat = FDCAN_CLASSIC_CAN;
+    chassis_tx_message_fdcan3_0x1FF.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
+    chassis_tx_message_fdcan3_0x1FF.MessageMarker = 0;
+    
+    chassis_fdcan3_send_data_0x1FF[0] = (uint8_t)(motor1 >> 8);
+    chassis_fdcan3_send_data_0x1FF[1] = (uint8_t)(motor1 & 0xFF);
+    chassis_fdcan3_send_data_0x1FF[2] = (uint8_t)(motor2 >> 8);
+    chassis_fdcan3_send_data_0x1FF[3] = (uint8_t)(motor2 & 0xFF);
+    chassis_fdcan3_send_data_0x1FF[4] = (uint8_t)(motor3 >> 8);
+    chassis_fdcan3_send_data_0x1FF[5] = (uint8_t)(motor3 & 0xFF);
+    chassis_fdcan3_send_data_0x1FF[6] = (uint8_t)(motor4 >> 8);
+    chassis_fdcan3_send_data_0x1FF[7] = (uint8_t)(motor4 & 0xFF);
+    
+    HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan3, &chassis_tx_message_fdcan3_0x1FF, chassis_fdcan3_send_data_0x1FF);
+}
+
+
 // 电机数据处理函数（需要在FDCAN回调中调用）
 void Motor3508_Process_Rx_Message(FDCAN_HandleTypeDef *hfdcan, FDCAN_RxHeaderTypeDef *RxHeader, uint8_t *RxData)
 {
@@ -158,37 +218,57 @@ void Motor3508_Process_Rx_Message(FDCAN_HandleTypeDef *hfdcan, FDCAN_RxHeaderTyp
                 motor[5].NowEnconder = (uint16_t)(RxData[0] << 8 | RxData[1]);
                 position_accumulation(5);
                 break;
+            case 0x207:
+                motor[6].NowSpeed = (int16_t)(RxData[2] << 8 | RxData[3]);
+                motor[6].LastEnconder = motor[6].NowEnconder;
+                motor[6].NowEnconder = (uint16_t)(RxData[0] << 8 | RxData[1]);
+                position_accumulation(6);
+                break;
+            case 0x208:
+                motor[7].NowSpeed = (int16_t)(RxData[2] << 8 | RxData[3]);
+                motor[7].LastEnconder = motor[7].NowEnconder;
+                motor[7].NowEnconder = (uint16_t)(RxData[0] << 8 | RxData[1]);
+                position_accumulation(7);
+                break;
             default:
                 // printf("未知ID:%x ", RxHeader->Identifier);
                 break;
             }
         }
     }
-    else if(hfdcan->Instance == FDCAN2)
+    else if(hfdcan->Instance == FDCAN3)
     {
         if(RxHeader->Identifier & (2 << 8))
         {
             switch(RxHeader->Identifier)
             {
             case 0x201:
+                motor[8].NowSpeed = (int16_t)(RxData[2] << 8 | RxData[3]);
+                motor[8].LastEnconder = motor[8].NowEnconder;
+                motor[8].NowEnconder = (uint16_t)(RxData[0] << 8 | RxData[1]);
+                position_accumulation(8);
                 break;
             case 0x202:
+                motor[9].NowSpeed = (int16_t)(RxData[2] << 8 | RxData[3]);
+                motor[9].LastEnconder = motor[9].NowEnconder;
+                motor[9].NowEnconder = (uint16_t)(RxData[0] << 8 | RxData[1]);
+                position_accumulation(9);
                 break;
             case 0x203:
+                motor[10].NowSpeed = (int16_t)(RxData[2] << 8 | RxData[3]);
+                motor[10].LastEnconder = motor[10].NowEnconder;
+                motor[10].NowEnconder = (uint16_t)(RxData[0] << 8 | RxData[1]);
+                position_accumulation(10);
                 break;
             case 0x204:
-                break;
-            case 0x205:
-                break;
-            case 0x206:
-                break;
-            case 0x207:
-                break;
-            case 0x208:
+                motor[11].NowSpeed = (int16_t)(RxData[2] << 8 | RxData[3]);
+                motor[11].LastEnconder = motor[11].NowEnconder;
+                motor[11].NowEnconder = (uint16_t)(RxData[0] << 8 | RxData[1]);
+                position_accumulation(11);
                 break;
             default:
-                // printf("未知ID:%x ", RxHeader->Identifier);
-                break;
+
+            break;
             }
         }
     }

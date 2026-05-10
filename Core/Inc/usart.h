@@ -1,4 +1,6 @@
 /* USER CODE BEGIN Header */
+//written by Fred Xiao
+
 /**
   ******************************************************************************
   * @file    usart.h
@@ -32,6 +34,12 @@ extern "C" {
 
 /* USER CODE END Includes */
 
+extern UART_HandleTypeDef huart7;
+
+extern UART_HandleTypeDef huart8;
+
+extern UART_HandleTypeDef huart9;
+
 extern UART_HandleTypeDef huart1;
 
 extern UART_HandleTypeDef huart2;
@@ -41,9 +49,23 @@ extern UART_HandleTypeDef huart3;
 extern UART_HandleTypeDef huart10;
 
 /* USER CODE BEGIN Private defines */
+#define USART1_RX_BUF_LENGTH 256
+#define USART7_RX_BUF_LENGTH 256
+#define USART8_RX_BUF_LENGTH 256
+#define USART9_RX_BUF_LENGTH 256
+#define USART10_RX_BUF_LENGTH 256
+
+extern uint8_t uart_rx_byte;
+
+
+
+
 
 /* USER CODE END Private defines */
 
+void MX_UART7_Init(void);
+void MX_UART8_Init(void);
+void MX_UART9_Init(void);
 void MX_USART1_UART_Init(void);
 void MX_USART2_UART_Init(void);
 void MX_USART3_UART_Init(void);
@@ -51,6 +73,10 @@ void MX_USART10_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 void USER_UART_IRQHandler(UART_HandleTypeDef *huart);
+void USAR_UART7_IDLECallback(UART_HandleTypeDef *huart);
+void USAR_UART8_IDLECallback(UART_HandleTypeDef *huart);
+void USAR_UART9_IDLECallback(UART_HandleTypeDef *huart);
+void USAR_UART1_IDLECallback(UART_HandleTypeDef *huart);
 void USAR_UART10_IDLECallback(UART_HandleTypeDef *huart);
 
 

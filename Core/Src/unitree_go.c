@@ -1,12 +1,5 @@
-/**
- * @file unitree_go.c
- * @brief 宇树GO电机 (GO-M8010-6) RS485通信驱动实现
- * @version 1.0
- * @date 2026-03-07
- * 
- * @note 基于Unitree官方协议，适配STM32H723平台，使用硬件RS485(USART2)
- * @note 直接输入角度(数据已处理)
- */
+//written by Fred Xiao
+
 
 #include "unitree_go.h"
 #include <string.h>
@@ -19,6 +12,8 @@ extern DMA_HandleTypeDef hdma_usart2_rx;
 #endif
 
 int error_unitree = 0;
+
+int unitree_pos[2];
 
 // 全局变量定义
 UnitreeMotorCmd_t unitree_cmd[UNITREE_MOTOR_NUM];
@@ -123,6 +118,21 @@ void unitree_extract_data(UnitreeMotorData_t *motor_r)
             unitree_angle_init[motor_r->motor_id] = motor_r->Pos; 
             unitree_flag[motor_r->motor_id] = 1;
         }
+
+        if(motor_r->motor_id == 2)
+        {
+            motor_r->pos = motor_r->pos/1.625;
+        }
+
+        if(motor_r->motor_id == 2)
+        {
+            unitree_pos[0] = motor_r->pos;
+        }
+        if(motor_r->motor_id == 3)
+        {
+            unitree_pos[1] = motor_r->pos;
+        }
+
         
         return;
     }
@@ -149,6 +159,11 @@ void unitree_cmd_create(UnitreeMotorCmd_t *cmd, uint8_t id, uint8_t mode,
     cmd->Pos = Pos_deg;      // 存储角度值
     cmd->W = W_deg_s;        // 存储角度/秒值
     cmd->T = T;
+
+    if(cmd->id ==2)
+    {
+        cmd->Pos = cmd->Pos*1.625;
+    }
 }
 
 

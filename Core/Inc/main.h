@@ -1,4 +1,6 @@
 /* USER CODE BEGIN Header */
+//written by Fred Xiao
+
 /**
   ******************************************************************************
   * @file           : main.h
@@ -50,6 +52,16 @@ extern "C" {
 #include "motordm.h"
 #include "remote.h"
 #include "chassic.h"
+#include "HIPNUC.h"
+#include "kalman_filter.h"
+#include "laser.h"
+#include "visual.h"
+#include "control.h"
+#include "L1.h"
+#include "LADRC.h"
+#include "stddef.h"
+#include "arm_planning.h"
+#include "DH.h"
 
 
 #include "cmsis_os.h"
@@ -64,26 +76,6 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-// #define PI 3.14159265358979323846f
-extern int q;
-extern uint8_t q_2;
-extern int unitree_angle_turn;
-extern int unitree_lift;
-extern int dm_arm;
-extern int dm_wrist;
-
-extern int lift;
-extern int down;
-
-extern int angle;
-extern int speed;
-extern int span;
-extern int span_t;
-extern int lift;
-extern int down;
-
-
-extern int remote_mode;
 
 /* USER CODE END EC */
 
@@ -106,6 +98,14 @@ void Error_Handler(void);
 #define POWER_24V_1_GPIO_Port GPIOC
 #define POWER_5V_Pin GPIO_PIN_15
 #define POWER_5V_GPIO_Port GPIOC
+#define ACC_CS_Pin GPIO_PIN_0
+#define ACC_CS_GPIO_Port GPIOC
+#define GYRO_CS_Pin GPIO_PIN_3
+#define GYRO_CS_GPIO_Port GPIOC
+#define ACC_INT_Pin GPIO_PIN_10
+#define ACC_INT_GPIO_Port GPIOE
+#define GYRO_INT_Pin GPIO_PIN_12
+#define GYRO_INT_GPIO_Port GPIOE
 
 /* USER CODE BEGIN Private defines */
 

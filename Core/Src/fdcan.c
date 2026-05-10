@@ -1,4 +1,6 @@
 /* USER CODE BEGIN Header */
+//written by Fred Xiao
+
 /**
   ******************************************************************************
   * @file    fdcan.c
@@ -393,7 +395,7 @@ void fdcan_filter_init(void)
 {
     fdcan1_filter_init();
     fdcan2_filter_init();
-    // fdcan3_filter_init();
+    fdcan3_filter_init();
 }
 
 void fdcan1_filter_init(void)
@@ -496,12 +498,12 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
         }
         else if(hfdcan->Instance == FDCAN2)
         {
-            if(RxHeader.Identifier == 0x02 || RxHeader.Identifier == 0x03)
-            {
-                DM_Process_Rx_Message(RxHeader.Identifier, RxData);
-            }
+          DM_Process_Rx_Message(RxHeader.Identifier, RxData);
         }
-        // CAN3: 可扩展其他设备
+        else if(hfdcan->Instance == FDCAN3)
+        {
+            Motor3508_Process_Rx_Message(hfdcan, &RxHeader, RxData);
+        }
     }
 }
 

@@ -1,4 +1,5 @@
 /* USER CODE BEGIN Header */
+//written by Fred Xiao
 /**
   ******************************************************************************
   * @file           : main.c
@@ -33,21 +34,6 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-int unitree_angle_turn = 0;
-int unitree_lift = 0;
-int dm_arm = 0;
-int dm_wrist = 0;
-
-
-
-int angle=0;
-int speed=0;
-int span=0;
-int span_t=0;
-int lift=0;
-int down=0;
-
-int remote_mode = 0;
 
 
 /* USER CODE END PTD */
@@ -66,17 +52,16 @@ int remote_mode = 0;
 
 /* USER CODE BEGIN PV */
 uint8_t r = 1;
-uint8_t g = 255;
-uint8_t b = 1;
+uint8_t g = 1;
+uint8_t b = 255;
 
-int q =0;
-uint8_t q_2 =0;
 
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+void PeriphCommonClock_Config(void);
 static void MPU_Config(void);
 void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
@@ -114,6 +99,9 @@ int main(void)
   /* Configure the system clock */
   SystemClock_Config();
 
+  /* Configure the peripherals common clocks */
+  PeriphCommonClock_Config();
+
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
@@ -124,8 +112,6 @@ int main(void)
   MX_FDCAN1_Init();
   MX_FDCAN2_Init();
   MX_FDCAN3_Init();
-  MX_TIM1_Init();
-  MX_TIM2_Init();
   MX_TIM3_Init();
   MX_TIM12_Init();
   MX_USART1_UART_Init();
@@ -135,33 +121,55 @@ int main(void)
   MX_SPI6_Init();
   MX_TIM6_Init();
   MX_USART10_UART_Init();
+  MX_UART7_Init();
+  MX_UART9_Init();
+  MX_SPI3_Init();
+  MX_UART8_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim6);
-  
-  // Initialize FDCAN filters
+
+  L1_Init(&L1_Sensor1, &huart8);
+  L1_Init(&L1_Sensor2, &huart9);
+
   fdcan_filter_init();
   PID_Init_All();
 
-  WS2812_Ctrl(r, g, b);
-  
+  float measure_noise = 0.1f;    // 测量噪声(相信传感器)
+  float process_noise = 0.01f;   // 过程噪声(相信模型)
+  Kalman_Init(&filter, 0.0f, 1.0f, process_noise, measure_noise);
 
+  WS2812_Ctrl(r, g, b);
+
+  Chassis_Force_Control_Init(&chassis_controller);
+  
+  DM_Motor_Init();
   unitree_init();
-  while(unitree_angle_init[2] == 0)
+
+  while(unitree_angle_init[1] == 0 && unitree_angle_init[2] == 0 && unitree_angle_init[3] == 0)
   {
     unitree_cmd_create(&unitree_cmd[1], 1, 1, 0.0, 0.0, 0, 0.0, 0.0);
     unitree_communicate(1);
+    HAL_Delay(100);
     unitree_cmd_create(&unitree_cmd[2], 2, 1, 0.0, 0.0, 0, 0.0, 0.0);
     unitree_communicate(2);
+    HAL_Delay(100);
     unitree_cmd_create(&unitree_cmd[3], 3, 1, 0.0, 0.0, 0, 0.0, 0.0);
     unitree_communicate(3);
+    HAL_Delay(100);
+    unitree_cmd_create(&unitree_cmd[4], 4, 1, 0.0, 0.0, 0, 0.0, 0.0);
+    unitree_communicate(4);
+    HAL_Delay(100);
+    unitree_cmd_create(&unitree_cmd[5], 5, 1, 0.0, 0.0, 0, 0.0, 0.0);
+    unitree_communicate(5);
+    HAL_Delay(100);
   }
-  RGB_Color_Ctrl(255,255,255);
 
-  DM_Motor_Init();
+  //RGB变白，顺利启动
+  RGB_Color_Ctrl(255,1,255);
+
+
+  HAL_Delay(1000);
   
-
-
-
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -245,6 +253,24 @@ void SystemClock_Config(void)
   HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_HSI, RCC_MCODIV_1);
 }
 
+/**
+  * @brief Peripherals Common Clock Configuration
+  * @retval None
+  */
+void PeriphCommonClock_Config(void)
+{
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+
+  /** Initializes the peripherals clock
+  */
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_CKPER;
+  PeriphClkInitStruct.CkperClockSelection = RCC_CLKPSOURCE_HSE;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
@@ -298,13 +324,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 1 */
   if (htim->Instance == TIM6)
   {
-    pid_3508[2] = PID_Calc(&pid_3508_speed[2], 7.0f, 0.035f, 0.0f, result.motor1.out, motor[2].NowSpeed);
-    pid_3508[3] = -PID_Calc(&pid_3508_speed[3], 7.0f, 0.035f, 0.0f, result.motor2.out, -motor[3].NowSpeed);
-    pid_3508[4] = -PID_Calc(&pid_3508_speed[4], 7.0f, 0.035f, 0.0f, result.motor3.out, -motor[4].NowSpeed);
-    pid_3508[5] = PID_Calc(&pid_3508_speed[5], 7.0f, 0.035f, 0.0f, result.motor4.out, motor[5].NowSpeed);
-    pid_3508[0] = PID_Calc(&pid_3508_speed[0], 3.0f, 0.015f, 0.0f, lift+down, motor[0].NowSpeed);
-    pid_3508[1] = PID_Calc(&pid_3508_speed[1], 3.0f, 0.015f, 0.0f, lift+down, motor[1].NowSpeed);
+    PID_Calc_All();
 
+    RC_Data_To_Chassis_Target();
+    Chassis_Force_Control_Update(&chassis_controller);
 
   }
 

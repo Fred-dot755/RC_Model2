@@ -33,7 +33,9 @@ targets:
         - Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2
         - Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
       libList: []
-    excludeList: []
+    excludeList:
+      - Core/Src/omni_chassis.c
+    settings: {}
     toolchain: GCC
     toolchainConfigMap:
       GCC:
@@ -47,6 +49,8 @@ targets:
             ASM_FLAGS: -DDEBUG
           beforeBuildTasks: []
           c/cpp-compiler:
+            CXX_FLAGS: ""
+            C_FLAGS: ""
             language-c: c11
             language-cpp: c++11
             one-elf-section-per-data: true
@@ -55,18 +59,17 @@ targets:
             warnings: all-warnings
           global:
             $float-abi-type: hard
-            arm-thumb-mode: thumb
+            misc-control: []
             not-use-syscalls: true
             output-debug-info: enable
             use-newlib-nano: true
           linker:
             $outputTaskExcludes:
               - .bin
-            $toolName: auto
+            LD_FLAGS: ""
+            LIB_FLAGS: ""
             output-format: elf
             remove-unused-input-sections: true
-            use-float-printf: true
-            use-float-scanf: true
         scatterFilePath: STM32H723VGTX_FLASH.ld
         storageLayout:
           RAM: []
@@ -115,6 +118,7 @@ targets:
         - Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
       libList: []
     excludeList: []
+    settings: {}
     toolchain: GCC
     toolchainConfigMap:
       GCC:

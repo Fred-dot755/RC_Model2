@@ -1,11 +1,5 @@
-/**
- * @file unitree_go.h
- * @brief 宇树GO电机 (GO-M8010-6) RS485通信协议驱动
- * @version 1.0
- * @date 2026-03-07
- *
- * @note 基于Unitree官方协议，适配STM32H723平台
- */
+//written by Fred Xiao
+
 
 #ifndef __UNITREE_GO_H
 #define __UNITREE_GO_H
@@ -111,7 +105,7 @@ typedef struct
 } UnitreeMotorData_t;
 
 // 电机数量配置
-#define UNITREE_MOTOR_NUM 4
+#define UNITREE_MOTOR_NUM 8
 
 // 全局电机命令和反馈数组
 extern UnitreeMotorCmd_t unitree_cmd[UNITREE_MOTOR_NUM];
@@ -140,5 +134,7 @@ typedef struct
     uint8_t data[30];
 }DataRecive_t;
 extern DataRecive_t unitree_data_receive[UNITREE_MOTOR_NUM];
+
+extern int unitree_pos[2];
 
 #endif /* __UNITREE_GO_H */

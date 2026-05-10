@@ -1,4 +1,6 @@
 /* USER CODE BEGIN Header */
+//written by Fred Xiao
+
 /**
   ******************************************************************************
   * @file    fdcan.h

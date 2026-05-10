@@ -1,5 +1,8 @@
+//written by Fred Xiao
+
 #include "main.h"
 
+#define RX_BUF_SIZE 256
 RemoteData_t rc_data;
 
 // 数据解析标志位
@@ -25,65 +28,58 @@ uint16_t Calculate_CRC16(const char *data, uint16_t len)
     return crc;
 }
 
-
-// 处理一帧接收到的数据
 void Process_RC_Packet(char *packet, uint16_t len) 
 {
-    // 1. 寻找帧头 '['
+    // 1. 寻找帧头和帧尾
     char *start = strchr(packet, '[');
-    if (start == NULL) return; // 没找到头，直接丢弃
+    if (start == NULL) return; 
 
-    // 2. 【关键修复】从帧头所在的位置开始，向后寻找帧尾 ']'
     char *end = strchr(start, ']');
-    if (end == NULL) return;   // 没找到尾巴，说明数据不完整，直接丢弃
+    if (end == NULL) return;   
     
-    // (因为是从 start 向后找的，所以 end 必然大于 start，不再需要判断 end < start)
-
-    // 3. 截取 dataPart 的长度 (包含 '[' 和 ']')
     uint16_t data_len = end - start + 1;
 
-    // 4. 确保 ']' 后面至少有 4 个字符作为 CRC
-    if (strlen(end) < 5) return; // 修复越界隐患：确保字符串末尾有足够的长度供 CRC 读取
+    // 确保 ']' 后面至少有 4 个字符作为 CRC
+    if (strlen(end) < 5) return; 
 
-    // 5. 计算本地 CRC
+    // 2. 计算本地 CRC (如果你想进一步优化，可以把 Calculate_CRC16 换成查表法)
     uint16_t calc_crc = Calculate_CRC16(start, data_len);
 
-    // JS代码逻辑是 hi在前, lo在后，并转为大写 HEX
-    char calc_crc_str[5];
-    sprintf(calc_crc_str, "%02X%02X", (calc_crc >> 8) & 0xFF, calc_crc & 0xFF);
+    // 3. 【优化核心】将接收到的 4 位 HEX 字符串快速转换为 uint16_t 数字
+    uint16_t rx_crc = 0;
+    for (int i = 1; i <= 4; i++) {
+        rx_crc <<= 4; // 左移 4 位腾出空间
+        char c = end[i];
+        if (c >= '0' && c <= '9') {
+            rx_crc |= (c - '0');
+        } else if (c >= 'A' && c <= 'F') {
+            rx_crc |= (c - 'A' + 10);
+        } else if (c >= 'a' && c <= 'f') { // 兼容小写
+            rx_crc |= (c - 'a' + 10);
+        } else {
+            return; // 遇到非十六进制字符，说明数据错乱，丢弃
+        }
+    }
 
-    // 5. 提取接收到的 CRC (紧跟在 ']' 后面的4个字符)
-    char rx_crc_str[5] = {0};
-    strncpy(rx_crc_str, end + 1, 4);
-
-    // 6. 比较 CRC
-    if (strncmp(rx_crc_str, calc_crc_str, 4) == 0) 
+    // 4. 数字直接比对，极速！
+    if (calc_crc == rx_crc) 
     {
-        // 定义 4 个标准 int 来做缓冲
-        int b1 = 0, b2 = 0, b3 = 0, b4 = 0;
+        // 5. 【优化核心】摒弃 sscanf，使用 strtof / strtol 配合指针快速滑动解析
+        // 格式假设完美对应: [angle;distance;b1;b2;b3;b4]
+        char *p = start + 1; // 指针跳过 '['
         
-        // 校验通过，提取数据
-        // 使用 %f 和 %d 分别对应 float 和 uint8_t
-        int parsed = sscanf(start, "[%f;%f;%d;%d;%d;%d]", 
-                            &rc_data.angle, 
-                            &rc_data.distance, 
-                            &b1, &b2, &b3, &b4);
+        rc_data.angle    = strtof(p, &p); p++; // 解析完浮点后，p会自动指向';'，p++跳过';'
+        rc_data.distance = strtof(p, &p); p++;
+        rc_data.btn_1    = (uint8_t)strtol(p, &p, 10); p++;
+        rc_data.btn_2    = (uint8_t)strtol(p, &p, 10); p++;
+        rc_data.btn_3    = (uint8_t)strtol(p, &p, 10); p++;
+        rc_data.btn_4    = (uint8_t)strtol(p, &p, 10);
+
+        // 防止前端传来异常的非法数据
+        if(rc_data.distance > 1.0f) rc_data.distance = 1.0f;
+        if(rc_data.distance < 0.0f) rc_data.distance = 0.0f;
         
-        // 如果成功解析了 6 个参数，说明包格式完美                 
-        // if(parsed == 6) {
-            // 解析成功后，再安全地写入 uint8_t 变量
-            rc_data.btn_1 = (uint8_t)b1;
-            rc_data.btn_2 = (uint8_t)b2;
-            rc_data.btn_3 = (uint8_t)b3;
-            rc_data.btn_4 = (uint8_t)b4;
-            
-            // 仅仅做数据更新
-            rc_data.update_flag = 1; 
-            
-            // 防止前端传来异常的非法数据
-            if(rc_data.distance > 1.0f) rc_data.distance = 1.0f;
-            if(rc_data.distance < 0.0f) rc_data.distance = 0.0f;
-        // } 
+        // 更新标志位
+        rc_data.update_flag = 1; 
     }
 }
-

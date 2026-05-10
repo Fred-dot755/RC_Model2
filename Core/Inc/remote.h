@@ -1,3 +1,5 @@
+//written by Fred Xiao
+
 #ifndef __REMOTE_H
 #define __REMOTE_H
 #include "main.h"

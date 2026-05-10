@@ -82,6 +82,76 @@ const osThreadAttr_t Remote_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
+/* Definitions for DH_C */
+osThreadId_t DH_CHandle;
+const osThreadAttr_t DH_C_attributes = {
+  .name = "DH_C",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
+/* Definitions for Remote_mode */
+osThreadId_t Remote_modeHandle;
+const osThreadAttr_t Remote_mode_attributes = {
+  .name = "Remote_mode",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
+/* Definitions for inverseKinemati */
+osThreadId_t inverseKinematiHandle;
+const osThreadAttr_t inverseKinemati_attributes = {
+  .name = "inverseKinemati",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
+/* Definitions for Angle_ring */
+osThreadId_t Angle_ringHandle;
+const osThreadAttr_t Angle_ring_attributes = {
+  .name = "Angle_ring",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
+/* Definitions for L1_Mode */
+osThreadId_t L1_ModeHandle;
+const osThreadAttr_t L1_Mode_attributes = {
+  .name = "L1_Mode",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
+/* Definitions for Lift_Mode */
+osThreadId_t Lift_ModeHandle;
+const osThreadAttr_t Lift_Mode_attributes = {
+  .name = "Lift_Mode",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
+/* Definitions for One_Area */
+osThreadId_t One_AreaHandle;
+const osThreadAttr_t One_Area_attributes = {
+  .name = "One_Area",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
+/* Definitions for Two_Area */
+osThreadId_t Two_AreaHandle;
+const osThreadAttr_t Two_Area_attributes = {
+  .name = "Two_Area",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
+/* Definitions for Three_Area */
+osThreadId_t Three_AreaHandle;
+const osThreadAttr_t Three_Area_attributes = {
+  .name = "Three_Area",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
+/* Definitions for Mid360 */
+osThreadId_t Mid360Handle;
+const osThreadAttr_t Mid360_attributes = {
+  .name = "Mid360",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -93,6 +163,16 @@ void Unitree_Function(void *argument);
 void DM_Function(void *argument);
 void DJI_Function(void *argument);
 void Remote_Function(void *argument);
+void DH_C_Function(void *argument);
+void Remote_mode_function(void *argument);
+void inverseKinematics_Function(void *argument);
+void Angle_ring_Function(void *argument);
+void L1_Mode_Function(void *argument);
+void Lift_Mode_Function(void *argument);
+void One_Area_Function(void *argument);
+void Two_Area_Function(void *argument);
+void Three_Area_Function(void *argument);
+void Mid360_Function(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -138,6 +218,36 @@ void MX_FREERTOS_Init(void) {
   /* creation of Remote */
   RemoteHandle = osThreadNew(Remote_Function, NULL, &Remote_attributes);
 
+  /* creation of DH_C */
+  DH_CHandle = osThreadNew(DH_C_Function, NULL, &DH_C_attributes);
+
+  /* creation of Remote_mode */
+  Remote_modeHandle = osThreadNew(Remote_mode_function, NULL, &Remote_mode_attributes);
+
+  /* creation of inverseKinemati */
+  inverseKinematiHandle = osThreadNew(inverseKinematics_Function, NULL, &inverseKinemati_attributes);
+
+  /* creation of Angle_ring */
+  Angle_ringHandle = osThreadNew(Angle_ring_Function, NULL, &Angle_ring_attributes);
+
+  /* creation of L1_Mode */
+  L1_ModeHandle = osThreadNew(L1_Mode_Function, NULL, &L1_Mode_attributes);
+
+  /* creation of Lift_Mode */
+  Lift_ModeHandle = osThreadNew(Lift_Mode_Function, NULL, &Lift_Mode_attributes);
+
+  /* creation of One_Area */
+  One_AreaHandle = osThreadNew(One_Area_Function, NULL, &One_Area_attributes);
+
+  /* creation of Two_Area */
+  Two_AreaHandle = osThreadNew(Two_Area_Function, NULL, &Two_Area_attributes);
+
+  /* creation of Three_Area */
+  Three_AreaHandle = osThreadNew(Three_Area_Function, NULL, &Three_Area_attributes);
+
+  /* creation of Mid360 */
+  Mid360Handle = osThreadNew(Mid360_Function, NULL, &Mid360_attributes);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -161,12 +271,7 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    if(rc_data.btn_3 == 1 && rc_data.btn_4 == 1)
-    {
-      remote_mode += 1;
-      osDelay(1000);
-    }
-    osDelay(1);
+    osDelay(5);
   }
   /* USER CODE END StartDefaultTask */
 }
@@ -184,16 +289,22 @@ void Unitree_Function(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    unitree_cmd_create(&unitree_cmd[1], 1, 1, 2.5, 0.1, -unitree_lift, 0.0, 0.0);
+    //1负3正，2左正右负
+    unitree_cmd_create(&unitree_cmd[1], 1, 1, 7.5, 0.2, -now_position.output_angle2, 0.0, 0.0);
     unitree_communicate(1);
     osDelay(10);
-    unitree_cmd_create(&unitree_cmd[3], 3, 1, 2.5, 0.1, unitree_lift, 0.0, 0.0);
+    unitree_cmd_create(&unitree_cmd[3], 3, 1, 7.5, 0.2, now_position.output_angle2, 0.0, 0.0);
     unitree_communicate(3);
     osDelay(10);
-    unitree_cmd_create(&unitree_cmd[2], 2, 1, 2.5, 0.1, unitree_angle_turn, 0.0, 0.0);
+    unitree_cmd_create(&unitree_cmd[2], 2, 1, 1.0, 0.2, now_position.output_angle1, 0.0, 0.0);
     unitree_communicate(2);
     osDelay(10);
-    //1负3正，2左正右负
+    unitree_cmd_create(&unitree_cmd[4], 4, 1, 1.0, 0.2, R2_Extern.lift, 0.0, 0.0);
+    unitree_communicate(4);
+    osDelay(10);
+    unitree_cmd_create(&unitree_cmd[5], 5, 1, 1.0, 0.2, -R2_Extern.lift, 0.0, 0.0);
+    unitree_communicate(5);
+    osDelay(10);
 
     // unitree_cmd_create(&unitree_cmd[1], 1, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
     // unitree_communicate(1);
@@ -204,6 +315,13 @@ void Unitree_Function(void *argument)
     // unitree_cmd_create(&unitree_cmd[2], 2, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
     // unitree_communicate(2);
     // osDelay(10);
+    // unitree_cmd_create(&unitree_cmd[4], 4, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
+    // unitree_communicate(4);
+    // osDelay(10);
+    // unitree_cmd_create(&unitree_cmd[5], 5, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
+    // unitree_communicate(5);
+    // osDelay(10);
+
     //调试用
     osDelay(5);
   }
@@ -223,9 +341,12 @@ void DM_Function(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    DM_CAN_Send_PosVel_Mode(dm_wrist,20,2);//上正
-    DM_CAN_Send_PosVel_Mode(-dm_arm,20,3);//上负
+    DM_CAN_Enable_Motor(2);
+    DM_CAN_Enable_Motor(3);
 
+    DM_CAN_Send_PosVel_Mode((R2_Extern.angle4  - unitree_pos[1] + dm4310_fb[1].position_deg) * 1.5,80,2);//上正
+    DM_CAN_Send_PosVel_Mode(-R2_Extern.angle3,40,3);//上负
+  
     //调试用
     // DM_CAN_Send_PosVel_Mode(0,0,2);
     // DM_CAN_Send_PosVel_Mode(0,0,3);
@@ -248,7 +369,9 @@ void DJI_Function(void *argument)
   for(;;)
   {
     FDCAN_cmd_chassis_fdcan1_0x200(pid_3508[0], pid_3508[1], pid_3508[2], pid_3508[3]);
-    FDCAN_cmd_chassis_fdcan1_0x1FF(pid_3508[4], pid_3508[5], 0,0);
+    FDCAN_cmd_chassis_fdcan1_0x1FF(pid_3508[4], pid_3508[5], pid_3508[6], pid_3508[7]);
+    // FDCAN_cmd_chassis_fdcan3_0x200(pid_3508[8], pid_3508[9], pid_3508[10], pid_3508[11]);
+
     osDelay(5);
   }
   /* USER CODE END DJI_Function */
@@ -264,124 +387,366 @@ void DJI_Function(void *argument)
 void Remote_Function(void *argument)
 {
   /* USER CODE BEGIN Remote_Function */
+
   /* Infinite loop */
   for(;;)
   {
-    // if(rc_data.distance != 0)
+
+    // if(R2_Extern.get_init == 0)
     // {
-    //     if(rc_data.angle > -45 && rc_data.angle < 45)
-    //     {
-    //       unitree_lift += 1;
-    //       osDelay(100);
-    //     }
-    //     else if(rc_data.angle > 45 && rc_data.angle < 135)
-    //     {
-    //       unitree_angle_turn += 2;
-    //       osDelay(100);
-    //     }
-    //     else if((rc_data.angle > 135 && rc_data.angle < 180) || (rc_data.angle > -180 && rc_data.angle < -135))
-    //     {
-    //       unitree_lift -= 1;
-    //       osDelay(100);
-    //     }
-    //     else if(rc_data.angle > -135 && rc_data.angle < -45)
-    //     {
-    //       unitree_angle_turn -= 2;
-    //       osDelay(100);
-    //     }
+    //   up_stair();
+    //   R2_Extern.get_init = 1;
+    // }
+
+    R2_Extern.angle = rc_data.angle;
+    R2_Extern.speed = rc_data.distance;
+
+    // if(visual_data.bool_getKFS == 1)
+    // {
+    //   if(R2_Extern.lift_flag == 0)
+    //   {
+    //     now_mood.mood = 1;
+    //     R2_Extern.lift_flag = 1;
+    //   }
+    // }
+
+    // if(now_mood.mood == 2)
+    // {
+    //   R2_Extern.angle4 = 90;
+    //   now_mood.mood = 3;
+    // }
+    // if(now_mood.mood == 3)
+    // {
+    //   inverseKinematics(R2_Extern.x,R2_Extern.y,R2_Extern.z,&R2_Extern.angle1,&R2_Extern.angle2,&R2_Extern.angle3);
+    //   if(unitree_pos[1]>= R2_Extern.angle2 - 5 && unitree_pos[1] <= R2_Extern.angle2 + 5 && dm4310_fb[1].position_deg >= R2_Extern.angle3 - 5 && dm4310_fb[1].position_deg <= R2_Extern.angle3 + 5)
+    //   {
+    //     osDelay(500);
+    //       now_mood.mood = 4;
+    //   }
+    // }
+    // if(now_mood.mood == 4)
+    // {
+    //     up_stair();
+    //     R2_Extern.lift_flag = 0;
         
     // }
-    // if(rc_data.btn_1 == 1)
-    // {
-    //   dm_arm += 2;
-    //   osDelay(100);
-    // }
-    // if(rc_data.btn_2 == 1)
-    // {
-    //   dm_arm -= 2;
-    //   osDelay(100);
-    // }
-    // if(rc_data.btn_3 == 1)
-    // {
-    //   dm_wrist += 2;
-    //   osDelay(100);
-    // }
-    // if(rc_data.btn_4 == 1)
-    // {
-    //   dm_wrist -= 2;
-    //   osDelay(100);
-    // }
-    // 机械臂
 
 
-    if(remote_mode %2 == 0)
+
+    if(rc_data.btn_1 == 1)
     {
-      if(rc_data.distance != 0 || rc_data.btn_1 != 1 || rc_data.btn_2 != 1 || rc_data.btn_3 != 1 || rc_data.btn_4 != 1)
-      {
-          angle = rc_data.angle;
-          speed = rc_data.distance * 2000;
-
-          lift = rc_data.btn_1 * 10000;
-          down = -rc_data.btn_2 * 10000;
-
-          span = rc_data.btn_3 * 2000;
-          span_t = -rc_data.btn_4 * 2000;
-
-          chassic_control(angle,speed,span+span_t);
-      }
+      // R2_Extern.span = 1000;
+      // R2_Extern.angle_balance += 0.3;
+      // arm_goto_x(600.0f, 0.0f, 600.0f);
+      HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
     }
-    else if (remote_mode %2 == 1)
+    else if(rc_data.btn_2 == 1)
     {
-        if(rc_data.distance != 0)
-        {
-            if(rc_data.angle > -45 && rc_data.angle < 45)
-            {
-              unitree_lift += 1;
-              osDelay(100);
-            }
-            else if(rc_data.angle > 45 && rc_data.angle < 135)
-            {
-              unitree_angle_turn += 2;
-              osDelay(100);
-            }
-            else if((rc_data.angle > 135 && rc_data.angle < 180) || (rc_data.angle > -180 && rc_data.angle < -135))
-            {
-              unitree_lift -= 1;
-              osDelay(100);
-            }
-            else if(rc_data.angle > -135 && rc_data.angle < -45)
-            {
-              unitree_angle_turn -= 2;
-              osDelay(100);
-            }
-        
-        }
-        if(rc_data.btn_1 == 1)
-        {
-          dm_arm += 2;
-          osDelay(100);
-        }
-        if(rc_data.btn_2 == 1)
-        {
-          dm_arm -= 2;
-          osDelay(100);
-        }
-        if(rc_data.btn_3 == 1)
-        {
-          dm_wrist += 2;
-          osDelay(100);
-        }
-        if(rc_data.btn_4 == 1)
-        {
-          dm_wrist -= 2;
-          osDelay(100);
-        }
+      HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);
+      // R2_Extern.span = -1000;
+      // R2_Extern.angle_balance -= 0.3;
+      // arm_goto_x(300.0f, 0.0f, 600.0f);
     }
+    else if (rc_data.btn_3 == 1)
+    {
+      // R2_Extern.lift += 1;
+      HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
+    }
+    else if (rc_data.btn_4 == 1)
+    {
+      // R2_Extern.lift -= 1;
+      HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_RESET);
+    }
+    // else if(rc_data.btn_3 == 1)
+    // {
+    //   R2_Extern.lift_mood = 1;
+    //     HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_RESET);//为了收前气缸
+    //     osDelay(500);
+    //   osDelay(1000);
+    // }
+    // else if(rc_data.btn_4 == 1)
+    // {
+    //   // R2_Extern.lift_mood = 0;
+    //   // osDelay(1000);
+    //   HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);//收后气缸
+    //   now_mood.mood += 1;//相对升
+    //   R2_Extern.lift_mood = 1;
+    //   osDelay(500);
+    // }
+    else
+    {
+      R2_Extern.span = 0;
+    }
+
+    // if(R2_Extern.lift_mood == 1 && L1_Sensor.distance_mm < 170)
+    // {
+    //   HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
+    //   osDelay(500);
+    //   R2_Extern.lift_mood = 0;
+    //   now_mood.mood += 1;
+    // }
+
+    // if(R2_Extern.lift_mood == 1 && L1_Sensor.distance_mm > 500)
+    // {
+    //   R2_Extern.angle = 0;
+    //   R2_Extern.speed = 0;
+    //   R2_Extern.lift_mood = 0;
+    //   HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);
+    //   osDelay(500);
+    //   now_mood.mood += 1;
+
+    // }
+
+    
+    chassic_control(R2_Extern.angle,R2_Extern.speed,R2_Extern.span+(-R2_Extern.error_balance*200));
 
 
     osDelay(5);
   }
   /* USER CODE END Remote_Function */
+}
+
+/* USER CODE BEGIN Header_DH_C_Function */
+/**
+* @brief Function implementing the DH_C thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_DH_C_Function */
+void DH_C_Function(void *argument)
+{
+  /* USER CODE BEGIN DH_C_Function */
+  /* Infinite loop */
+  for(;;)
+  {
+    computeDHTransform(unitree_pos[0], unitree_pos[1],dm4310_fb[1].position_deg , &R2_Extern.x_t, &R2_Extern.y_t, &R2_Extern.z_t);
+    // inverseKinematics(x,y,z,&angle1,&angle2,&angle3);
+    osDelay(5);
+  }
+  /* USER CODE END DH_C_Function */
+}
+
+/* USER CODE BEGIN Header_Remote_mode_function */
+/**
+* @brief Function implementing the Remote_mode thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Remote_mode_function */
+void Remote_mode_function(void *argument)
+{
+  /* USER CODE BEGIN Remote_mode_function */
+  /* Infinite loop */
+  for(;;)
+  {
+    if(rc_data.btn_3 == 1 && rc_data.btn_4 == 1)
+    {
+      now_mood.mood += 1;
+      osDelay(500);
+    }
+    osDelay(5);
+  }
+  /* USER CODE END Remote_mode_function */
+}
+
+/* USER CODE BEGIN Header_inverseKinematics_Function */
+/**
+* @brief Function implementing the inverseKinemati thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_inverseKinematics_Function */
+void inverseKinematics_Function(void *argument)
+{
+  /* USER CODE BEGIN inverseKinematics_Function */
+  /* Infinite loop */
+  for(;;)
+  {
+    arm_unitree_planning_update(R2_Extern.angle1, R2_Extern.angle2);
+    osDelay(50);
+  }
+  /* USER CODE END inverseKinematics_Function */
+}
+
+/* USER CODE BEGIN Header_Angle_ring_Function */
+/**
+* @brief Function implementing the Angle_ring thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Angle_ring_Function */
+void Angle_ring_Function(void *argument)
+{
+  /* USER CODE BEGIN Angle_ring_Function */
+  static float prev_hipnuc_angle_z = 0.0f;
+  static float total_wrap_angle_z = 0.0f;
+  /* Infinite loop */
+  for(;;)
+  {
+    float current_angle = ops.HIPNUCAngleZ;
+    float delta = current_angle - prev_hipnuc_angle_z;
+    if (delta > 180.0f) {
+        total_wrap_angle_z -= 360.0f;
+    } else if (delta < -180.0f) {
+        total_wrap_angle_z += 360.0f;
+    }
+    prev_hipnuc_angle_z = current_angle;
+    float continuous_angle = current_angle + total_wrap_angle_z;
+    R2_Extern.error_balance = R2_Extern.angle_balance - continuous_angle;
+    osDelay(5);
+  }
+  /* USER CODE END Angle_ring_Function */
+}
+
+/* USER CODE BEGIN Header_L1_Mode_Function */
+/**
+* @brief Function implementing the L1_Mode thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_L1_Mode_Function */
+void L1_Mode_Function(void *argument)
+{
+  /* USER CODE BEGIN L1_Mode_Function */
+  /* Infinite loop */
+  for(;;)
+  {
+    L1_Control(&L1_Sensor1, L1_MODE_CONT);
+    L1_Control(&L1_Sensor2, L1_MODE_CONT);
+    osDelay(5);
+  }
+  /* USER CODE END L1_Mode_Function */
+}
+
+/* USER CODE BEGIN Header_Lift_Mode_Function */
+/**
+* @brief Function implementing the Lift_Mode thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Lift_Mode_Function */
+void Lift_Mode_Function(void *argument)
+{
+  /* USER CODE BEGIN Lift_Mode_Function */
+  /* Infinite loop */
+  for(;;)
+  {
+    // if(R2_Extern.lift_mood == 1)
+    // {
+    //   while(R2_Extern.lift <= 490)
+    //   {
+    //     R2_Extern.lift += 1;
+    //     osDelay(1);
+    //   }
+    // }
+    // else if(R2_Extern.lift_mood == 0)
+    // {
+    //   while(R2_Extern.lift >= 5)
+    //   {
+    //     R2_Extern.lift -= 1;
+    //     osDelay(1);
+    //   }
+    // }
+    osDelay(5);
+  }
+  /* USER CODE END Lift_Mode_Function */
+}
+
+/* USER CODE BEGIN Header_One_Area_Function */
+/**
+* @brief Function implementing the One_Area thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_One_Area_Function */
+void One_Area_Function(void *argument)
+{
+  /* USER CODE BEGIN One_Area_Function */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(5);
+  }
+  /* USER CODE END One_Area_Function */
+}
+
+/* USER CODE BEGIN Header_Two_Area_Function */
+/**
+* @brief Function implementing the Two_Area thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Two_Area_Function */
+void Two_Area_Function(void *argument)
+{
+  /* USER CODE BEGIN Two_Area_Function */
+  /* Infinite loop */
+  for(;;)
+  {
+
+    // if(R2_Extern.lift_mood == 1)
+    // {
+    //   while(R2_Extern.lift <= 490)
+    //   {
+    //     R2_Extern.lift += 1;
+    //     osDelay(1);
+    //   }
+    // }
+    // else if(R2_Extern.lift_mood == 0)
+    // {
+    //   while(R2_Extern.lift >= 5)
+    //   {
+    //     R2_Extern.lift -= 1;
+    //     osDelay(1);
+    //   }
+    // }
+
+    osDelay(5);
+  }
+  /* USER CODE END Two_Area_Function */
+}
+
+/* USER CODE BEGIN Header_Three_Area_Function */
+/**
+* @brief Function implementing the Three_Area thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Three_Area_Function */
+void Three_Area_Function(void *argument)
+{
+  /* USER CODE BEGIN Three_Area_Function */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(5);
+  }
+  /* USER CODE END Three_Area_Function */
+}
+
+/* USER CODE BEGIN Header_Mid360_Function */
+/**
+* @brief Function implementing the Mid360 thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Mid360_Function */
+void Mid360_Function(void *argument)
+{
+  /* USER CODE BEGIN Mid360_Function */
+  /* Infinite loop */
+  for(;;)
+  {
+    if(visual_data.i == 1)
+    {
+      chassic_control_auto(&chassic_data, visual_data.x, visual_data.y, chassic_data.target_x, chassic_data.target_y);
+      R2_Extern.angle = chassic_data.angle;
+      R2_Extern.speed = chassic_data.distance;
+    }
+
+    osDelay(5);
+  }
+  /* USER CODE END Mid360_Function */
 }
 
 /* Private application code --------------------------------------------------*/
