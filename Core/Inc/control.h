@@ -112,4 +112,13 @@ extern My_extern R2_Extern;
 
 void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float now_y, float target_x, float target_y);
 
+void chassic_up(void);
+void chassic_down(void);
+void chsaaic_behind_up(void);
+void chsaaic_behind_down(void);
+void chsaaic_front_up(void);
+void chsaaic_front_down(void);
+
+
+
 #endif // __CONTROL_H

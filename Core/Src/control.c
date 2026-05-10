@@ -5,82 +5,6 @@
 
 My_extern R2_Extern;
 
-int lift_flag = 0;
-int motor1_init = 0;
-int motor2_init = 0;
-int chassic_mood;
-
-void lift_control(void)
-{
-    if(lift_flag == 0)
-    {
-        if((guangdian_down_1 == 1))
-        {
-            motor1_init = -3000;
-        }
-        else
-        {
-            motor1_init = 0;
-        }
-        if((guangdian_down_2 == 1))
-        {
-            motor2_init = -3000;
-        }
-        else
-        {
-            motor2_init = 0;
-        }
-
-        if(guangdian_down_1 == 0 && guangdian_down_2 == 0)
-        {
-            lift_flag = 1;
-        }
-    }
-    else
-    {
-        if(chassic_mood == 1)
-        {
-            if(guangdian_up_1 != 0)
-            {
-                motor1_init = 3000;
-            }
-            else
-            {
-                motor1_init = 0;
-            }
-             if(guangdian_up_2 != 0)
-            {
-                motor2_init = 3000;
-            }
-            else
-            {
-                motor2_init = 0;
-            }
-
-        }
-        if(chassic_mood == 2)
-        {
-            if(guangdian_down_1 != 0)
-            {
-                motor1_init = -3000;
-            }
-            else
-            {
-                motor1_init = 0;
-            }
-
-            if(guangdian_down_2 != 0)
-            {
-                motor2_init = -3000;
-            }
-            else
-            {
-                motor2_init = 0;
-            }
-        }
-
-    }
-}
 
 StairState_t current_state = STATE_SIX;
 
@@ -121,3 +45,43 @@ void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float no
         chassic_data->distance = (int)(MAX_SPEED * real_distance);
     }
 }
+
+
+
+//1区控制
+
+
+
+//2区控制
+void chassic_up(void)//整体上升
+{
+    R2_Extern.lift_mood = 1;
+}
+
+void chassic_down(void)//整体下降
+{
+    R2_Extern.lift_mood = 0;
+}
+
+void chsaaic_behind_up(void)//后轮上升
+{
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
+}
+
+void chsaaic_behind_down(void)//后轮下降
+{
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
+}
+
+void chsaaic_front_up(void)//前轮上升
+{
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);
+}
+
+void chsaaic_front_down(void)//前轮下降
+{
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_RESET);
+}
+
+
+//3区控制

@@ -33,8 +33,7 @@ targets:
         - Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2
         - Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
       libList: []
-    excludeList:
-      - Core/Src/omni_chassis.c
+    excludeList: []
     settings: {}
     toolchain: GCC
     toolchainConfigMap:

@@ -631,22 +631,22 @@ void Lift_Mode_Function(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    // if(R2_Extern.lift_mood == 1)
-    // {
-    //   while(R2_Extern.lift <= 490)
-    //   {
-    //     R2_Extern.lift += 1;
-    //     osDelay(1);
-    //   }
-    // }
-    // else if(R2_Extern.lift_mood == 0)
-    // {
-    //   while(R2_Extern.lift >= 5)
-    //   {
-    //     R2_Extern.lift -= 1;
-    //     osDelay(1);
-    //   }
-    // }
+    if(R2_Extern.lift_mood == 1)
+    {
+      while(R2_Extern.lift <= 490)
+      {
+        R2_Extern.lift += 1;
+        osDelay(1);
+      }
+    }
+    else if(R2_Extern.lift_mood == 0)
+    {
+      while(R2_Extern.lift >= 5)
+      {
+        R2_Extern.lift -= 1;
+        osDelay(1);
+      }
+    }
     osDelay(5);
   }
   /* USER CODE END Lift_Mode_Function */
