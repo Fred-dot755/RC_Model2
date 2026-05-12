@@ -298,8 +298,8 @@ void Chassis_Force_Control_Update(Chassis_Force_Controller_t *chassis) {
 
 void RC_Data_To_Chassis_Target(void) {
     
-    float target_speed = rc_data.distance;
-    float target_angle = rc_data.angle;
+    float target_speed = R2_Extern.speed;
+    float target_angle = R2_Extern.angle;
     
     float angle_rad = target_angle * PI / 180.0f;
     

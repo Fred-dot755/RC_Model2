@@ -44,6 +44,6 @@ extern Chassic result;
 
 
 void chassic_control(float angle_deg, float speed_mag, float w_rotation);
-
+void chassic_small(void);
 
 #endif 

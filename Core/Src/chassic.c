@@ -38,7 +38,7 @@ void chassic_control(float angle_deg, float speed_mag, float w_rotation)
         val_motor4 *= rate;
     }
 
-    if(now_mood.mood % 2 == 0)
+    if(now_mood.mood  == 0)
     {
         result.motor1.out = (int16_t)val_motor1;
         result.motor2.out = (int16_t)val_motor2;
@@ -68,3 +68,20 @@ void chassic_control(float angle_deg, float speed_mag, float w_rotation)
     }
 }
 
+void chassic_small(void)
+{
+    if(now_mood.mood  == 0)
+    {
+        result.motor5.out = 0;
+        result.motor6.out = 0;
+        result.motor7.out = 0;
+        result.motor8.out = 0;
+    }
+    else
+    {
+        result.motor5.out = -3000;
+        result.motor6.out = -3000;
+        result.motor7.out = -3000;
+        result.motor8.out = -3000;
+    }
+}

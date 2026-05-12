@@ -129,7 +129,7 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim6);
 
   L1_Init(&L1_Sensor1, &huart8);
-  L1_Init(&L1_Sensor2, &huart9);
+  L1_Init(&L1_Sensor2, &huart1);
 
   fdcan_filter_init();
   PID_Init_All();
@@ -167,6 +167,7 @@ int main(void)
   //RGB变白，顺利启动
   RGB_Color_Ctrl(255,1,255);
 
+  R2_Extern.lift_mood = 1;
 
   HAL_Delay(1000);
   
@@ -325,6 +326,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   if (htim->Instance == TIM6)
   {
     PID_Calc_All();
+    chassic_small();
 
     RC_Data_To_Chassis_Target();
     Chassis_Force_Control_Update(&chassis_controller);

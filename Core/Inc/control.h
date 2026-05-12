@@ -84,8 +84,8 @@ typedef struct
 
 typedef struct
 {
-    int angle;
-    int speed;
+    float angle;
+    float speed;
 
     float span;
     float lift;
@@ -105,10 +105,26 @@ typedef struct
     int get_init;
 
     int lift_flag;
+
+    int Area2_flag;
+
+    int chsaaic_behind_flag;
+    int chsaaic_front_flag;
 }My_extern;
+
+
+
+typedef struct 
+{
+    int qian_dis;
+    int hou_dis;
+}Area2_control_t;
+
 
 extern chassic_control_t chassic_data;
 extern My_extern R2_Extern;
+extern Area2_control_t Area_Flag;
+
 
 void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float now_y, float target_x, float target_y);
 

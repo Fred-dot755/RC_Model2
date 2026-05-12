@@ -398,8 +398,6 @@ void Remote_Function(void *argument)
     //   R2_Extern.get_init = 1;
     // }
 
-    R2_Extern.angle = rc_data.angle;
-    R2_Extern.speed = rc_data.distance;
 
     // if(visual_data.bool_getKFS == 1)
     // {
@@ -435,27 +433,33 @@ void Remote_Function(void *argument)
 
     if(rc_data.btn_1 == 1)
     {
+      R2_Extern.Area2_flag = 1;
       // R2_Extern.span = 1000;
       // R2_Extern.angle_balance += 0.3;
       // arm_goto_x(600.0f, 0.0f, 600.0f);
-      HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
+      // HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
     }
     else if(rc_data.btn_2 == 1)
     {
-      HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);
+      R2_Extern.Area2_flag = 5;
+      // HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
       // R2_Extern.span = -1000;
       // R2_Extern.angle_balance -= 0.3;
       // arm_goto_x(300.0f, 0.0f, 600.0f);
     }
     else if (rc_data.btn_3 == 1)
     {
+      R2_Extern.angle_balance += 0.3;
       // R2_Extern.lift += 1;
-      HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
+      // HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
+      // R2_Extern.lift_mood = 1;
     }
     else if (rc_data.btn_4 == 1)
     {
+      R2_Extern.angle_balance -= 0.3;
       // R2_Extern.lift -= 1;
-      HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_RESET);
+      // HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_RESET);
+      // R2_Extern.lift_mood = 0;
     }
     // else if(rc_data.btn_3 == 1)
     // {
@@ -473,10 +477,10 @@ void Remote_Function(void *argument)
     //   R2_Extern.lift_mood = 1;
     //   osDelay(500);
     // }
-    else
-    {
-      R2_Extern.span = 0;
-    }
+    // else
+    // {
+    //   R2_Extern.span = 0;
+    // }
 
     // if(R2_Extern.lift_mood == 1 && L1_Sensor.distance_mm < 170)
     // {
@@ -497,8 +501,11 @@ void Remote_Function(void *argument)
 
     // }
 
-    
-    chassic_control(R2_Extern.angle,R2_Extern.speed,R2_Extern.span+(-R2_Extern.error_balance*200));
+    if(rc_data.btn_3 == 1 && rc_data.btn_4 == 1)
+    {
+      R2_Extern.lift += 1;
+    }
+    // chassic_control(R2_Extern.angle,R2_Extern.speed,R2_Extern.span+(-R2_Extern.error_balance*200));
 
 
     osDelay(5);
@@ -539,12 +546,33 @@ void Remote_mode_function(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    if(rc_data.btn_3 == 1 && rc_data.btn_4 == 1)
+    if(L1_Sensor1.distance_mm <= 170)
     {
-      now_mood.mood += 1;
-      osDelay(500);
+      Area_Flag.qian_dis = 1;//低
     }
-    osDelay(5);
+    else if(L1_Sensor1.distance_mm >= 500)
+    {
+      Area_Flag.qian_dis = 2;//高
+    }
+    else
+    {
+      Area_Flag.qian_dis = 0;
+    }
+
+    if(L1_Sensor2.distance_mm <= 170)
+    {
+      Area_Flag.hou_dis = 1;//低
+    }
+    else if(L1_Sensor2.distance_mm >= 500)
+    {
+      Area_Flag.hou_dis = 2;//高
+    }
+    else
+    {
+      Area_Flag.hou_dis = 0;
+    }
+
+    osDelay(3);
   }
   /* USER CODE END Remote_mode_function */
 }
@@ -611,8 +639,9 @@ void L1_Mode_Function(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    L1_Control(&L1_Sensor1, L1_MODE_CONT);
-    L1_Control(&L1_Sensor2, L1_MODE_CONT);
+    L1_Control(&L1_Sensor1, L1_MODE_FAST);
+    osDelay(5);
+    L1_Control(&L1_Sensor2, L1_MODE_FAST);
     osDelay(5);
   }
   /* USER CODE END L1_Mode_Function */
@@ -633,7 +662,7 @@ void Lift_Mode_Function(void *argument)
   {
     if(R2_Extern.lift_mood == 1)
     {
-      while(R2_Extern.lift <= 490)
+      while(R2_Extern.lift <= 500)
       {
         R2_Extern.lift += 1;
         osDelay(1);
@@ -641,7 +670,7 @@ void Lift_Mode_Function(void *argument)
     }
     else if(R2_Extern.lift_mood == 0)
     {
-      while(R2_Extern.lift >= 5)
+      while(R2_Extern.lift >= 10)
       {
         R2_Extern.lift -= 1;
         osDelay(1);
@@ -683,25 +712,132 @@ void Two_Area_Function(void *argument)
   /* Infinite loop */
   for(;;)
   {
+    switch (R2_Extern.Area2_flag)
+    {
+    case 0:
+        R2_Extern.angle = rc_data.angle;
+        R2_Extern.speed = rc_data.distance;
+      break;
 
-    // if(R2_Extern.lift_mood == 1)
-    // {
-    //   while(R2_Extern.lift <= 490)
-    //   {
-    //     R2_Extern.lift += 1;
-    //     osDelay(1);
-    //   }
-    // }
-    // else if(R2_Extern.lift_mood == 0)
-    // {
-    //   while(R2_Extern.lift >= 5)
-    //   {
-    //     R2_Extern.lift -= 1;
-    //     osDelay(1);
-    //   }
-    // }
+    case 1:
+        if(R2_Extern.lift_mood == 0)
+        {
+          R2_Extern.lift_mood = 1;
+          osDelay(1000);
+        }
+        R2_Extern.angle = 0;
+        R2_Extern.speed = 0.5;
+        if(Area_Flag.qian_dis == 1 && R2_Extern.lift >= 450)
+        {
+            R2_Extern.angle = 0;
+            R2_Extern.speed = 0;
+            R2_Extern.Area2_flag = 2;
+        }
+      break;
 
-    osDelay(5);
+    case 2:
+        if(R2_Extern.chsaaic_behind_flag == 0)
+        {
+          chsaaic_behind_up();
+          R2_Extern.chsaaic_behind_flag = 1;
+          osDelay(500);
+        }
+        R2_Extern.lift_mood = 0;
+        if(R2_Extern.lift <=10)
+        {
+          R2_Extern.Area2_flag = 3;
+        }
+      break;
+
+    case 3:
+        now_mood.mood = 1;
+        R2_Extern.angle = 0;
+        R2_Extern.speed = 0.3;
+        if(Area_Flag.hou_dis == 1)
+        {
+          now_mood.mood = 0;
+          R2_Extern.angle = 0;
+          R2_Extern.speed = 0;
+          chsaaic_behind_down();
+          R2_Extern.chsaaic_behind_flag = 0;
+          osDelay(1000);
+          R2_Extern.Area2_flag = 4;
+        }
+      break;
+
+    case 4:
+        R2_Extern.angle = 0;
+        R2_Extern.speed = 0.5;
+        osDelay(500);
+        R2_Extern.Area2_flag = 0;
+
+      break;
+//上台阶1到4
+
+    case 5:
+        if(R2_Extern.lift_mood == 0)
+        {
+          R2_Extern.lift_mood = 1;
+          osDelay(1000);
+        }
+        R2_Extern.angle = 0;
+        R2_Extern.speed = 0.15;
+
+        if(Area_Flag.qian_dis == 2 && R2_Extern.lift_mood == 1)
+        {
+            R2_Extern.angle = 0;
+            R2_Extern.speed = 0;
+            R2_Extern.Area2_flag = 6;
+        }
+      break;
+
+    case 6:
+        if(R2_Extern.lift_mood == 1)
+        {
+          R2_Extern.lift_mood = 0;
+          chsaaic_front_up();
+          osDelay(1000);
+        }
+        R2_Extern.angle = 0;
+        R2_Extern.speed = 0.2;
+        now_mood.mood = 1;
+
+        if(Area_Flag.hou_dis == 0 && R2_Extern.lift_mood == 0)
+        {
+          now_mood.mood = 0;
+          R2_Extern.angle = 0;
+          R2_Extern.speed = 0;
+          osDelay(500);
+          R2_Extern.Area2_flag = 7;
+        }
+    break;
+
+    case 7:
+        if(R2_Extern.lift_mood == 0)
+        {
+          R2_Extern.lift_mood = 1;
+        }
+        if(R2_Extern.lift >= 470)
+        {
+          chsaaic_front_down();
+          R2_Extern.Area2_flag = 8;
+        }
+    break;
+
+    case 8:
+        R2_Extern.angle = 0;
+        R2_Extern.speed = 0.5;
+        osDelay(500);
+        R2_Extern.Area2_flag = 0;
+    break;
+    default:
+      break;
+    }
+
+
+
+
+    osDelay(3);
   }
   /* USER CODE END Two_Area_Function */
 }

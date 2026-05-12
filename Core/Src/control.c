@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 My_extern R2_Extern;
-
+Area2_control_t Area_Flag;
 
 StairState_t current_state = STATE_SIX;
 
@@ -63,24 +63,28 @@ void chassic_down(void)//整体下降
     R2_Extern.lift_mood = 0;
 }
 
-void chsaaic_behind_up(void)//后轮上升
+void chsaaic_behind_up(void)//后轮下降
 {
-    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
-}
-
-void chsaaic_behind_down(void)//后轮下降
-{
-    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
-}
-
-void chsaaic_front_up(void)//前轮上升
-{
+    // HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
     HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);
 }
 
-void chsaaic_front_down(void)//前轮下降
+void chsaaic_behind_down(void)//后轮上升
 {
+    // HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_RESET);
+}
+
+void chsaaic_front_up(void)//前轮下降
+{
+    // HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
+}
+
+void chsaaic_front_down(void)//前轮上升
+{
+    // HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
 }
 
 
