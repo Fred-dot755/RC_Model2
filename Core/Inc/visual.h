@@ -6,16 +6,40 @@
 
 #pragma pack(push, 1)
 
+// enum : uint8_t
+// {
+//     DIR_NONE  = 0,
+//     DIR_LEFT  = 1,
+//     DIR_RIGHT = 2,
+//     DIR_FRONT = 3,
+//     DIR_BACK  = 4,
+//     DIR_UP    = 5,
+//     DIR_DOWN  = 6
+// };
+
+typedef struct
+{
+    uint8_t cell;        // 点位：1~12，0无效
+    uint8_t horizontal_s;    // 左1 右2 前3 后4，0无
+    uint8_t vertical_s;  // 上5 下6，0无
+} __attribute__((packed)) MeilinPointCmd;
+
+
 typedef struct {
-    uint8_t head[4];         // 'M', 'E', 'I', 'C'
-    int work_mode;       // int 在 32 位系统上是 4 字节
+     uint8_t head[4];
+    int workl_mode;
     int bool_graping;
     int bool_getKFS;
-    float xyz_in_base[3];    // 3 * 4 = 12 字节
-    float x;
-    float y;
+    float xyz_in_base[3];
+    //float wepend_offset_x;
+    float x_map;
+    float y_map;
+    //float yaw_map;
     int i;
-    uint16_t crc16;          // 2 字节
+    uint8_t meilin_count;               // 有效点数量，最多9
+    MeilinPointCmd meilin_points[9];   // 不足9个填{0,0,0}
+    uint16_t crc16;  // CRC16校验值（用于数据完整性校验）
+    
 } __attribute__((packed)) ReceiveData_t;
 
 typedef struct {

@@ -110,6 +110,15 @@ typedef struct
 
     int chsaaic_behind_flag;
     int chsaaic_front_flag;
+
+    int chack_yaw_flag;
+    int meilin_count_flag;
+    int horizontal_s_flag;
+    int vertical_s_flag;
+    int complete_flag;
+    int complete_taijie_flag;
+
+    int lingshi_flag;
 }My_extern;
 
 
