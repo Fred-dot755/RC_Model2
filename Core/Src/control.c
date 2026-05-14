@@ -29,8 +29,8 @@ void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float no
     chassic_data->angle = -raw_angle;
     
     float MAX_SPEED = 1.0; 
-    double ONE_METER = 0.2;
-    double DEADZONE = 0.05;
+    double ONE_METER = 0.05;
+    double DEADZONE = 0.02;
 
     if (real_distance < DEADZONE) 
     {
@@ -85,6 +85,37 @@ void chsaaic_front_down(void)//前轮上升
 {
     // HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
+}
+
+const float data_table[12][2] = {
+    {3.42f, -0.50f},
+    {3.39f, -1.68f},
+    {3.35f, -2.88f},
+    {4.60f, -0.50f},
+    {4.60f, -1.69f},
+    {4.58f, -2.88f},
+    {5.77f, -0.50f},
+    {5.75f, -1.69f},
+    {5.74f, -2.88f},
+    {7.04f, -0.48f},
+    {7.00f, -1.79f},
+    {6.89f, -2.88f}
+};
+
+void check_dingwei(float current_x, float current_y, int cell_index)
+{
+    // cell_index: 0~11，对应 data_table[0]~data_table[11]
+    if (cell_index < 0 || cell_index >= 12)
+    {
+        R2_Extern.complete_dingwei_flag = 0;
+        return;
+    }
+
+    float dx = current_x - data_table[cell_index][0];
+    float dy = current_y - data_table[cell_index][1];
+    float dist = sqrtf(dx * dx + dy * dy);
+
+    R2_Extern.complete_dingwei_flag = (dist <= 0.1f) ? 1 : 0;
 }
 
 

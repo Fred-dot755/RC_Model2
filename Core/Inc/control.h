@@ -92,6 +92,7 @@ typedef struct
 
 
     float angle_balance;
+    float angle_balance_target;  // angle_balance 的目标值，用于逐度逼近
     float error_balance;
 
 
@@ -117,6 +118,7 @@ typedef struct
     int vertical_s_flag;
     int complete_flag;
     int complete_taijie_flag;
+    int complete_dingwei_flag;
 
     int lingshi_flag;
 }My_extern;
@@ -144,6 +146,8 @@ void chsaaic_behind_down(void);
 void chsaaic_front_up(void);
 void chsaaic_front_down(void);
 
+extern const float data_table[12][2];
 
+void check_dingwei(float current_x, float current_y, int cell_index);
 
 #endif // __CONTROL_H
