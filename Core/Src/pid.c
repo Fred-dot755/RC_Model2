@@ -204,9 +204,99 @@ void Chassis_Force_Control_Init(Chassis_Force_Controller_t *chassis) {
     chassis->pid_wheel4.I_Max = 1.0f; chassis->pid_wheel4.V_Max = 50;
 }
 
+//麦克纳姆轮解算
+// void Chassis_Force_Control_Update(Chassis_Force_Controller_t *chassis) {
+//     float r = chassis->params.wheel_radius;
+//     float k = chassis->params.k_param;
+//     float m = chassis->params.mass;
+//     float J = chassis->params.inertia;
+    
+//     chassis->state.w1_real = (float)motor[0].NowSpeed * RPM_TO_RADS;
+//     chassis->state.w2_real = (float)-motor[1].NowSpeed * RPM_TO_RADS;
+//     chassis->state.w3_real = (float)-motor[2].NowSpeed * RPM_TO_RADS;
+//     chassis->state.w4_real = (float)motor[3].NowSpeed * RPM_TO_RADS;
+
+//     float w1 =  chassis->state.w1_real;
+//     float w2 =  chassis->state.w2_real;   
+//     float w3 =  chassis->state.w3_real;   
+//     float w4 =  chassis->state.w4_real;
+
+//     float sqrt2_r_4 = (SQRT2 * r) / 4.0f;
+
+
+//     chassis->state.vx_obs =  sqrt2_r_4 * (w1 + w2 + w3 + w4);
+//     chassis->state.vy_obs =  sqrt2_r_4 * (-w1 + w2 - w3 + w4);
+//     chassis->state.wz_obs =  sqrt2_r_4 * (1.0f / k) * (w1 - w2 - w3 + w4);
+
+
+//     float theta_feedback = ops.HIPNUCAngleZ * PI / 180.0f;
+    
+//     float theta_err = chassis->state.target_theta - theta_feedback;
+//     while (theta_err >  PI) theta_err -= 2.0f * PI;
+//     while (theta_err < -PI) theta_err += 2.0f * PI;
+    
+//     chassis->state.target_wz = -PID_Calc(&chassis->pid_theta,
+//                                           chassis->pid_theta.Kp, chassis->pid_theta.Ki, chassis->pid_theta.Kd,
+//                                           theta_err, 0.0f);
+
+
+//     float ax = PID_Calc(&chassis->pid_vx, chassis->pid_vx.Kp, chassis->pid_vx.Ki, chassis->pid_vx.Kd, 
+//                         chassis->state.target_vx, chassis->state.vx_obs);
+    
+//     float ay = PID_Calc(&chassis->pid_vy, chassis->pid_vy.Kp, chassis->pid_vy.Ki, chassis->pid_vy.Kd, 
+//                         chassis->state.target_vy, chassis->state.vy_obs);
+    
+//     float alpha = PID_Calc(&chassis->pid_wz, chassis->pid_wz.Kp, chassis->pid_wz.Ki, chassis->pid_wz.Kd, 
+//                            chassis->state.target_wz, chassis->state.wz_obs);
+
+
+//     float p1_dot_a = -ax + ay;
+//     float p2_dot_a = -ax - ay;
+//     float p3_dot_a =  ax - ay;
+//     float p4_dot_a =  ax + ay;
+
+//     float torque_theta = (J / k) * alpha;
+
+//     float tau_ff1 = -sqrt2_r_4 * (m * p1_dot_a + torque_theta);
+//     float tau_ff2 = -sqrt2_r_4 * (m * p2_dot_a + torque_theta);
+//     float tau_ff3 = -sqrt2_r_4 * (m * p3_dot_a + torque_theta);
+//     float tau_ff4 = -sqrt2_r_4 * (m * p4_dot_a + torque_theta);
+
+
+//     float sqrt2_invR = SQRT2 / r;
+//     float w1_exp = sqrt2_invR * ( chassis->state.target_vx - chassis->state.target_vy + k * chassis->state.target_wz);
+//     float w2_exp = sqrt2_invR * ( chassis->state.target_vx + chassis->state.target_vy - k * chassis->state.target_wz);
+//     float w3_exp = sqrt2_invR * ( chassis->state.target_vx - chassis->state.target_vy - k * chassis->state.target_wz);
+//     float w4_exp = sqrt2_invR * ( chassis->state.target_vx + chassis->state.target_vy + k * chassis->state.target_wz);
+
+//     float tau_pid1 = PID_Calc(&chassis->pid_wheel1, chassis->pid_wheel1.Kp, chassis->pid_wheel1.Ki, chassis->pid_wheel1.Kd, 
+//                               w1_exp, w1);
+//     float tau_pid2 = PID_Calc(&chassis->pid_wheel2, chassis->pid_wheel2.Kp, chassis->pid_wheel2.Ki, chassis->pid_wheel2.Kd, 
+//                               w2_exp, w2);
+//     float tau_pid3 = PID_Calc(&chassis->pid_wheel3, chassis->pid_wheel3.Kp, chassis->pid_wheel3.Ki, chassis->pid_wheel3.Kd, 
+//                               w3_exp, w3);
+//     float tau_pid4 = PID_Calc(&chassis->pid_wheel4, chassis->pid_wheel4.Kp, chassis->pid_wheel4.Ki, chassis->pid_wheel4.Kd, 
+//                               w4_exp, w4);
+
+//     float t_max = chassis->params.torque_max;
+    
+//     chassis->state.tau_out1 =  Clamp(tau_ff1 + tau_pid1, -t_max, t_max);
+//     chassis->state.tau_out2 = -Clamp(tau_ff2 + tau_pid2, -t_max, t_max);  
+//     chassis->state.tau_out3 = -Clamp(tau_ff3 + tau_pid3, -t_max, t_max); 
+//     chassis->state.tau_out4 =  Clamp(tau_ff4 + tau_pid4, -t_max, t_max);
+
+
+//     pid_3508[0] = (int)(chassis->state.tau_out1 * TORQUE_TO_CAN_RATIO);
+//     pid_3508[1] = (int)(chassis->state.tau_out2 * TORQUE_TO_CAN_RATIO);
+//     pid_3508[2] = (int)(chassis->state.tau_out3 * TORQUE_TO_CAN_RATIO);
+//     pid_3508[3] = (int)(chassis->state.tau_out4 * TORQUE_TO_CAN_RATIO);
+
+// }
+
+//全向轮解算
 void Chassis_Force_Control_Update(Chassis_Force_Controller_t *chassis) {
     float r = chassis->params.wheel_radius;
-    float k = chassis->params.k_param;
+    float k = chassis->params.k_param; 
     float m = chassis->params.mass;
     float J = chassis->params.inertia;
     
@@ -220,12 +310,13 @@ void Chassis_Force_Control_Update(Chassis_Force_Controller_t *chassis) {
     float w3 =  chassis->state.w3_real;   
     float w4 =  chassis->state.w4_real;
 
-    float sqrt2_r_4 = (SQRT2 * r) / 4.0f;
 
+    float sqrt2_r_4 = (SQRT2 * r) / 4.0f;
+    float r_4k = r / (4.0f * k); 
 
     chassis->state.vx_obs =  sqrt2_r_4 * (w1 + w2 + w3 + w4);
     chassis->state.vy_obs =  sqrt2_r_4 * (-w1 + w2 - w3 + w4);
-    chassis->state.wz_obs =  sqrt2_r_4 * (1.0f / k) * (w1 - w2 - w3 + w4);
+    chassis->state.wz_obs =  r_4k * (w1 - w2 - w3 + w4);
 
 
     float theta_feedback = ops.HIPNUCAngleZ * PI / 180.0f;
@@ -238,7 +329,6 @@ void Chassis_Force_Control_Update(Chassis_Force_Controller_t *chassis) {
                                           chassis->pid_theta.Kp, chassis->pid_theta.Ki, chassis->pid_theta.Kd,
                                           theta_err, 0.0f);
 
-
     float ax = PID_Calc(&chassis->pid_vx, chassis->pid_vx.Kp, chassis->pid_vx.Ki, chassis->pid_vx.Kd, 
                         chassis->state.target_vx, chassis->state.vx_obs);
     
@@ -248,25 +338,21 @@ void Chassis_Force_Control_Update(Chassis_Force_Controller_t *chassis) {
     float alpha = PID_Calc(&chassis->pid_wz, chassis->pid_wz.Kp, chassis->pid_wz.Ki, chassis->pid_wz.Kd, 
                            chassis->state.target_wz, chassis->state.wz_obs);
 
+    float sqrt2_r_4_m = sqrt2_r_4 * m;
+    float tau_wz_ff = r_4k * J * alpha;
 
-    float p1_dot_a = -ax + ay;
-    float p2_dot_a = -ax - ay;
-    float p3_dot_a =  ax - ay;
-    float p4_dot_a =  ax + ay;
+    float tau_ff1 = sqrt2_r_4_m * ( ax - ay) + tau_wz_ff;
+    float tau_ff2 = sqrt2_r_4_m * ( ax + ay) - tau_wz_ff;
+    float tau_ff3 = sqrt2_r_4_m * ( ax - ay) - tau_wz_ff;
+    float tau_ff4 = sqrt2_r_4_m * ( ax + ay) + tau_wz_ff;
 
-    float torque_theta = (J / k) * alpha;
+    float sqrt2_2r = SQRT2 / (2.0f * r);
+    float k_r = k / r;
 
-    float tau_ff1 = -sqrt2_r_4 * (m * p1_dot_a + torque_theta);
-    float tau_ff2 = -sqrt2_r_4 * (m * p2_dot_a + torque_theta);
-    float tau_ff3 = -sqrt2_r_4 * (m * p3_dot_a + torque_theta);
-    float tau_ff4 = -sqrt2_r_4 * (m * p4_dot_a + torque_theta);
-
-
-    float sqrt2_invR = SQRT2 / r;
-    float w1_exp = sqrt2_invR * ( chassis->state.target_vx - chassis->state.target_vy + k * chassis->state.target_wz);
-    float w2_exp = sqrt2_invR * ( chassis->state.target_vx + chassis->state.target_vy - k * chassis->state.target_wz);
-    float w3_exp = sqrt2_invR * ( chassis->state.target_vx - chassis->state.target_vy - k * chassis->state.target_wz);
-    float w4_exp = sqrt2_invR * ( chassis->state.target_vx + chassis->state.target_vy + k * chassis->state.target_wz);
+    float w1_exp = sqrt2_2r * ( chassis->state.target_vx - chassis->state.target_vy) + k_r * chassis->state.target_wz;
+    float w2_exp = sqrt2_2r * ( chassis->state.target_vx + chassis->state.target_vy) - k_r * chassis->state.target_wz;
+    float w3_exp = sqrt2_2r * ( chassis->state.target_vx - chassis->state.target_vy) - k_r * chassis->state.target_wz;
+    float w4_exp = sqrt2_2r * ( chassis->state.target_vx + chassis->state.target_vy) + k_r * chassis->state.target_wz;
 
     float tau_pid1 = PID_Calc(&chassis->pid_wheel1, chassis->pid_wheel1.Kp, chassis->pid_wheel1.Ki, chassis->pid_wheel1.Kd, 
                               w1_exp, w1);
@@ -284,13 +370,12 @@ void Chassis_Force_Control_Update(Chassis_Force_Controller_t *chassis) {
     chassis->state.tau_out3 = -Clamp(tau_ff3 + tau_pid3, -t_max, t_max); 
     chassis->state.tau_out4 =  Clamp(tau_ff4 + tau_pid4, -t_max, t_max);
 
-
     pid_3508[0] = (int)(chassis->state.tau_out1 * TORQUE_TO_CAN_RATIO);
     pid_3508[1] = (int)(chassis->state.tau_out2 * TORQUE_TO_CAN_RATIO);
     pid_3508[2] = (int)(chassis->state.tau_out3 * TORQUE_TO_CAN_RATIO);
     pid_3508[3] = (int)(chassis->state.tau_out4 * TORQUE_TO_CAN_RATIO);
-
 }
+
 
 
 #define MAX_CHASSIS_SPEED  0.3f   
