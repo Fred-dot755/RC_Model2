@@ -62,6 +62,7 @@ extern "C" {
 #include "stddef.h"
 #include "arm_planning.h"
 #include "DH.h"
+#include "bspline.h"
 
 
 #include "cmsis_os.h"

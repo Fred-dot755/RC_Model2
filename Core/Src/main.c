@@ -145,24 +145,18 @@ int main(void)
   DM_Motor_Init();
   unitree_init();
 
-  while(unitree_angle_init[1] == 0 && unitree_angle_init[2] == 0 && unitree_angle_init[3] == 0)
-  {
-    unitree_cmd_create(&unitree_cmd[1], 1, 1, 0.0, 0.0, 0, 0.0, 0.0);
-    unitree_communicate(1);
-    HAL_Delay(100);
-    unitree_cmd_create(&unitree_cmd[2], 2, 1, 0.0, 0.0, 0, 0.0, 0.0);
-    unitree_communicate(2);
-    HAL_Delay(100);
-    unitree_cmd_create(&unitree_cmd[3], 3, 1, 0.0, 0.0, 0, 0.0, 0.0);
-    unitree_communicate(3);
-    HAL_Delay(100);
-    unitree_cmd_create(&unitree_cmd[4], 4, 1, 0.0, 0.0, 0, 0.0, 0.0);
-    unitree_communicate(4);
-    HAL_Delay(100);
-    unitree_cmd_create(&unitree_cmd[5], 5, 1, 0.0, 0.0, 0, 0.0, 0.0);
-    unitree_communicate(5);
-    HAL_Delay(100);
-  }
+  // while(unitree_angle_init[1] == 0 && unitree_angle_init[2] == 0 && unitree_angle_init[3] == 0)
+  // {
+  //   unitree_cmd_create(&unitree_cmd[1], 1, 1, 0.0, 0.0, 0, 0.0, 0.0);
+  //   unitree_communicate(1);
+  //   HAL_Delay(100);
+  //   unitree_cmd_create(&unitree_cmd[2], 2, 1, 0.0, 0.0, 0, 0.0, 0.0);
+  //   unitree_communicate(2);
+  //   HAL_Delay(100);
+  //   unitree_cmd_create(&unitree_cmd[3], 3, 1, 0.0, 0.0, 0, 0.0, 0.0);
+  //   unitree_communicate(3);
+  //   HAL_Delay(100);
+  // }
 
   //RGB变白，顺利启动
   RGB_Color_Ctrl(255,1,255);

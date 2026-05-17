@@ -72,7 +72,7 @@ typedef struct {
 /* USER CODE END Exported types */
 
 /* USER CODE BEGIN Exported variables */
-extern DM4310_Feedback_t dm4310_fb[2];
+extern DM4310_Feedback_t dm4310_fb[4];
 
 /* USER CODE END Exported variables */
 

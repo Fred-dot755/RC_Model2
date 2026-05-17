@@ -38,7 +38,7 @@ static int dm_float_to_uint(float x_float, float x_min, float x_max, int bits) {
 /* USER CODE END Private defines */
 
 /* USER CODE BEGIN Private variables */
-DM4310_Feedback_t dm4310_fb[2] = {0};
+DM4310_Feedback_t dm4310_fb[4] = {0};
 
 /* USER CODE END Private variables */
 
@@ -74,13 +74,46 @@ void DM_Motor_Init(void)
     dm4310_fb[1].velocity_rads = 0.0f;
     dm4310_fb[1].torque_Nm = 0.0f;
 
+    dm4310_fb[2].id = 0;
+    dm4310_fb[2].error = 0;
+    dm4310_fb[2].pos_raw = 0;
+    dm4310_fb[2].vel_raw = 0;
+    dm4310_fb[2].tor_raw = 0;
+    dm4310_fb[2].pos_offset_rad = 0.0f;
+    dm4310_fb[2].is_initialized = 0;
+    dm4310_fb[2].position_deg = 0.0f;
+    dm4310_fb[2].position_rad = 0.0f;
+    dm4310_fb[2].velocity_rads = 0.0f;
+    dm4310_fb[2].torque_Nm = 0.0f;
+
+    dm4310_fb[3].id = 0;
+    dm4310_fb[3].error = 0;
+    dm4310_fb[3].pos_raw = 0;
+    dm4310_fb[3].vel_raw = 0;
+    dm4310_fb[3].tor_raw = 0;
+    dm4310_fb[3].pos_offset_rad = 0.0f;
+    dm4310_fb[3].is_initialized = 0;
+    dm4310_fb[3].position_deg = 0.0f;
+    dm4310_fb[3].position_rad = 0.0f;
+    dm4310_fb[3].velocity_rads = 0.0f;
+    dm4310_fb[3].torque_Nm = 0.0f;
+
+
     DM_CAN_Enable_Motor(2);
     HAL_Delay(100);
     DM_CAN_Enable_Motor(3);
     HAL_Delay(100);
+    DM_CAN_Enable_Motor(4);
+    HAL_Delay(100);
+    DM_CAN_Enable_Motor(5);
+    HAL_Delay(100);
     DM_CAN_Save_Zero_Motor(2);
     HAL_Delay(100);
     DM_CAN_Save_Zero_Motor(3);
+    HAL_Delay(100);
+    DM_CAN_Save_Zero_Motor(4);
+    HAL_Delay(100);
+    DM_CAN_Save_Zero_Motor(5);
     HAL_Delay(100);
 }
 
@@ -146,6 +179,61 @@ void DM_Process_Rx_Message(uint32_t StdId, uint8_t* data)
       dm4310_fb[1].velocity_rads = dm_uint_to_float(v_int, DM_V_MIN, DM_V_MAX, 12);
       dm4310_fb[1].torque_Nm     = dm_uint_to_float(t_int, DM_T_MIN, DM_T_MAX, 12);
     }
+
+    if (StdId == 0x04 ) 
+    {
+      dm4310_fb[2].id    = data[0] & 0x0F;
+      dm4310_fb[2].error = (data[0] >> 4) & 0x0F;
+
+      // POS: 16位，D[1]高字节，D[2]低字节
+      uint16_t p_int = (uint16_t)((data[1] << 8) | data[2]);
+
+      // VEL: 12位，D[3]全8位为高8位，D[4]高4位为低4位
+      uint16_t v_int = (uint16_t)((data[3] << 4) | (data[4] >> 4));
+
+      // TOR: 12位，D[4]低4位为高4位，D[5]全8位为低8位
+      uint16_t t_int = (uint16_t)(((data[4] & 0x0F) << 8) | data[5]);
+
+      float current_abs_rad = dm_uint_to_float(p_int, DM_P_MIN, DM_P_MAX, 16);
+
+      if (dm4310_fb[2].is_initialized == 0) {
+          dm4310_fb[2].pos_offset_rad = current_abs_rad;
+          dm4310_fb[2].is_initialized = 1;
+      }
+
+      dm4310_fb[2].position_rad  = current_abs_rad - dm4310_fb[3].pos_offset_rad;
+      dm4310_fb[2].position_deg  = -dm4310_fb[2].position_rad * (180.0f / DM_PI);
+      dm4310_fb[2].velocity_rads = dm_uint_to_float(v_int, DM_V_MIN, DM_V_MAX, 12);
+      dm4310_fb[2].torque_Nm     = dm_uint_to_float(t_int, DM_T_MIN, DM_T_MAX, 12);
+    }
+
+    if (StdId == 0x05 ) 
+    {
+      dm4310_fb[3].id    = data[0] & 0x0F;
+      dm4310_fb[3].error = (data[0] >> 4) & 0x0F;
+
+      // POS: 16位，D[1]高字节，D[2]低字节
+      uint16_t p_int = (uint16_t)((data[1] << 8) | data[2]);
+
+      // VEL: 12位，D[3]全8位为高8位，D[4]高4位为低4位
+      uint16_t v_int = (uint16_t)((data[3] << 4) | (data[4] >> 4));
+
+      // TOR: 12位，D[4]低4位为高4位，D[5]全8位为低8位
+      uint16_t t_int = (uint16_t)(((data[4] & 0x0F) << 8) | data[5]);
+
+      float current_abs_rad = dm_uint_to_float(p_int, DM_P_MIN, DM_P_MAX, 16);
+
+      if (dm4310_fb[3].is_initialized == 0) {
+          dm4310_fb[3].pos_offset_rad = current_abs_rad;
+          dm4310_fb[3].is_initialized = 1;
+      }
+
+      dm4310_fb[3].position_rad  = current_abs_rad - dm4310_fb[3].pos_offset_rad;
+      dm4310_fb[3].position_deg  = -dm4310_fb[3].position_rad * (180.0f / DM_PI);
+      dm4310_fb[3].velocity_rads = dm_uint_to_float(v_int, DM_V_MIN, DM_V_MAX, 12);
+      dm4310_fb[3].torque_Nm     = dm_uint_to_float(t_int, DM_T_MIN, DM_T_MAX, 12);
+    }
+    
 }
 
 /**

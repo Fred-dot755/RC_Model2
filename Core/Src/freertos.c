@@ -299,12 +299,6 @@ void Unitree_Function(void *argument)
     unitree_cmd_create(&unitree_cmd[2], 2, 1, 1.0, 0.2, now_position.output_angle1, 0.0, 0.0);
     unitree_communicate(2);
     osDelay(10);
-    unitree_cmd_create(&unitree_cmd[4], 4, 1, 1.0, 0.2, R2_Extern.lift, 0.0, 0.0);
-    unitree_communicate(4);
-    osDelay(10);
-    unitree_cmd_create(&unitree_cmd[5], 5, 1, 1.0, 0.2, -R2_Extern.lift, 0.0, 0.0);
-    unitree_communicate(5);
-    osDelay(10);
 
     // unitree_cmd_create(&unitree_cmd[1], 1, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
     // unitree_communicate(1);
@@ -314,12 +308,6 @@ void Unitree_Function(void *argument)
     // osDelay(10);
     // unitree_cmd_create(&unitree_cmd[2], 2, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
     // unitree_communicate(2);
-    // osDelay(10);
-    // unitree_cmd_create(&unitree_cmd[4], 4, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
-    // unitree_communicate(4);
-    // osDelay(10);
-    // unitree_cmd_create(&unitree_cmd[5], 5, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
-    // unitree_communicate(5);
     // osDelay(10);
 
     //调试用
@@ -343,13 +331,19 @@ void DM_Function(void *argument)
   {
     DM_CAN_Enable_Motor(2);
     DM_CAN_Enable_Motor(3);
+    DM_CAN_Enable_Motor(4);
+    DM_CAN_Enable_Motor(5);
 
     DM_CAN_Send_PosVel_Mode((R2_Extern.angle4  - unitree_pos[1] + dm4310_fb[1].position_deg) * 1.5,80,2);//上正
     DM_CAN_Send_PosVel_Mode(-R2_Extern.angle3,40,3);//上负
+    // DM_CAN_Send_PosVel_Mode(R2_Extern.lift,40,4);
+    // DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,40,5);
   
     //调试用
     // DM_CAN_Send_PosVel_Mode(0,0,2);
     // DM_CAN_Send_PosVel_Mode(0,0,3);
+    // DM_CAN_Send_PosVel_Mode(0,0,4);
+    // DM_CAN_Send_PosVel_Mode(0,0,5);
     osDelay(5);
   }
   /* USER CODE END DM_Function */
@@ -827,6 +821,8 @@ void Two_Area_Function(void *argument)
           R2_Extern.Area2_flag = 0;
           R2_Extern.complete_taijie_flag = 1;
       break;
+//下台阶5到8
+
       default:
         break;
     }
@@ -867,17 +863,51 @@ void Three_Area_Function(void *argument)
 void Mid360_Function(void *argument)
 {
   /* USER CODE BEGIN Mid360_Function */
+  static BSTracker bs_tracker;
+  static uint8_t   bs_path_planned = 0;
+
   /* Infinite loop */
   for(;;)
   {
     if(visual_data.i == 1)
     {
-      if(visual_data.workl_mode == 1)
+      if (visual_data.workl_mode == 1)
       {
-        chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, chassic_data.target_x, chassic_data.target_y);
-        R2_Extern.angle = chassic_data.angle;
-        R2_Extern.speed = chassic_data.distance;
+          if (!bs_path_planned)
+          {
+              BSPath path;
+              bspline_plan_path(visual_data.x_map, visual_data.y_map,
+                                chassic_data.target_x, chassic_data.target_y,
+                                NULL, NULL, 0,
+                                &path, BSPLINE_PATH_SAMPLES);
+              bspline_tracker_init(&bs_tracker, &path,
+                                  visual_data.x_map, visual_data.y_map,
+                                  chassic_data.target_x, chassic_data.target_y);
+              bs_path_planned = 1;
+          }
+
+          float next_x, next_y;
+          int ret = bspline_tracker_next(&bs_tracker,
+                                        visual_data.x_map, visual_data.y_map,
+                                        &next_x, &next_y);
+          if (ret == 1)
+          {
+              chassic_control_auto(&chassic_data,
+                                  visual_data.x_map, visual_data.y_map,
+                                  next_x, next_y);
+          }
+          else
+          {
+              bs_path_planned = 0;
+          }
       }
+      else
+      {
+          bs_path_planned = 0;
+          bspline_tracker_reset(&bs_tracker);
+      }
+
+
       if(visual_data.workl_mode == 2)
       {
         if(R2_Extern.complete_taijie_flag == 1 && R2_Extern.complete_dingwei_flag == 0)
@@ -887,6 +917,8 @@ void Mid360_Function(void *argument)
           R2_Extern.speed = chassic_data.distance;
         }
       }
+
+
       if(visual_data.workl_mode == 3)
       {
         
