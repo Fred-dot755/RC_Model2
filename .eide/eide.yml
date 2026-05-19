@@ -32,7 +32,9 @@ targets:
         - Middlewares/Third_Party/FreeRTOS/Source/include
         - Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2
         - Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
-      libList: []
+        - Middlewares/ST/ARM/DSP/Inc
+      libList:
+        - Middlewares/ST/ARM/DSP/Lib
     excludeList: []
     settings: {}
     toolchain: GCC
@@ -66,7 +68,7 @@ targets:
             $outputTaskExcludes:
               - .bin
             LD_FLAGS: ""
-            LIB_FLAGS: ""
+            LIB_FLAGS: "-larm_cortexM7lfsp_math"
             output-format: elf
             remove-unused-input-sections: true
         scatterFilePath: STM32H723VGTX_FLASH.ld
@@ -115,7 +117,9 @@ targets:
         - Middlewares/Third_Party/FreeRTOS/Source/include
         - Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2
         - Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
-      libList: []
+        - Middlewares/ST/ARM/DSP/Inc
+      libList:
+        - Middlewares/ST/ARM/DSP/Lib
     excludeList: []
     settings: {}
     toolchain: GCC
@@ -149,7 +153,7 @@ targets:
             $outputTaskExcludes:
               - .bin
             LD_FLAGS: ""
-            LIB_FLAGS: ""
+            LIB_FLAGS: "-larm_cortexM7lfsp_math"
             output-format: elf
             remove-unused-input-sections: true
         scatterFilePath: STM32H723VGTX_FLASH.ld

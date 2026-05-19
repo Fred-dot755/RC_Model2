@@ -186,24 +186,28 @@ void Motor3508_Process_Rx_Message(FDCAN_HandleTypeDef *hfdcan, FDCAN_RxHeaderTyp
                 motor[0].NowSpeed = (int16_t)(RxData[2] << 8 | RxData[3]);
                 motor[0].LastEnconder = motor[0].NowEnconder;
                 motor[0].NowEnconder = (uint16_t)(RxData[0] << 8 | RxData[1]);
+                motor[0].current = (int16_t)(RxData[4] << 8 | RxData[5]);
                 position_accumulation(0);
                 break;
             case 0x202:
                 motor[1].NowSpeed = (int16_t)(RxData[2] << 8 | RxData[3]);
                 motor[1].LastEnconder = motor[1].NowEnconder;
                 motor[1].NowEnconder = (uint16_t)(RxData[0] << 8 | RxData[1]);
+                motor[1].current = (int16_t)(RxData[4] << 8 | RxData[5]);
                 position_accumulation(1);
                 break;
             case 0x203:
                 motor[2].NowSpeed = (int16_t)(RxData[2] << 8 | RxData[3]);
                 motor[2].LastEnconder = motor[2].NowEnconder;
                 motor[2].NowEnconder = (uint16_t)(RxData[0] << 8 | RxData[1]);
+                motor[2].current = (int16_t)(RxData[4] << 8 | RxData[5]);
                 position_accumulation(2);
                 break;
             case 0x204:
                 motor[3].NowSpeed = (int16_t)(RxData[2] << 8 | RxData[3]);
                 motor[3].LastEnconder = motor[3].NowEnconder;
                 motor[3].NowEnconder = (uint16_t)(RxData[0] << 8 | RxData[1]);
+                motor[3].current = (int16_t)(RxData[4] << 8 | RxData[5]);
                 position_accumulation(3);
                 break;
             case 0x205:

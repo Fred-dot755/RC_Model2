@@ -120,3 +120,15 @@ void check_dingwei(float current_x, float current_y, int cell_index)
 
 
 //3区控制
+
+
+//
+
+float v[4];
+void v_update(void)
+{
+    v[0] = -(float)motor[0].NowSpeed * CUR_TO_RPM;
+    v[1] = -(float)motor[1].NowSpeed * CUR_TO_RPM;
+    v[2] = -(float)motor[2].NowSpeed * CUR_TO_RPM;
+    v[3] = -(float)motor[3].NowSpeed * CUR_TO_RPM;
+}

@@ -63,6 +63,9 @@ extern "C" {
 #include "arm_planning.h"
 #include "DH.h"
 #include "bspline.h"
+#include "QXL_Chassis.h"
+#include "zx_pid.h"
+
 
 
 #include "cmsis_os.h"

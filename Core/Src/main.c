@@ -141,6 +141,9 @@ int main(void)
   WS2812_Ctrl(r, g, b);
 
   Chassis_Force_Control_Init(&chassis_controller);
+
+  QXL_Chassis_Init(&QXL_Chassis_Controller);
+  QXL_chassis_controller_init(100,100,200,1,5,25,0.461,&QXL_Chassis_Controller);
   
   DM_Motor_Init();
   unitree_init();
@@ -323,7 +326,31 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     chassic_small();
 
     RC_Data_To_Chassis_Target();
-    Chassis_Force_Control_Update(&chassis_controller);
+    // Chassis_Force_Control_Update(&chassis_controller);
+    // chassic_control(rc_data.angle, rc_data.distance * 7000, PID_Calc(&pid_span,100,0.5,0.1,0,ops.HIPNUCAngleZ));
+    QXL_chassis_observe_update(v , ops.HIPNUCgyroscopeZ/57.3 , &QXL_Chassis_Controller , 5);
+    QXL_chassis_controller_update(chassis_controller.state.target_vx, chassis_controller.state.target_vy, 0 , &QXL_Chassis_Controller);
+
+    pid_3508[1] = QXL_Chassis_Controller.QXL_Chassis_Controller.Wheel_T1 * TOR_TO_CUR;
+    pid_3508[2] = QXL_Chassis_Controller.QXL_Chassis_Controller.Wheel_T2 * TOR_TO_CUR;
+    pid_3508[3] = QXL_Chassis_Controller.QXL_Chassis_Controller.Wheel_T3 * TOR_TO_CUR;
+    pid_3508[0] = QXL_Chassis_Controller.QXL_Chassis_Controller.Wheel_T4 * TOR_TO_CUR;
+    if(abs(pid_3508[0]) > 16384)
+    {
+      pid_3508[0] = 16384 * (pid_3508[0] / abs(pid_3508[0]));
+    }
+    if(abs(pid_3508[1]) > 16384)
+    {
+      pid_3508[1] = 16384 * (pid_3508[1] / abs(pid_3508[1]));
+    }
+    if(abs(pid_3508[2]) > 16384)
+    {
+      pid_3508[2] = 16384 * (pid_3508[2] / abs(pid_3508[2]));
+    }
+    if(abs(pid_3508[3]) > 16384)
+    {
+      pid_3508[3] = 16384 * (pid_3508[3] / abs(pid_3508[3]));
+    }
 
   }
 

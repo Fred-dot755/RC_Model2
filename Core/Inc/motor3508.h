@@ -6,6 +6,11 @@
 
 #define RPM_TO_RADS (2.0f * PI / 60.0f / 19.2f)
 
+#define CUR_TO_RPM 2.0f * PI / 8191.0f / 60.0f
+// #define TOR_TO_CUR 5.7 / 16384 * 20 
+#define TOR_TO_CUR 16384 /5.7 / 20
+
+
 typedef struct
 {
     int   NowSpeed;				//现在速度
@@ -21,6 +26,8 @@ typedef struct
 
     float ExpectAngle;			//期望角度 可通过脉冲数转换
     float OutSpeed;				//PID控制器输出
+
+    float current;
 
 } DJmotor_struct;      			//DJI电机控制
 

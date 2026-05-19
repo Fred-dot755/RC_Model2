@@ -249,9 +249,9 @@ void DM_CAN_Send_PosVel_Mode(float p_des_deg, float v_des_deg, uint8_t CAN_ID)
     // if (CAN_ID < 2 || CAN_ID > 3 || dm4310_fb[CAN_ID - 2].is_initialized == 0) {
     //     return;
     // }
-    if (CAN_ID < 2 || CAN_ID > 3) {
-        return;
-    }
+    // if (CAN_ID < 2 || CAN_ID > 3) {
+    //     return;
+    // }
     
     float p_target_abs = (p_des_deg * (DM_PI / 180.0f));
     float v_limit_rad = v_des_deg * (DM_PI / 180.0f);

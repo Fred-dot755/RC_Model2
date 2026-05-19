@@ -119,8 +119,10 @@ typedef struct
     int complete_flag;
     int complete_taijie_flag;
     int complete_dingwei_flag;
+    int KFS_Get_flag;
 
     int lingshi_flag;
+
 }My_extern;
 
 
@@ -149,5 +151,9 @@ void chsaaic_front_down(void);
 extern const float data_table[12][2];
 
 void check_dingwei(float current_x, float current_y, int cell_index);
+
+extern float v[4];
+void v_update(void);
+
 
 #endif // __CONTROL_H

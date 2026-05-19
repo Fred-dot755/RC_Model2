@@ -8,12 +8,12 @@
 
 #include <stdint.h>
 
-#define MAX_PWM_VALUE 8000.0f
+#define MAX_PWM_VALUE 16384.0f
 
 // 调试符号系数（如果运动方向不对，调整这些系数）
 // 默认值为 1.0f，如果方向相反改为 -1.0f
 #define COEFF_VX  1.0f
-#define COEFF_VY  -1.0f
+#define COEFF_VY  1.0f
 #define COEFF_W   -1.0f
 
 // 定义圆周率

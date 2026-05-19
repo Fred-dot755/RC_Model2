@@ -43,8 +43,8 @@ static float de_boor_basis(const float *knots, int i, int p, float u)
 {
     if (p == 0)
     {
-        /* 0 次基函数：在节点区间内为 1，否则为 0 */
-        return (u >= knots[i] && u < knots[i + 1]) ? 1.0f : 0.0f;
+        /* 0 次基函数：在节点区间内为 1（闭区间，确保端点可求值），否则为 0 */
+        return (u >= knots[i] && u <= knots[i + 1]) ? 1.0f : 0.0f;
     }
 
     float left  = 0.0f;
@@ -85,14 +85,15 @@ static void build_clamped_knots(float *knots, int n, int p)
 
     /* 内部节点均匀分布 */
     int interior_count = n - p;  /* 内部节点段数 */
-    for (int i = 0; i < interior_count - 1; i++)
+    int interior_knots = (interior_count > 1) ? (interior_count - 1) : 0;
+    for (int i = 0; i < interior_knots; i++)
     {
         knots[p + 1 + i] = (float)(i + 1);
     }
 
     /* 后 p+1 个节点为最大值（clamped 结束） */
-    float max_knot = (float)(interior_count - 1);
-    if (max_knot < 0.0f) max_knot = 0.0f;
+    /* 确保 max_knot >= 1.0f，避免 n==p+1 时节点全零 */
+    float max_knot = (float)(interior_knots > 0 ? interior_knots : 1);
     for (int i = 0; i <= p; i++)
     {
         knots[m - 1 - i] = max_knot;

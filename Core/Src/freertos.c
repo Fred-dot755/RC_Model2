@@ -336,8 +336,8 @@ void DM_Function(void *argument)
 
     DM_CAN_Send_PosVel_Mode((R2_Extern.angle4  - unitree_pos[1] + dm4310_fb[1].position_deg) * 1.5,80,2);//上正
     DM_CAN_Send_PosVel_Mode(-R2_Extern.angle3,40,3);//上负
-    // DM_CAN_Send_PosVel_Mode(R2_Extern.lift,40,4);
-    // DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,40,5);
+    DM_CAN_Send_PosVel_Mode(R2_Extern.lift,40,4);
+    DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,40,5);
   
     //调试用
     // DM_CAN_Send_PosVel_Mode(0,0,2);
