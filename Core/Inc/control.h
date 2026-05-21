@@ -119,7 +119,9 @@ typedef struct
     int complete_flag;
     int complete_taijie_flag;
     int complete_dingwei_flag;
+
     int KFS_Get_flag;
+    int KFS_status_flag;
 
     int lingshi_flag;
 

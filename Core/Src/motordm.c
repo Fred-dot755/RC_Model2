@@ -201,7 +201,7 @@ void DM_Process_Rx_Message(uint32_t StdId, uint8_t* data)
           dm4310_fb[2].is_initialized = 1;
       }
 
-      dm4310_fb[2].position_rad  = current_abs_rad - dm4310_fb[3].pos_offset_rad;
+      dm4310_fb[2].position_rad  = current_abs_rad - dm4310_fb[2].pos_offset_rad;
       dm4310_fb[2].position_deg  = -dm4310_fb[2].position_rad * (180.0f / DM_PI);
       dm4310_fb[2].velocity_rads = dm_uint_to_float(v_int, DM_V_MIN, DM_V_MAX, 12);
       dm4310_fb[2].torque_Nm     = dm_uint_to_float(t_int, DM_T_MIN, DM_T_MAX, 12);

@@ -496,11 +496,11 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
         {
             Motor3508_Process_Rx_Message(hfdcan, &RxHeader, RxData);
         }
-        else if(hfdcan->Instance == FDCAN2)
+        if(hfdcan->Instance == FDCAN2)
         {
-          DM_Process_Rx_Message(RxHeader.Identifier, RxData);
+            DM_Process_Rx_Message(RxHeader.Identifier, RxData);
         }
-        else if(hfdcan->Instance == FDCAN3)
+        if(hfdcan->Instance == FDCAN3)
         {
             Motor3508_Process_Rx_Message(hfdcan, &RxHeader, RxData);
         }

@@ -128,11 +128,11 @@ void up_stair(void)
 {
     R2_Extern.angle2 = 15;
     R2_Extern.angle3 = 30;
-    // if(unitree_pos[1]>= 55 && unitree_pos[1] <= 65 && dm4310_fb[1].position_deg >= 85 && dm4310_fb[1].position_deg <= 95)
-    // {
-    //     now_mood.mood = 3;
-    //     return;
-    // }
+    if(unitree_pos[1]>= (R2_Extern.angle2-5) && unitree_pos[1] <= (R2_Extern.angle2+5) && dm4310_fb[1].position_deg >= (R2_Extern.angle3-5) && dm4310_fb[1].position_deg <= (R2_Extern.angle3+5))
+    {
+        now_mood.mood = 3;
+        return;
+    }
 }
 
 

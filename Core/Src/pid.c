@@ -12,6 +12,17 @@ float pid_span_result;
 int motor_angle1;
 int motor_angle2;
 
+
+/**
+ * @brief 浮点数限位函数
+ */
+static inline float Clamp(float val, float min, float max) {
+    if (val > max) return max;
+    if (val < min) return min;
+    return val;
+}
+
+
 void PID_Init_All(void)
 {
     for(int i=0;i<12;i++)
@@ -127,20 +138,20 @@ void position_accumulation(int ID)
 
 void PID_Calc_All(void)
 {
-	pid_3508[0] = PID_Calc(&pid_3508_speed[0], 10.0f, 0.025f, 0.0f, result.motor1.out, motor[0].NowSpeed);
-    pid_3508[1] = -PID_Calc(&pid_3508_speed[1], 10.0f, 0.025f, 0.0f, result.motor2.out, -motor[1].NowSpeed);
-    pid_3508[2] = -PID_Calc(&pid_3508_speed[2], 10.0f, 0.025f, 0.0f, result.motor3.out, -motor[2].NowSpeed);
-    pid_3508[3] = PID_Calc(&pid_3508_speed[3], 10.0f, 0.025f, 0.0f, result.motor4.out, motor[3].NowSpeed);
-    pid_3508[4] = -PID_Calc(&pid_3508_speed[4], 3.0f, 0.015f, 0.0f, result.motor5.out, -motor[4].NowSpeed);
-    pid_3508[5] = PID_Calc(&pid_3508_speed[5], 3.0f, 0.015f, 0.0f, result.motor6.out, motor[5].NowSpeed);
-	pid_3508[6] = PID_Calc(&pid_3508_speed[6], 3.0f, 0.015f, 0.0f, result.motor7.out, motor[6].NowSpeed);
-	pid_3508[7] = -PID_Calc(&pid_3508_speed[7], 3.0f, 0.015f, 0.0f, result.motor8.out, -motor[7].NowSpeed);
+	pid_3508[0] =  Clamp(PID_Calc(&pid_3508_speed[0], 10.0f, 0.025f, 0.0f, result.motor1.out, motor[0].NowSpeed),            -16384.0f, 16384.0f);
+    pid_3508[1] =  Clamp(-PID_Calc(&pid_3508_speed[1], 10.0f, 0.025f, 0.0f, result.motor2.out, -motor[1].NowSpeed),           -16384.0f, 16384.0f);
+    pid_3508[2] =  Clamp(-PID_Calc(&pid_3508_speed[2], 10.0f, 0.025f, 0.0f, result.motor3.out, -motor[2].NowSpeed),           -16384.0f, 16384.0f);
+    pid_3508[3] =  Clamp(PID_Calc(&pid_3508_speed[3], 10.0f, 0.025f, 0.0f, result.motor4.out, motor[3].NowSpeed),            -16384.0f, 16384.0f);
+    pid_3508[4] =  Clamp(-PID_Calc(&pid_3508_speed[4], 3.0f, 0.015f, 0.0f, result.motor5.out, -motor[4].NowSpeed),           -16384.0f, 16384.0f);
+    pid_3508[5] =  Clamp(PID_Calc(&pid_3508_speed[5], 3.0f, 0.015f, 0.0f, result.motor6.out, motor[5].NowSpeed),            -16384.0f, 16384.0f);
+	pid_3508[6] =  Clamp(PID_Calc(&pid_3508_speed[6], 3.0f, 0.015f, 0.0f, result.motor7.out, motor[6].NowSpeed),            -16384.0f, 16384.0f);
+	pid_3508[7] =  Clamp(-PID_Calc(&pid_3508_speed[7], 3.0f, 0.015f, 0.0f, result.motor8.out, -motor[7].NowSpeed),           -16384.0f, 16384.0f);
 
-	pid_3508[8] = PID_Calc(&pid_3508_loc[8], 1.40, 0.10, 0.70, PID_Calc(&pid_3508_speed[8], 0.55, 0, 0.20, motor[8].ExpectAngle, motor[8].accumulated_distance), motor[8].NowSpeed);
-	pid_3508[9] = PID_Calc(&pid_3508_loc[9], 1.40, 0.10, 0.70, PID_Calc(&pid_3508_speed[9], 0.55, 0, 0.20, motor[9].ExpectAngle, motor[9].accumulated_distance), motor[9].NowSpeed);
+	pid_3508[8] =  Clamp(PID_Calc(&pid_3508_loc[8], 1.40, 0.10, 0.70, PID_Calc(&pid_3508_speed[8], 0.55, 0, 0.20, motor[8].ExpectAngle, motor[8].accumulated_distance), motor[8].NowSpeed),   -16384.0f, 16384.0f);
+	pid_3508[9] =  Clamp(PID_Calc(&pid_3508_loc[9], 1.40, 0.10, 0.70, PID_Calc(&pid_3508_speed[9], 0.55, 0, 0.20, motor[9].ExpectAngle, motor[9].accumulated_distance), motor[9].NowSpeed),   -16384.0f, 16384.0f);
 
-	pid_3508[10] = PID_Calc(&pid_3508_loc[10], 0.80, 0.10, 0.40, PID_Calc(&pid_3508_speed[10], 0.55, 0, 0.20, motor[10].ExpectAngle, motor[10].accumulated_distance), motor[10].NowSpeed);
-	pid_3508[11] = PID_Calc(&pid_3508_loc[11], 0.80, 0.10, 0.40, PID_Calc(&pid_3508_speed[11], 0.55, 0, 0.20, motor[11].ExpectAngle, motor[11].accumulated_distance), motor[11].NowSpeed);
+	pid_3508[10] = Clamp(PID_Calc(&pid_3508_loc[10], 0.80, 0.10, 0.40, PID_Calc(&pid_3508_speed[10], 0.55, 0, 0.20, motor[10].ExpectAngle, motor[10].accumulated_distance), motor[10].NowSpeed), -16384.0f, 16384.0f);
+	pid_3508[11] = Clamp(PID_Calc(&pid_3508_loc[11], 0.80, 0.10, 0.40, PID_Calc(&pid_3508_speed[11], 0.55, 0, 0.20, motor[11].ExpectAngle, motor[11].accumulated_distance), motor[11].NowSpeed), -16384.0f, 16384.0f);
 
 }
 
@@ -152,14 +163,6 @@ Chassis_Force_Controller_t chassis_controller;
 #define SQRT2 1.4142135f
 
 
-/**
- * @brief 浮点数限位函数
- */
-static inline float Clamp(float val, float min, float max) {
-    if (val > max) return max;
-    if (val < min) return min;
-    return val;
-}
 
 
 void Chassis_Force_Control_Init(Chassis_Force_Controller_t *chassis) {
@@ -186,10 +189,10 @@ void Chassis_Force_Control_Init(Chassis_Force_Controller_t *chassis) {
 
     // 初始化目标加速度 PID 参数
     // vx
-    chassis->pid_vx.Kp = 10.0f;  chassis->pid_vx.Ki = 0.05f; chassis->pid_vx.Kd = 0.0f;
+    chassis->pid_vx.Kp = 20.0f;  chassis->pid_vx.Ki = 0.1f; chassis->pid_vx.Kd = 0.0f;
     chassis->pid_vx.I_Max = 10.0f; chassis->pid_vx.V_Max = 40.0f;
     // vy
-    chassis->pid_vy.Kp = 10.0f;  chassis->pid_vy.Ki = 0.05f; chassis->pid_vy.Kd = 0.0f;
+    chassis->pid_vy.Kp = 20.0f;  chassis->pid_vy.Ki = 0.1f; chassis->pid_vy.Kd = 0.0f;
     chassis->pid_vy.I_Max = 10.0f; chassis->pid_vy.V_Max = 40.0f;
     // wz
     chassis->pid_wz.Kp = 8.0f;  chassis->pid_wz.Ki = 0.0f; chassis->pid_wz.Kd = 0.0f;
@@ -308,10 +311,10 @@ void Chassis_Force_Control_Update(Chassis_Force_Controller_t *chassis) {
     float m = chassis->params.mass;
     float J = chassis->params.inertia;
     
-    chassis->state.w1_real = (float)motor[0].NowSpeed * CUR_TO_RPM;
-    chassis->state.w2_real = (float)-motor[1].NowSpeed * CUR_TO_RPM;
-    chassis->state.w3_real = (float)-motor[2].NowSpeed * CUR_TO_RPM;
-    chassis->state.w4_real = (float)motor[3].NowSpeed * CUR_TO_RPM;
+    chassis->state.w1_real = (float)motor[0].NowSpeed * RPM_TO_RADS;
+    chassis->state.w2_real = (float)-motor[1].NowSpeed * RPM_TO_RADS;
+    chassis->state.w3_real = (float)-motor[2].NowSpeed * RPM_TO_RADS;
+    chassis->state.w4_real = (float)motor[3].NowSpeed * RPM_TO_RADS;
 
     float w1 =  chassis->state.w1_real;
     float w2 =  chassis->state.w2_real;   
@@ -378,28 +381,28 @@ void Chassis_Force_Control_Update(Chassis_Force_Controller_t *chassis) {
     chassis->state.tau_out3 = -Clamp(tau_ff3 + tau_pid3, -t_max, t_max); 
     chassis->state.tau_out4 =  Clamp(tau_ff4 + tau_pid4, -t_max, t_max);
 
-    pid_3508[0] = (int)(chassis->state.tau_out1 * TORQUE_TO_CAN_RATIO);
-    pid_3508[1] = (int)(chassis->state.tau_out2 * TORQUE_TO_CAN_RATIO);
-    pid_3508[2] = (int)(chassis->state.tau_out3 * TORQUE_TO_CAN_RATIO);
-    pid_3508[3] = (int)(chassis->state.tau_out4 * TORQUE_TO_CAN_RATIO);
+    pid_3508[0] = Clamp((int)(chassis->state.tau_out1 * TORQUE_TO_CAN_RATIO), -16384, 16384);
+    pid_3508[1] = Clamp((int)(chassis->state.tau_out2 * TORQUE_TO_CAN_RATIO), -16384, 16384);
+    pid_3508[2] = Clamp((int)(chassis->state.tau_out3 * TORQUE_TO_CAN_RATIO), -16384, 16384);
+    pid_3508[3] = Clamp((int)(chassis->state.tau_out4 * TORQUE_TO_CAN_RATIO), -16384, 16384);
 }
 
 
 
-#define MAX_CHASSIS_SPEED  2.0f
+#define MAX_CHASSIS_SPEED  1.0f
 #define MAX_CHASSIS_WZ     3.0f
 
 void RC_Data_To_Chassis_Target(void) {
     
     // float target_speed = R2_Extern.speed;
     // float target_angle = R2_Extern.angle;
-    float target_speed = rc_data.distance;
+    float target_speed = rc_data.distance * 3;
     float target_angle = rc_data.angle;
     
     float angle_rad = target_angle * PI / 180.0f;
     
     float vx = target_speed * cosf(angle_rad);
-    float vy = -target_speed * sinf(angle_rad);
+    float vy = target_speed * sinf(angle_rad);
     
     float speed_mag = sqrtf(vx * vx + vy * vy);
     if (speed_mag > MAX_CHASSIS_SPEED) {
