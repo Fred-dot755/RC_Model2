@@ -28,8 +28,8 @@ void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float no
     }
     chassic_data->angle = -raw_angle;
     
-    float MAX_SPEED = 1.0; 
-    double ONE_METER = 0.05;
+    float MAX_SPEED = 2.0; 
+    double ONE_METER = 0.5;
     double DEADZONE = 0.02;
 
     if (real_distance < DEADZONE) 
@@ -42,7 +42,7 @@ void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float no
     }
     else 
     {
-        chassic_data->distance = MAX_SPEED * real_distance;
+        chassic_data->distance = 5 * real_distance;
     }
 }
 
@@ -115,7 +115,7 @@ void check_dingwei(float current_x, float current_y, int cell_index)
     float dy = current_y - data_table[cell_index][1];
     float dist = sqrtf(dx * dx + dy * dy);
 
-    R2_Extern.complete_dingwei_flag = (dist <= 0.1f) ? 1 : 0;
+    R2_Extern.complete_dingwei_flag = (dist <= 1.0f) ? 1 : 0;
 }
 
 

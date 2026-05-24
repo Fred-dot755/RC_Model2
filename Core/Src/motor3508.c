@@ -279,3 +279,21 @@ void Motor3508_Process_Rx_Message(FDCAN_HandleTypeDef *hfdcan, FDCAN_RxHeaderTyp
 }
 
 
+/**
+ * 设置云台的角度
+ * @param angle_pitch 俯仰角度，单位为度，向前为正
+ * @param angle_yaw 偏航角度，单位为度,逆时针是负
+ */
+void set_yuntai_angle(float angle_pitch , float angle_yaw)
+{
+
+    // 将角度从度转换为弧度
+    float angle_pitch_temp = (angle_pitch+95) * CUR_TO_RADS;  // 俯仰角度转换为弧度
+    float angle_yaw_temp = angle_yaw * CUR_TO_RADS;     // 偏航角度转换为弧度
+
+    
+    // 设置电机期望角度，俯仰电机取负值可能是为了方向校正
+    motor[9].ExpectAngle = -angle_pitch_temp;  // 设置俯仰电机(编号9)的期望角度
+    motor[8].ExpectAngle = angle_yaw_temp;     // 设置偏航电机(编号8)的期望角度
+}
+

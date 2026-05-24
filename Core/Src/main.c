@@ -129,7 +129,7 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim6);
 
   L1_Init(&L1_Sensor1, &huart8);
-  L1_Init(&L1_Sensor2, &huart1);
+  L1_Init(&L1_Sensor2, &huart9);
 
   fdcan_filter_init();
   PID_Init_All();

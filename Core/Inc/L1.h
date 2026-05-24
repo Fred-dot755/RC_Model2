@@ -22,7 +22,7 @@ typedef struct {
 } L1_Data_t;
 
 extern L1_Data_t L1_Sensor1;  // UART8
-extern L1_Data_t L1_Sensor2;  // UART1
+extern L1_Data_t L1_Sensor2;  // UART9
 
 /* 核心控制接口 */
 void L1_Init(L1_Data_t *sensor, UART_HandleTypeDef *huart);

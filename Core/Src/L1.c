@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 L1_Data_t L1_Sensor1 = {0};  // UART8
-L1_Data_t L1_Sensor2 = {0};  // UART1
+L1_Data_t L1_Sensor2 = {0};  // UART9
 
 /**
  * @brief 计算 BCC 异或校验

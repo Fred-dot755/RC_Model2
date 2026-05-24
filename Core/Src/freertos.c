@@ -271,6 +271,7 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
+    set_yuntai_angle(0,0);
     osDelay(5);
   }
   /* USER CODE END StartDefaultTask */
@@ -364,7 +365,7 @@ void DJI_Function(void *argument)
   {
     FDCAN_cmd_chassis_fdcan1_0x200(pid_3508[0], pid_3508[1], pid_3508[2], pid_3508[3]);
     FDCAN_cmd_chassis_fdcan1_0x1FF(pid_3508[4], pid_3508[5], pid_3508[6], pid_3508[7]);
-    // FDCAN_cmd_chassis_fdcan3_0x200(pid_3508[8], pid_3508[9], pid_3508[10], pid_3508[11]);
+    FDCAN_cmd_chassis_fdcan3_0x200(pid_3508[8], pid_3508[9], pid_3508[10], pid_3508[11]);
 
     osDelay(5);
   }
@@ -385,33 +386,13 @@ void Remote_Function(void *argument)
   /* Infinite loop */
   for(;;)
   {
+    // R2_Extern.angle = rc_data.angle;
+    // R2_Extern.speed = rc_data.distance *3;
     // if(R2_Extern.get_init == 0)
     // {
     //   up_stair();
     //   R2_Extern.get_init = 1;
     // }
-
-    // if(rc_data.btn_1 == 1)
-    // {
-    //   R2_Extern.Area2_flag = 1;
-
-    // }
-    // else if(rc_data.btn_2 == 1)
-    // {
-    //   R2_Extern.Area2_flag = 5;
-
-    // }
-    // else if (rc_data.btn_3 == 1)
-    // {
-    //   R2_Extern.angle_balance += 0.3;
-
-    // }
-    // else if (rc_data.btn_4 == 1)
-    // {
-    //   R2_Extern.angle_balance -= 0.3;
-
-    // }
-
 
     // chassic_control(R2_Extern.angle,R2_Extern.speed,R2_Extern.span+(-R2_Extern.error_balance*200));
 
@@ -454,7 +435,7 @@ void Remote_mode_function(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    if(L1_Sensor1.distance_mm <= 170)
+    if(L1_Sensor1.distance_mm <= 190)
     {
       Area_Flag.qian_dis = 1;//低
     }
@@ -467,7 +448,7 @@ void Remote_mode_function(void *argument)
       Area_Flag.qian_dis = 0;
     }
 
-    if(L1_Sensor2.distance_mm <= 170)
+    if(L1_Sensor2.distance_mm <= 180)
     {
       Area_Flag.hou_dis = 1;//低
     }
@@ -501,7 +482,7 @@ void Remote_mode_function(void *argument)
 
     check_dingwei(visual_data.x_map, visual_data.y_map, visual_data.meilin_points[R2_Extern.meilin_count_flag].cell - 1);
 
-    osDelay(3);
+    osDelay(1);
   }
   /* USER CODE END Remote_mode_function */
 }
@@ -587,7 +568,6 @@ void L1_Mode_Function(void *argument)
   for(;;)
   {
     L1_Control(&L1_Sensor1, L1_MODE_FAST);
-    osDelay(5);
     L1_Control(&L1_Sensor2, L1_MODE_FAST);
     osDelay(5);
   }
@@ -614,7 +594,7 @@ void Lift_Mode_Function(void *argument)
       //   R2_Extern.lift += 1;
       //   osDelay(1);
       // }
-      R2_Extern.lift = 400;
+      R2_Extern.lift = 470;
     }
     else if(R2_Extern.lift_mood == 0)
     {
@@ -627,7 +607,11 @@ void Lift_Mode_Function(void *argument)
       // {
       //   R2_Extern.lift = 20;
       // }
-      R2_Extern.lift = 20;
+      R2_Extern.lift = 30;
+    }
+    else if (R2_Extern.lift_mood == 2)
+    {
+      R2_Extern.lift = -30;
     }
     osDelay(5);
   }
@@ -702,6 +686,15 @@ void Two_Area_Function(void *argument)
                   R2_Extern.complete_flag = 1;
               }
          }
+         else
+         {
+          if(R2_Extern.complete_erqu_flag == 0)
+          {
+            R2_Extern.complete_erqu_flag = 1;
+            R2_Extern.Area2_flag = 5;
+          }
+         }
+
         }
 
         if(R2_Extern.complete_taijie_flag == 1 && R2_Extern.complete_dingwei_flag == 1)
@@ -718,8 +711,8 @@ void Two_Area_Function(void *argument)
       switch (R2_Extern.Area2_flag)
       {
       case 0:
-          // R2_Extern.angle = rc_data.angle;
-          // R2_Extern.speed = rc_data.distance;
+          R2_Extern.angle = 0;
+          R2_Extern.speed = 0;
           R2_Extern.angle_balance_target = 0;
         break;
 
@@ -727,7 +720,7 @@ void Two_Area_Function(void *argument)
           if(R2_Extern.lift_mood == 0)
           {
             R2_Extern.lift_mood = 1;
-            osDelay(1000);
+            osDelay(2000);
           }
           R2_Extern.angle = 0;
           R2_Extern.speed = 0.5;
@@ -746,8 +739,8 @@ void Two_Area_Function(void *argument)
             R2_Extern.chsaaic_behind_flag = 1;
             osDelay(500);
           }
-          R2_Extern.lift_mood = 0;
-          osDelay(500);
+          R2_Extern.lift_mood = 2;
+          osDelay(1000);
           R2_Extern.Area2_flag = 3;
         break;
 
@@ -761,6 +754,7 @@ void Two_Area_Function(void *argument)
             R2_Extern.angle = 0;
             R2_Extern.speed = 0;
             chsaaic_behind_down();
+            R2_Extern.lift_mood = 0;
             R2_Extern.chsaaic_behind_flag = 0;
             osDelay(1000);
             R2_Extern.Area2_flag = 4;
@@ -797,41 +791,40 @@ void Two_Area_Function(void *argument)
       case 6:
           if(R2_Extern.lift_mood == 1)
           {
-            R2_Extern.lift_mood = 0;
+            R2_Extern.lift_mood = 2;
             chsaaic_front_up();
-            osDelay(1000);
+            osDelay(2500);
           }
           R2_Extern.angle = 0;
           R2_Extern.speed = 0.2;
           now_mood.mood = 1;
 
-          if(Area_Flag.hou_dis == 0 && R2_Extern.lift_mood == 0)
+          if(Area_Flag.hou_dis == 0 && R2_Extern.lift_mood == 2)
           {
             now_mood.mood = 0;
             R2_Extern.angle = 0;
             R2_Extern.speed = 0;
-            osDelay(500);
+            osDelay(100);
             R2_Extern.Area2_flag = 7;
           }
       break;
 
       case 7:
-          if(R2_Extern.lift_mood == 0)
-          {
             R2_Extern.lift_mood = 1;
-            osDelay(500);
+            osDelay(2000);
             chsaaic_front_down();
             R2_Extern.Area2_flag = 8;
-          }
 
       break;
 
       case 8:
           R2_Extern.angle = 0;
-          R2_Extern.speed = 0.5;
+          R2_Extern.speed = 0.3;
           osDelay(1000);
+          R2_Extern.lift_mood = 0;
           R2_Extern.Area2_flag = 0;
           R2_Extern.complete_taijie_flag = 1;
+          R2_Extern.start_sanqugoon_flag = 1;
       break;
 //下台阶5到8
 
@@ -961,6 +954,36 @@ void Mid360_Function(void *argument)
           chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, data_table[visual_data.meilin_points[R2_Extern.meilin_count_flag].cell-1][0], data_table[visual_data.meilin_points[R2_Extern.meilin_count_flag].cell-1][1]);
           R2_Extern.angle = chassic_data.angle;
           R2_Extern.speed = chassic_data.distance;
+        }
+
+        if(R2_Extern.start_sanqugoon_flag == 1)
+        {
+          float dx1 = visual_data.x_map - 8.28f;
+          float dy1 = visual_data.y_map - (-4.0f);
+          float dist1 = sqrtf(dx1 * dx1 + dy1 * dy1);
+
+          float dx2 = visual_data.x_map - 10.95f;
+          float dy2 = visual_data.y_map - (-4.26f);
+          float dist2 = sqrtf(dx2 * dx2 + dy2 * dy2);
+
+          if(dist2 <= 0.5f)
+          {
+            R2_Extern.complete_dingwei_flag = 1;
+            R2_Extern.angle = 0;
+            R2_Extern.speed = 0;
+          }
+          else if(dist1 <= 0.5f)
+          {
+            chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 10.95, -4.26);
+            R2_Extern.angle = chassic_data.angle;
+            R2_Extern.speed = chassic_data.distance;
+          }
+          else
+          {
+            chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 8.28, -4);
+            R2_Extern.angle = chassic_data.angle;
+            R2_Extern.speed = chassic_data.distance;
+          }
         }
       }
 

@@ -10,6 +10,7 @@
 // #define TOR_TO_CUR 5.7 / 16384 * 20 
 #define TOR_TO_CUR 16384 /5.7 / 20
 
+#define CUR_TO_RADS 8191 * 36 / 360
 
 typedef struct
 {
@@ -44,6 +45,8 @@ void FDCAN_cmd_chassis_fdcan3_0x1FF(int16_t motor1, int16_t motor2, int16_t moto
 
 // 电机数据处理函数
 void Motor3508_Process_Rx_Message(FDCAN_HandleTypeDef *hfdcan, FDCAN_RxHeaderTypeDef *RxHeader, uint8_t *RxData);
+
+void set_yuntai_angle(float angle_pitch , float angle_yaw);
 
 #endif
 
