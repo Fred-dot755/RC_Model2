@@ -49,6 +49,30 @@ void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float no
 
 
 //1区控制
+void zhuazi_mode_1_5(void)
+{
+    set_quzhua_angle(180);
+}
+void zhuazi_mode_2(void)
+{
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
+}
+void zhuazi_mode_3(void)
+{
+    set_quzhua_angle(265);
+}
+void zhuazi_mode_4(void)
+{
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
+}
+void zhuazi_mode_6(void)
+{
+    motor[10].ExpectAngle = 474552;
+}
+void zhuazi_mode_7(void)
+{
+    set_quzhua_angle(0);
+}
 
 
 

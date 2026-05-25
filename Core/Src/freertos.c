@@ -272,6 +272,7 @@ void StartDefaultTask(void *argument)
   for(;;)
   {
     set_yuntai_angle(0,0);
+
     osDelay(5);
   }
   /* USER CODE END StartDefaultTask */
@@ -388,10 +389,30 @@ void Remote_Function(void *argument)
   {
     // R2_Extern.angle = rc_data.angle;
     // R2_Extern.speed = rc_data.distance *3;
-    // if(R2_Extern.get_init == 0)
+    if(R2_Extern.get_init == 0)
+    {
+      up_stair();
+      R2_Extern.get_init = 1;
+    }
+
+    // if(R2_Extern.lingshi_flag == 0)
     // {
-    //   up_stair();
-    //   R2_Extern.get_init = 1;
+    //   osDelay(2000);
+    //   zhuazi_mode_1_5();
+    //   osDelay(1000);
+    //   zhuazi_mode_2();
+    //   osDelay(1000);
+    //   zhuazi_mode_3();
+    //   osDelay(1000);
+    //   zhuazi_mode_4();
+    //   osDelay(1000);
+    //   zhuazi_mode_1_5();
+    //   osDelay(2000);
+    //   zhuazi_mode_6();
+    //   osDelay(1000);
+    //   zhuazi_mode_7();
+    //   osDelay(1000);
+    //   R2_Extern.lingshi_flag = 1;
     // }
 
     // chassic_control(R2_Extern.angle,R2_Extern.speed,R2_Extern.span+(-R2_Extern.error_balance*200));
@@ -471,17 +492,15 @@ void Remote_mode_function(void *argument)
       R2_Extern.chack_yaw_flag = 0;
     }
 
-    if(visual_data.bool_getKFS == 1)
-    {
-      R2_Extern.KFS_Get_flag = 1;
-    }
-    else
-    {
-      R2_Extern.KFS_Get_flag = 0;
-    }
 
     check_dingwei(visual_data.x_map, visual_data.y_map, visual_data.meilin_points[R2_Extern.meilin_count_flag].cell - 1);
 
+
+    if(visual_data.bool_getKFS == 1)
+    {
+      R2_Extern.KFS_Get_flag == 1;
+    }
+    
     osDelay(1);
   }
   /* USER CODE END Remote_mode_function */
@@ -594,7 +613,7 @@ void Lift_Mode_Function(void *argument)
       //   R2_Extern.lift += 1;
       //   osDelay(1);
       // }
-      R2_Extern.lift = 470;
+      R2_Extern.lift = 500;
     }
     else if(R2_Extern.lift_mood == 0)
     {
@@ -607,7 +626,7 @@ void Lift_Mode_Function(void *argument)
       // {
       //   R2_Extern.lift = 20;
       // }
-      R2_Extern.lift = 30;
+      R2_Extern.lift = 100;
     }
     else if (R2_Extern.lift_mood == 2)
     {
@@ -686,7 +705,7 @@ void Two_Area_Function(void *argument)
                   R2_Extern.complete_flag = 1;
               }
          }
-         else
+         else if(R2_Extern.meilin_count_flag > visual_data.meilin_count)
          {
           if(R2_Extern.complete_erqu_flag == 0)
           {
@@ -824,7 +843,10 @@ void Two_Area_Function(void *argument)
           R2_Extern.lift_mood = 0;
           R2_Extern.Area2_flag = 0;
           R2_Extern.complete_taijie_flag = 1;
-          R2_Extern.start_sanqugoon_flag = 1;
+          if(R2_Extern.complete_erqu_flag == 1)
+          {
+            R2_Extern.start_sanqugoon_flag = 1;
+          }
       break;
 //下台阶5到8
 
@@ -835,10 +857,11 @@ void Two_Area_Function(void *argument)
 
   }
 
-  if(R2_Extern.KFS_Get_flag == 1)
+  if(visual_data.workl_mode == 2 && R2_Extern.KFS_Get_flag == 1)
   {
     R2_Extern.angle = 0;
     R2_Extern.speed = 0;
+    R2_Extern.lift_mood = 0;
     switch(R2_Extern.KFS_status_flag)
     {
       case 0:
@@ -862,8 +885,9 @@ void Two_Area_Function(void *argument)
       break;
 
       case 4:
-      R2_Extern.angle2 = 15;
-      R2_Extern.angle3 = 30;
+      R2_Extern.angle2 = 35;
+      R2_Extern.angle3 = 20;
+      R2_Extern.KFS_Get_flag = 0;
       break;
 
     }

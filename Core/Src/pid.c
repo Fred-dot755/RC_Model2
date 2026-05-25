@@ -150,9 +150,10 @@ void PID_Calc_All(void)
 	pid_3508[8] =  Clamp(PID_Calc(&pid_3508_loc[8], 1.40, 0.10, 0.70, PID_Calc(&pid_3508_speed[8], 0.55, 0, 0.20, motor[8].ExpectAngle, motor[8].accumulated_distance), motor[8].NowSpeed),   -2000.0f, 2000.0f);
 	pid_3508[9] =  Clamp(PID_Calc(&pid_3508_loc[9], 1.40, 0.10, 0.70, PID_Calc(&pid_3508_speed[9], 0.55, 0, 0.20, motor[9].ExpectAngle, motor[9].accumulated_distance), motor[9].NowSpeed),   -2000.0f, 2000.0f);
 
-	pid_3508[10] = Clamp(PID_Calc(&pid_3508_loc[10], 0.80, 0.10, 0.40, PID_Calc(&pid_3508_speed[10], 0.55, 0, 0.20, motor[10].ExpectAngle, motor[10].accumulated_distance), motor[10].NowSpeed), -16384.0f, 16384.0f);
-	pid_3508[11] = Clamp(PID_Calc(&pid_3508_loc[11], 0.80, 0.10, 0.40, PID_Calc(&pid_3508_speed[11], 0.55, 0, 0.20, motor[11].ExpectAngle, motor[11].accumulated_distance), motor[11].NowSpeed), -16384.0f, 16384.0f);
+	// pid_3508[10] = Clamp(PID_Calc(&pid_3508_loc[10], 1.40, 0.10, 0.70, PID_Calc(&pid_3508_speed[10], 0.55, 0, 0.20, motor[10].ExpectAngle, motor[10].accumulated_distance), motor[10].NowSpeed), -16384.0f, 16384.0f);
+	// pid_3508[11] = Clamp(PID_Calc(&pid_3508_loc[11], 1.40, 0.005, 3.50, PID_Calc(&pid_3508_speed[11], 0.55, 0, 0.20, motor[11].ExpectAngle, motor[11].accumulated_distance), motor[11].NowSpeed), -16384.0f, 16384.0f);
 
+    //10 472552
 }
 
 

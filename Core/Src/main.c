@@ -145,7 +145,6 @@ int main(void)
   QXL_Chassis_Init(&QXL_Chassis_Controller);
   QXL_chassis_controller_init(100,100,200,1,100,25,0.461,&QXL_Chassis_Controller);
   
-  DM_Motor_Init();
   unitree_init();
 
   while(unitree_angle_init[1] == 0 && unitree_angle_init[2] == 0 && unitree_angle_init[3] == 0)
@@ -161,6 +160,8 @@ int main(void)
     HAL_Delay(100);
   }
 
+  DM_Motor_Init();
+  
   //RGB变白，顺利启动
   RGB_Color_Ctrl(255,1,255);
 

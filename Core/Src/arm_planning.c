@@ -126,8 +126,8 @@ void arm_unitree_planning_update(int angle1, int angle2)
 
 void up_stair(void)
 {
-    R2_Extern.angle2 = 15;
-    R2_Extern.angle3 = 30;
+    R2_Extern.angle2 = 35;
+    R2_Extern.angle3 = 20;
     if(unitree_pos[1]>= (R2_Extern.angle2-5) && unitree_pos[1] <= (R2_Extern.angle2+5) && dm4310_fb[1].position_deg >= (R2_Extern.angle3-5) && dm4310_fb[1].position_deg <= (R2_Extern.angle3+5))
     {
         now_mood.mood = 3;

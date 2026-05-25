@@ -124,6 +124,7 @@ typedef struct
 
     int KFS_Get_flag;
     int KFS_status_flag;
+    int KFS_Grap_flag;
 
     int lingshi_flag;
 
@@ -144,6 +145,14 @@ extern Area2_control_t Area_Flag;
 
 
 void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float now_y, float target_x, float target_y);
+
+void zhuazi_mode_1_5(void);
+void zhuazi_mode_2(void);
+void zhuazi_mode_3(void);
+void zhuazi_mode_4(void);
+void zhuazi_mode_6(void);
+void zhuazi_mode_7(void);
+
 
 void chassic_up(void);
 void chassic_down(void);

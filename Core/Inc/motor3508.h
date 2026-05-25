@@ -12,6 +12,8 @@
 
 #define CUR_TO_RADS 8191 * 36 / 360
 
+#define CUR_TO_RADS_3508 8191 * 19 / 360
+
 typedef struct
 {
     int   NowSpeed;				//现在速度
@@ -47,6 +49,7 @@ void FDCAN_cmd_chassis_fdcan3_0x1FF(int16_t motor1, int16_t motor2, int16_t moto
 void Motor3508_Process_Rx_Message(FDCAN_HandleTypeDef *hfdcan, FDCAN_RxHeaderTypeDef *RxHeader, uint8_t *RxData);
 
 void set_yuntai_angle(float angle_pitch , float angle_yaw);
+void set_quzhua_angle(float angle);
 
 #endif
 
