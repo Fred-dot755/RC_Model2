@@ -42,7 +42,7 @@ void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float no
     }
     else 
     {
-        chassic_data->distance = 5 * real_distance;
+        chassic_data->distance = 4 * real_distance;
     }
 }
 
@@ -142,6 +142,14 @@ void check_dingwei(float current_x, float current_y, int cell_index)
     R2_Extern.complete_dingwei_flag = (dist <= 1.0f) ? 1 : 0;
 }
 
+void check_dingwei_2(float current_x, float current_y, float target_x, float target_y)
+{
+    float dx = current_x - target_x;
+    float dy = current_y - target_y;
+    float dist = sqrtf(dx * dx + dy * dy);
+
+    R2_Extern.bool_check_1_flag = (dist <= 0.2f) ? 1 : 0;
+}
 
 //3区控制
 

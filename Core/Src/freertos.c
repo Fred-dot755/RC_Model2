@@ -613,7 +613,7 @@ void Lift_Mode_Function(void *argument)
       //   R2_Extern.lift += 1;
       //   osDelay(1);
       // }
-      R2_Extern.lift = 500;
+      R2_Extern.lift = 530;
     }
     else if(R2_Extern.lift_mood == 0)
     {
@@ -668,14 +668,28 @@ void Two_Area_Function(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    if(visual_data.workl_mode == 2 && R2_Extern.KFS_Get_flag == 0)
+    if(R2_Extern.check_1_flag == 0)
+    {
+        chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 2.22, -1.50);
+        R2_Extern.angle = chassic_data.angle;
+        R2_Extern.speed = chassic_data.distance;
+        check_dingwei_2(visual_data.x_map, visual_data.y_map, 2.22, -1.50);
+        if(R2_Extern.bool_check_1_flag == 1)
+        {
+            R2_Extern.angle = 0;
+            R2_Extern.speed = 0;
+            R2_Extern.check_1_flag = 1;
+        }
+    }
+
+    if(visual_data.workl_mode == 2 && R2_Extern.KFS_Get_flag == 0 && R2_Extern.check_1_flag == 1 && R2_Extern.bool_meilin_flag == 0)
     {
 
       
-      if(R2_Extern.complete_flag == 0)
-      {
-          if (R2_Extern.meilin_count_flag < visual_data.meilin_count)
+          if(R2_Extern.complete_flag == 0)
           {
+            if (R2_Extern.meilin_count_flag < visual_data.meilin_count)
+            {
               MeilinPointCmd current_point = visual_data.meilin_points[R2_Extern.meilin_count_flag];
 
               if (current_point.cell == 0)
@@ -704,29 +718,25 @@ void Two_Area_Function(void *argument)
 
                   R2_Extern.complete_flag = 1;
               }
-         }
-         else if(R2_Extern.meilin_count_flag > visual_data.meilin_count)
-         {
-          if(R2_Extern.complete_erqu_flag == 0)
-          {
-            R2_Extern.complete_erqu_flag = 1;
-            R2_Extern.Area2_flag = 5;
+            }
+
           }
-         }
 
-        }
-
-        if(R2_Extern.complete_taijie_flag == 1 && R2_Extern.complete_dingwei_flag == 1)
-        {
-          R2_Extern.complete_flag = 0;
-          R2_Extern.complete_taijie_flag = 0;
-          R2_Extern.meilin_count_flag++;
-        }
+          if(R2_Extern.complete_taijie_flag == 1 && R2_Extern.complete_dingwei_flag == 1)
+          {
+            R2_Extern.complete_flag = 0;
+            R2_Extern.complete_taijie_flag = 0;
+            R2_Extern.meilin_count_flag++;
+            if(R2_Extern.meilin_count_flag == visual_data.meilin_count)
+            {
+              if(R2_Extern.complete_erqu_flag == 0)
+                {
+                  R2_Extern.complete_erqu_flag = 1;
+                  R2_Extern.Area2_flag = 5;
+                }
+            }
+          }
       
-
-
-
-
       switch (R2_Extern.Area2_flag)
       {
       case 0:
@@ -796,8 +806,16 @@ void Two_Area_Function(void *argument)
             R2_Extern.lift_mood = 1;
             osDelay(1000);
           }
-          R2_Extern.angle = 0;
-          R2_Extern.speed = 0.15;
+          if(R2_Extern.chack_yaw_flag == 1)
+          {
+            R2_Extern.angle = 0;
+            R2_Extern.speed = 0.15;
+          }
+          else
+          {
+            R2_Extern.angle = 0;
+            R2_Extern.speed = 0;
+          }
 
           if(Area_Flag.qian_dis == 2 && R2_Extern.lift_mood == 1)
           {
@@ -846,6 +864,7 @@ void Two_Area_Function(void *argument)
           if(R2_Extern.complete_erqu_flag == 1)
           {
             R2_Extern.start_sanqugoon_flag = 1;
+            R2_Extern.bool_meilin_flag = 1;
           }
       break;
 //下台阶5到8
@@ -857,7 +876,7 @@ void Two_Area_Function(void *argument)
 
   }
 
-  if(visual_data.workl_mode == 2 && R2_Extern.KFS_Get_flag == 1)
+  if(visual_data.workl_mode == 2 && R2_Extern.KFS_Get_flag == 1 && R2_Extern.check_1_flag == 1)
   {
     R2_Extern.angle = 0;
     R2_Extern.speed = 0;
@@ -990,13 +1009,13 @@ void Mid360_Function(void *argument)
           float dy2 = visual_data.y_map - (-4.26f);
           float dist2 = sqrtf(dx2 * dx2 + dy2 * dy2);
 
-          if(dist2 <= 0.5f)
+          if(dist2 <= 0.2f)
           {
             R2_Extern.complete_dingwei_flag = 1;
             R2_Extern.angle = 0;
             R2_Extern.speed = 0;
           }
-          else if(dist1 <= 0.5f)
+          else if(dist1 <= 0.2f)
           {
             chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 10.95, -4.26);
             R2_Extern.angle = chassic_data.angle;

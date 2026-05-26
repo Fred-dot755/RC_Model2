@@ -112,6 +112,9 @@ typedef struct
     int chsaaic_behind_flag;
     int chsaaic_front_flag;
 
+    int check_1_flag;
+    int bool_check_1_flag;
+
     int chack_yaw_flag;
     int meilin_count_flag;
     int horizontal_s_flag;
@@ -121,6 +124,7 @@ typedef struct
     int complete_dingwei_flag;
     int complete_erqu_flag;
     int start_sanqugoon_flag;
+    int bool_meilin_flag;
 
     int KFS_Get_flag;
     int KFS_status_flag;
@@ -167,6 +171,7 @@ void check_dingwei(float current_x, float current_y, int cell_index);
 
 extern float v[4];
 void v_update(void);
+void check_dingwei_2(float current_x, float current_y, float target_x, float target_y);
 
 
 #endif // __CONTROL_H
