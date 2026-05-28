@@ -3,6 +3,9 @@
 #define ARM_PLANNING_H
 #include "main.h"
 
+#define angle_2 35
+#define angle_3 80
+
 typedef struct {
     int angle1;
     int angle2;
@@ -55,5 +58,9 @@ void arm_goto_stop(void);
  * @return 1=正在移动, 0=已停止
  */
 int arm_goto_is_active(void);
+
+
+void arm_put_kfs(void);
+
 
 #endif

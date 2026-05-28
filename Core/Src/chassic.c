@@ -83,9 +83,9 @@ void chassic_small(void)
     }
     else
     {
-        result.motor5.out = -2000;
-        result.motor6.out = -2000;
-        result.motor7.out = -2000;
-        result.motor8.out = -2000;
+        result.motor5.out = -3000;
+        result.motor6.out = -3000;
+        result.motor7.out = -3000;
+        result.motor8.out = -3000;
     }
 }

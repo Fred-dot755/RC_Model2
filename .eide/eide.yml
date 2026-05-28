@@ -35,7 +35,10 @@ targets:
         - Middlewares/ST/ARM/DSP/Inc
       libList:
         - Middlewares/ST/ARM/DSP/Lib
-    excludeList: []
+    excludeList:
+      - Core/Src/matrix.cpp
+      - Core/Src/QXL_Chassis.cpp
+      - Core/Src/zx_pid.c
     settings: {}
     toolchain: GCC
     toolchainConfigMap:
@@ -68,7 +71,7 @@ targets:
             $outputTaskExcludes:
               - .bin
             LD_FLAGS: ""
-            LIB_FLAGS: "-larm_cortexM7lfsp_math"
+            LIB_FLAGS: -larm_cortexM7lfsp_math
             output-format: elf
             remove-unused-input-sections: true
         scatterFilePath: STM32H723VGTX_FLASH.ld
@@ -153,7 +156,7 @@ targets:
             $outputTaskExcludes:
               - .bin
             LD_FLAGS: ""
-            LIB_FLAGS: "-larm_cortexM7lfsp_math"
+            LIB_FLAGS: -larm_cortexM7lfsp_math
             output-format: elf
             remove-unused-input-sections: true
         scatterFilePath: STM32H723VGTX_FLASH.ld

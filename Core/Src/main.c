@@ -141,9 +141,6 @@ int main(void)
   WS2812_Ctrl(r, g, b);
 
   Chassis_Force_Control_Init(&chassis_controller);
-
-  QXL_Chassis_Init(&QXL_Chassis_Controller);
-  QXL_chassis_controller_init(100,100,200,1,100,25,0.461,&QXL_Chassis_Controller);
   
   unitree_init();
 

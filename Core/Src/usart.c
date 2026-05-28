@@ -1209,7 +1209,7 @@ void USAR_UART10_IDLECallback(UART_HandleTypeDef *huart)
     {
       R2_Extern.x = visual_data.xyz_in_base[0];
       R2_Extern.y = visual_data.xyz_in_base[1];
-      R2_Extern.z = visual_data.xyz_in_base[2] + 250;
+      R2_Extern.z = visual_data.xyz_in_base[2] + 100;
       R2_Extern.KFS_status_flag = 2;
     }
 

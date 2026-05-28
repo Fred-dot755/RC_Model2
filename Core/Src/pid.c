@@ -390,7 +390,7 @@ void Chassis_Force_Control_Update(Chassis_Force_Controller_t *chassis) {
 
 
 
-#define MAX_CHASSIS_SPEED  1.0f
+#define MAX_CHASSIS_SPEED  0.5f
 #define MAX_CHASSIS_WZ     3.0f
 
 void RC_Data_To_Chassis_Target(void) {

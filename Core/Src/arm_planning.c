@@ -90,7 +90,7 @@ void arm_unitree_planning_update(int angle1, int angle2)
     float error1 = diff1;
     float error2 = diff2;
 
-    int target_err1 = (int)(error1 / 10.0f);
+    int target_err1 = (int)(error1 / 20.0f);
     int target_err2 = (int)(error2 / 10.0f);
 
     if (target_err1 == 0 && (int)error1 != 0) target_err1 = (error1 > 0) ? 1 : -1;
@@ -124,10 +124,11 @@ void arm_unitree_planning_update(int angle1, int angle2)
     judgment_moving();
 }
 
+
 void up_stair(void)
 {
-    R2_Extern.angle2 = 35;
-    R2_Extern.angle3 = 20;
+    R2_Extern.angle2 = angle_2;
+    R2_Extern.angle3 = angle_3;
     if(unitree_pos[1]>= (R2_Extern.angle2-5) && unitree_pos[1] <= (R2_Extern.angle2+5) && dm4310_fb[1].position_deg >= (R2_Extern.angle3-5) && dm4310_fb[1].position_deg <= (R2_Extern.angle3+5))
     {
         now_mood.mood = 3;
@@ -177,4 +178,19 @@ void arm_goto_stop(void)
 int arm_goto_is_active(void)
 {
     return arm_goto_active;
+}
+
+void arm_put_kfs(void)
+{
+    R2_Extern.angle2 = angle_2;
+    R2_Extern.angle3 = angle_3 + 20;
+    if(unitree_pos[1]>= R2_Extern.angle2 - 5 && unitree_pos[1] <= R2_Extern.angle2 + 5 && dm4310_fb[1].position_deg >= R2_Extern.angle3 - 5 && dm4310_fb[1].position_deg <= R2_Extern.angle3 + 5)
+      {
+        R2_Extern.angle1 = 155;
+        if(unitree_pos[0] >= R2_Extern.angle1 - 5 && R2_Extern.angle1 <= unitree_pos[0] + 5)
+        {
+            R2_Extern.angle4 = 90;
+            R2_Extern.angle2 = angle_2 + 20;
+        }
+      }
 }

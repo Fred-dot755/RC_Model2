@@ -271,7 +271,7 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    set_yuntai_angle(0,0);
+    set_yuntai_angle(45,0);
 
     osDelay(5);
   }
@@ -292,17 +292,17 @@ void Unitree_Function(void *argument)
   for(;;)
   {
     //1负3正，2左正右负
-    unitree_cmd_create(&unitree_cmd[1], 1, 1, 7.5, 0.2, -now_position.output_angle2, 0.0, 0.0);
+    unitree_cmd_create(&unitree_cmd[1], 1, 1, 7.5, 0.3, -now_position.output_angle2, 0.0, 0.0);
     unitree_communicate(1);
     osDelay(10);
-    unitree_cmd_create(&unitree_cmd[3], 3, 1, 7.5, 0.2, now_position.output_angle2, 0.0, 0.0);
+    unitree_cmd_create(&unitree_cmd[3], 3, 1, 7.5, 0.3, now_position.output_angle2, 0.0, 0.0);
     unitree_communicate(3);
     osDelay(10);
     unitree_cmd_create(&unitree_cmd[2], 2, 1, 1.0, 0.2, now_position.output_angle1, 0.0, 0.0);
     unitree_communicate(2);
     osDelay(10);
 
-    // unitree_cmd_create(&unitree_cmd[1], 1, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
+    unitree_cmd_create(&unitree_cmd[1], 1, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
     // unitree_communicate(1);
     // osDelay(10);
     // unitree_cmd_create(&unitree_cmd[3], 3, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
@@ -337,7 +337,7 @@ void DM_Function(void *argument)
     DM_CAN_Enable_Motor(5);
 
     DM_CAN_Send_PosVel_Mode((R2_Extern.angle4  - unitree_pos[1] + dm4310_fb[1].position_deg) * 1.5,80,2);//上正
-    DM_CAN_Send_PosVel_Mode(-R2_Extern.angle3,40,3);//上负
+    DM_CAN_Send_PosVel_Mode(-R2_Extern.angle3,60,3);//上负
     DM_CAN_Send_PosVel_Mode(R2_Extern.lift,400,4);
     DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,400,5);
   
@@ -391,8 +391,12 @@ void Remote_Function(void *argument)
     // R2_Extern.speed = rc_data.distance *3;
     if(R2_Extern.get_init == 0)
     {
-      up_stair();
-      R2_Extern.get_init = 1;
+      R2_Extern.angle2 = angle_2;
+      R2_Extern.angle3 = angle_3;
+      if(unitree_pos[1]>= R2_Extern.angle2 - 5 && unitree_pos[1] <= R2_Extern.angle2 + 5 && dm4310_fb[1].position_deg >= R2_Extern.angle3 - 5 && dm4310_fb[1].position_deg <= R2_Extern.angle3 + 5)
+      {
+        R2_Extern.get_init = 1;
+      }
     }
 
     // if(R2_Extern.lingshi_flag == 0)
@@ -498,7 +502,11 @@ void Remote_mode_function(void *argument)
 
     if(visual_data.bool_getKFS == 1)
     {
-      R2_Extern.KFS_Get_flag == 1;
+      R2_Extern.KFS_Get_flag = 1;
+    }
+    else
+    {
+      R2_Extern.KFS_Get_flag = 0;
     }
     
     osDelay(1);
@@ -613,7 +621,7 @@ void Lift_Mode_Function(void *argument)
       //   R2_Extern.lift += 1;
       //   osDelay(1);
       // }
-      R2_Extern.lift = 530;
+      R2_Extern.lift = 500;
     }
     else if(R2_Extern.lift_mood == 0)
     {
@@ -668,229 +676,268 @@ void Two_Area_Function(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    if(R2_Extern.check_1_flag == 0)
-    {
-        chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 2.22, -1.50);
-        R2_Extern.angle = chassic_data.angle;
-        R2_Extern.speed = chassic_data.distance;
-        check_dingwei_2(visual_data.x_map, visual_data.y_map, 2.22, -1.50);
-        if(R2_Extern.bool_check_1_flag == 1)
-        {
-            R2_Extern.angle = 0;
-            R2_Extern.speed = 0;
-            R2_Extern.check_1_flag = 1;
-        }
-    }
+//     if(visual_data.workl_mode == 2 && R2_Extern.check_1_flag == 0)
+//     {
+//         chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 2.22, -1.50);
+//         R2_Extern.angle = chassic_data.angle;
+//         R2_Extern.speed = chassic_data.distance;
+//         check_dingwei_2(visual_data.x_map, visual_data.y_map, 2.22, -1.50);
+//         if(R2_Extern.bool_check_1_flag == 1)
+//         {
+//             R2_Extern.angle = 0;
+//             R2_Extern.speed = 0;
+//             R2_Extern.check_1_flag = 1;
+//         }
+//     }
 
-    if(visual_data.workl_mode == 2 && R2_Extern.KFS_Get_flag == 0 && R2_Extern.check_1_flag == 1 && R2_Extern.bool_meilin_flag == 0)
-    {
+//     if(visual_data.workl_mode == 2 && R2_Extern.KFS_Get_flag == 0 && R2_Extern.check_1_flag == 1 && R2_Extern.bool_meilin_flag == 0)
+//     {
 
       
-          if(R2_Extern.complete_flag == 0)
-          {
-            if (R2_Extern.meilin_count_flag < visual_data.meilin_count)
-            {
-              MeilinPointCmd current_point = visual_data.meilin_points[R2_Extern.meilin_count_flag];
+//           if(R2_Extern.complete_flag == 0)
+//           {
+//             if (R2_Extern.meilin_count_flag < visual_data.meilin_count)
+//             {
+//               MeilinPointCmd current_point = visual_data.meilin_points[R2_Extern.meilin_count_flag];
 
-              if (current_point.cell == 0)
-              {
-                  R2_Extern.meilin_count_flag++; 
-                  return;
-              }
+//               if (current_point.cell == 0)
+//               {
+//                   R2_Extern.meilin_count_flag++; 
+//                   return;
+//               }
 
-              switch(current_point.horizontal_s)
-              {
-                case 1: R2_Extern.angle_balance_target = 90; break;
-                case 2: R2_Extern.angle_balance_target = -90;  break;
-                case 3: R2_Extern.angle_balance_target = 0;   break;
-                case 4: R2_Extern.angle_balance_target = 180; break;
-                default: break;
-              }
+//               switch(current_point.horizontal_s)
+//               {
+//                 case 1: R2_Extern.angle_balance_target = 90; break;
+//                 case 2: R2_Extern.angle_balance_target = -90;  break;
+//                 case 3: R2_Extern.angle_balance_target = 0;   break;
+//                 case 4: R2_Extern.angle_balance_target = 180; break;
+//                 default: break;
+//               }
 
-              if (R2_Extern.chack_yaw_flag == 1)
-              {
-                  switch(current_point.vertical_s)
-                  {
-                      case 5: R2_Extern.Area2_flag = 1; break;
-                      case 6: R2_Extern.Area2_flag = 5; break;
-                      default: break;
-                  }
+//               if (R2_Extern.chack_yaw_flag == 1)
+//               {
+//                   switch(current_point.vertical_s)
+//                   {
+//                       case 5: R2_Extern.Area2_flag = 1; break;
+//                       case 6: R2_Extern.Area2_flag = 5; break;
+//                       default: break;
+//                   }
 
-                  R2_Extern.complete_flag = 1;
-              }
-            }
+//                   R2_Extern.complete_flag = 1;
+//               }
+//             }
 
-          }
+//           }
 
-          if(R2_Extern.complete_taijie_flag == 1 && R2_Extern.complete_dingwei_flag == 1)
-          {
-            R2_Extern.complete_flag = 0;
-            R2_Extern.complete_taijie_flag = 0;
-            R2_Extern.meilin_count_flag++;
-            if(R2_Extern.meilin_count_flag == visual_data.meilin_count)
-            {
-              if(R2_Extern.complete_erqu_flag == 0)
-                {
-                  R2_Extern.complete_erqu_flag = 1;
-                  R2_Extern.Area2_flag = 5;
-                }
-            }
-          }
+//           if(R2_Extern.complete_taijie_flag == 1 && R2_Extern.complete_dingwei_flag == 1)
+//           {
+//             R2_Extern.complete_flag = 0;
+//             R2_Extern.complete_taijie_flag = 0;
+//             R2_Extern.meilin_count_flag++;
+//             if(R2_Extern.meilin_count_flag == visual_data.meilin_count)
+//             {
+//               if(R2_Extern.complete_erqu_flag == 0)
+//                 {
+//                   R2_Extern.complete_erqu_flag = 1;
+//                   R2_Extern.Area2_flag = 5;
+//                 }
+//             }
+//           }
       
-      switch (R2_Extern.Area2_flag)
-      {
-      case 0:
-          R2_Extern.angle = 0;
-          R2_Extern.speed = 0;
-          R2_Extern.angle_balance_target = 0;
-        break;
+//       switch (R2_Extern.Area2_flag)
+//       {
+//       case 0:
+//           R2_Extern.angle = 0;
+//           R2_Extern.speed = 0;
+//           R2_Extern.angle_balance_target = 0;
+//         break;
 
-      case 1:
-          if(R2_Extern.lift_mood == 0)
-          {
-            R2_Extern.lift_mood = 1;
-            osDelay(2000);
-          }
-          R2_Extern.angle = 0;
-          R2_Extern.speed = 0.5;
-          if(Area_Flag.qian_dis == 1 && R2_Extern.lift_mood == 1)
-          {
-              R2_Extern.angle = 0;
-              R2_Extern.speed = 0;
-              R2_Extern.Area2_flag = 2;
-          }
-        break;
+//       case 1:
+//           if(R2_Extern.lift_mood == 0)
+//           {
+//             R2_Extern.lift_mood = 1;
+//             osDelay(2000);
+//           }
+//           R2_Extern.angle = 0;
+//           R2_Extern.speed = 0.5;
+//           if(Area_Flag.qian_dis == 1 && R2_Extern.lift_mood == 1)
+//           {
+//               R2_Extern.angle = 0;
+//               R2_Extern.speed = 0;
+//               R2_Extern.Area2_flag = 2;
+//           }
+//         break;
 
-      case 2:
-          if(R2_Extern.chsaaic_behind_flag == 0)
-          {
-            chsaaic_behind_up();
-            R2_Extern.chsaaic_behind_flag = 1;
-            osDelay(500);
-          }
-          R2_Extern.lift_mood = 2;
-          osDelay(1000);
-          R2_Extern.Area2_flag = 3;
-        break;
+//       case 2:
+//           if(R2_Extern.chsaaic_behind_flag == 0)
+//           {
+//             chsaaic_behind_up();
+//             R2_Extern.chsaaic_behind_flag = 1;
+//             osDelay(500);
+//           }
+//           R2_Extern.lift_mood = 2;
+//           osDelay(2000);
+//           R2_Extern.Area2_flag = 3;
+//         break;
 
-      case 3:
-          now_mood.mood = 1;
-          R2_Extern.angle = 0;
-          R2_Extern.speed = 0.3;
-          if(Area_Flag.hou_dis == 1)
-          {
-            now_mood.mood = 0;
-            R2_Extern.angle = 0;
-            R2_Extern.speed = 0;
-            chsaaic_behind_down();
-            R2_Extern.lift_mood = 0;
-            R2_Extern.chsaaic_behind_flag = 0;
-            osDelay(1000);
-            R2_Extern.Area2_flag = 4;
-          }
-        break;
+//       case 3:
+//           now_mood.mood = 1;
+//           R2_Extern.angle = 0;
+//           R2_Extern.speed = 0.3;
+//           if(Area_Flag.hou_dis == 1)
+//           {
+//             now_mood.mood = 0;
+//             R2_Extern.angle = 0;
+//             R2_Extern.speed = 0;
+//             chsaaic_behind_down();
+//             R2_Extern.lift_mood = 0;
+//             R2_Extern.chsaaic_behind_flag = 0;
+//             osDelay(1000);
+//             R2_Extern.Area2_flag = 4;
+//           }
+//         break;
 
-      case 4:
-          R2_Extern.angle = 0;
-          R2_Extern.speed = 0.5;
-          osDelay(500);
-          R2_Extern.Area2_flag = 0;
-          R2_Extern.complete_taijie_flag = 1;
+//       case 4:
+//           R2_Extern.angle = 0;
+//           R2_Extern.speed = 0.5;
+//           osDelay(500);
+//           R2_Extern.Area2_flag = 0;
+//           R2_Extern.complete_taijie_flag = 1;
 
-        break;
-//上台阶1到4
+//         break;
+// //上台阶1到4
 
-      case 5:
-          if(R2_Extern.lift_mood == 0)
-          {
-            R2_Extern.lift_mood = 1;
-            osDelay(1000);
-          }
-          if(R2_Extern.chack_yaw_flag == 1)
-          {
-            R2_Extern.angle = 0;
-            R2_Extern.speed = 0.15;
-          }
-          else
-          {
-            R2_Extern.angle = 0;
-            R2_Extern.speed = 0;
-          }
+//       case 5:
+//           if(R2_Extern.lift_mood == 0)
+//           {
+//             R2_Extern.lift_mood = 1;
+//             osDelay(1000);
+//           }
+//           if(R2_Extern.chack_yaw_flag == 1)
+//           {
+//             R2_Extern.angle = 0;
+//             R2_Extern.speed = 0.15;
+//           }
+//           else
+//           {
+//             R2_Extern.angle = 0;
+//             R2_Extern.speed = 0;
+//           }
 
-          if(Area_Flag.qian_dis == 2 && R2_Extern.lift_mood == 1)
-          {
-              R2_Extern.angle = 0;
-              R2_Extern.speed = 0;
-              R2_Extern.Area2_flag = 6;
-          }
-        break;
+//           if(Area_Flag.qian_dis == 2 && R2_Extern.lift_mood == 1)
+//           {
+//               R2_Extern.angle = 0;
+//               R2_Extern.speed = 0;
+//               R2_Extern.Area2_flag = 6;
+//           }
+//         break;
 
-      case 6:
-          if(R2_Extern.lift_mood == 1)
-          {
-            R2_Extern.lift_mood = 2;
-            chsaaic_front_up();
-            osDelay(2500);
-          }
-          R2_Extern.angle = 0;
-          R2_Extern.speed = 0.2;
-          now_mood.mood = 1;
+//       case 6:
+//           if(R2_Extern.lift_mood == 1)
+//           {
+//             R2_Extern.lift_mood = 2;
+//             chsaaic_front_up();
+//             osDelay(2500);
+//           }
+//           R2_Extern.angle = 0;
+//           R2_Extern.speed = 0.2;
+//           now_mood.mood = 1;
 
-          if(Area_Flag.hou_dis == 0 && R2_Extern.lift_mood == 2)
-          {
-            now_mood.mood = 0;
-            R2_Extern.angle = 0;
-            R2_Extern.speed = 0;
-            osDelay(100);
-            R2_Extern.Area2_flag = 7;
-          }
-      break;
+//           if(Area_Flag.hou_dis == 0 && R2_Extern.lift_mood == 2)
+//           {
+//             now_mood.mood = 0;
+//             R2_Extern.angle = 0;
+//             R2_Extern.speed = 0;
+//             osDelay(100);
+//             R2_Extern.Area2_flag = 7;
+//           }
+//       break;
 
-      case 7:
-            R2_Extern.lift_mood = 1;
-            osDelay(2000);
-            chsaaic_front_down();
-            R2_Extern.Area2_flag = 8;
+//       case 7:
+//             R2_Extern.lift_mood = 1;
+//             osDelay(2000);
+//             chsaaic_front_down();
+//             R2_Extern.Area2_flag = 8;
 
-      break;
+//       break;
 
-      case 8:
-          R2_Extern.angle = 0;
-          R2_Extern.speed = 0.3;
-          osDelay(1000);
-          R2_Extern.lift_mood = 0;
-          R2_Extern.Area2_flag = 0;
-          R2_Extern.complete_taijie_flag = 1;
-          if(R2_Extern.complete_erqu_flag == 1)
-          {
-            R2_Extern.start_sanqugoon_flag = 1;
-            R2_Extern.bool_meilin_flag = 1;
-          }
-      break;
-//下台阶5到8
+//       case 8:
+//           R2_Extern.angle = 0;
+//           R2_Extern.speed = 0.3;
+//           osDelay(1000);
+//           R2_Extern.lift_mood = 0;
+//           R2_Extern.Area2_flag = 0;
+//           R2_Extern.complete_taijie_flag = 1;
+//           if(R2_Extern.complete_erqu_flag == 1)
+//           {
+//             R2_Extern.start_sanqugoon_flag = 1;
+//             R2_Extern.bool_meilin_flag = 1;
+//           }
+//       break;
+// //下台阶5到8
 
-      default:
-        break;
-    }
+//       default:
+//         break;
+//     }
 
 
-  }
+//   }
 
-  if(visual_data.workl_mode == 2 && R2_Extern.KFS_Get_flag == 1 && R2_Extern.check_1_flag == 1)
+  // if(visual_data.workl_mode == 2 && R2_Extern.KFS_Get_flag == 1 && R2_Extern.check_1_flag == 1)
+  // {
+  //   R2_Extern.angle = 0;
+  //   R2_Extern.speed = 0;
+  //   R2_Extern.lift_mood = 0;
+  //   switch(R2_Extern.KFS_status_flag)
+  //   {
+  //     case 0:
+  //     R2_Extern.KFS_status_flag = 1;
+  //     osDelay(200);
+  //     break;
+
+  //     case 2:
+  //     up_stair();
+  //     R2_Extern.angle4 = 90;
+  //     R2_Extern.KFS_status_flag = 3;
+  //     break;
+
+  //     case 3:
+  //     inverseKinematics(R2_Extern.x, R2_Extern.y, R2_Extern.z,&R2_Extern.angle1, &R2_Extern.angle2, &R2_Extern.angle3);
+  //     if(unitree_pos[1]>= R2_Extern.angle2 - 5 && unitree_pos[1] <= R2_Extern.angle2 + 5 && dm4310_fb[1].position_deg >= R2_Extern.angle3 - 5 && dm4310_fb[1].position_deg <= R2_Extern.angle3 + 5)
+  //     {
+  //       osDelay(500);
+  //       R2_Extern.KFS_status_flag = 4;
+  //     }
+  //     break;
+
+  //     case 4:
+  //     R2_Extern.angle2 = 35;
+  //     R2_Extern.angle3 = 20;
+  //     R2_Extern.KFS_Get_flag = 0;
+  //     break;
+
+  //   }
+  // }
+
+  if(visual_data.workl_mode == 2 && R2_Extern.get_init == 1)
   {
-    R2_Extern.angle = 0;
-    R2_Extern.speed = 0;
-    R2_Extern.lift_mood = 0;
     switch(R2_Extern.KFS_status_flag)
     {
       case 0:
-      R2_Extern.KFS_status_flag = 1;
-      osDelay(200);
+      if(R2_Extern.KFS_Get_flag == 1)
+      {
+        R2_Extern.angle = 0;
+        R2_Extern.speed = 0;
+        R2_Extern.lift_mood = 0;
+        R2_Extern.angle4 = 90;
+        R2_Extern.KFS_status_flag = 1;
+        osDelay(200);
+      }
       break;
 
       case 2:
       up_stair();
-      R2_Extern.angle4 = 90;
       R2_Extern.KFS_status_flag = 3;
       break;
 
@@ -898,15 +945,47 @@ void Two_Area_Function(void *argument)
       inverseKinematics(R2_Extern.x, R2_Extern.y, R2_Extern.z,&R2_Extern.angle1, &R2_Extern.angle2, &R2_Extern.angle3);
       if(unitree_pos[1]>= R2_Extern.angle2 - 5 && unitree_pos[1] <= R2_Extern.angle2 + 5 && dm4310_fb[1].position_deg >= R2_Extern.angle3 - 5 && dm4310_fb[1].position_deg <= R2_Extern.angle3 + 5)
       {
-        osDelay(500);
+        osDelay(2000);
         R2_Extern.KFS_status_flag = 4;
       }
       break;
 
       case 4:
-      R2_Extern.angle2 = 35;
-      R2_Extern.angle3 = 20;
-      R2_Extern.KFS_Get_flag = 0;
+      R2_Extern.angle2 = angle_2;
+      R2_Extern.angle3 = angle_3;
+      R2_Extern.angle4 = -10;
+      if(unitree_pos[1]>= R2_Extern.angle2 - 5 && unitree_pos[1] <= R2_Extern.angle2 + 5 && dm4310_fb[1].position_deg >= R2_Extern.angle3 - 5 && dm4310_fb[1].position_deg <= R2_Extern.angle3 + 5)
+      {
+        osDelay(500);
+        if(R2_Extern.KFS_Get_flag == 1)
+        {
+          osDelay(500);
+          if(R2_Extern.KFS_Get_flag == 1)
+          {
+            R2_Extern.KFS_status_flag = 0;
+          }
+        }
+        else
+        {
+          R2_Extern.KFS_status_flag = 5;
+        }
+      }
+      break;
+
+      case 5:
+
+        R2_Extern.angle1 = 155;
+        R2_Extern.angle4 = 80;
+        if(unitree_pos[0] >= R2_Extern.angle1 - 5 && R2_Extern.angle1 <= unitree_pos[0] + 5)
+        {
+            R2_Extern.angle2 = angle_2 + 20;
+            R2_Extern.angle3 = angle_3 + 20;
+            R2_Extern.KFS_status_flag = 0;
+        }
+
+      break;
+
+      default:
       break;
 
     }
@@ -1001,29 +1080,29 @@ void Mid360_Function(void *argument)
 
         if(R2_Extern.start_sanqugoon_flag == 1)
         {
-          float dx1 = visual_data.x_map - 8.28f;
-          float dy1 = visual_data.y_map - (-4.0f);
+          float dx1 = visual_data.x_map - 8.40f;
+          float dy1 = visual_data.y_map - (-3.60f);
           float dist1 = sqrtf(dx1 * dx1 + dy1 * dy1);
 
-          float dx2 = visual_data.x_map - 10.95f;
-          float dy2 = visual_data.y_map - (-4.26f);
+          float dx2 = visual_data.x_map - 11.17f;
+          float dy2 = visual_data.y_map - (-3.60f);
           float dist2 = sqrtf(dx2 * dx2 + dy2 * dy2);
 
-          if(dist2 <= 0.2f)
+          if(dist2 <= 0.05f)
           {
             R2_Extern.complete_dingwei_flag = 1;
             R2_Extern.angle = 0;
             R2_Extern.speed = 0;
           }
-          else if(dist1 <= 0.2f)
+          else if(dist1 <= 0.05f)
           {
-            chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 10.95, -4.26);
+            chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 11.17, -3.60);
             R2_Extern.angle = chassic_data.angle;
             R2_Extern.speed = chassic_data.distance;
           }
           else
           {
-            chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 8.28, -4);
+            chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 8.40, -3.60);
             R2_Extern.angle = chassic_data.angle;
             R2_Extern.speed = chassic_data.distance;
           }
