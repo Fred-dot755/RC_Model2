@@ -45,7 +45,8 @@ typedef struct {
 typedef struct {
     uint8_t head[4];         // 'M', 'E', 'I', 'C'
     int work_mode;
-    int bool_graping;
+    int yaw;
+    int pitch;
     uint16_t crc16;
 } __attribute__((packed)) SendData_t;
 
@@ -62,6 +63,6 @@ bool meic_protocol_parse_packet(const uint8_t *packet, uint16_t len, ReceiveData
 extern ReceiveData_t visual_data;
 extern SendData_t visual_send_data;
 
-void meic_protocol_send_packet_dma(UART_HandleTypeDef *huart, int work_mode, int bool_graping);
+void meic_protocol_send_packet_dma(UART_HandleTypeDef *huart, int pitch ,int yaw);
 
 #endif

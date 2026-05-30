@@ -91,13 +91,13 @@ void arm_unitree_planning_update(int angle1, int angle2)
     float error2 = diff2;
 
     int target_err1 = (int)(error1 / 20.0f);
-    int target_err2 = (int)(error2 / 10.0f);
+    int target_err2 = (int)(error2 / 20.0f);
 
     if (target_err1 == 0 && (int)error1 != 0) target_err1 = (error1 > 0) ? 1 : -1;
     if (target_err2 == 0 && (int)error2 != 0) target_err2 = (error2 > 0) ? 1 : -1;
 
-    if(target_err1 > 10) target_err1 = 10;
-    if(target_err1 < -10) target_err1 = -10;
+    if(target_err1 > 5) target_err1 = 5;
+    if(target_err1 < -5) target_err1 = -5;
     if(target_err2 > 5) target_err2 = 5;
     if(target_err2 < -5) target_err2 = -5;
 
@@ -131,7 +131,6 @@ void up_stair(void)
     R2_Extern.angle3 = angle_3;
     if(unitree_pos[1]>= (R2_Extern.angle2-5) && unitree_pos[1] <= (R2_Extern.angle2+5) && dm4310_fb[1].position_deg >= (R2_Extern.angle3-5) && dm4310_fb[1].position_deg <= (R2_Extern.angle3+5))
     {
-        now_mood.mood = 3;
         return;
     }
 }

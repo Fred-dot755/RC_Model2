@@ -106,7 +106,7 @@ bool meic_protocol_parse_packet(const uint8_t *packet, uint16_t len, ReceiveData
 }
 
 
-void meic_protocol_send_packet_dma(UART_HandleTypeDef *huart, int work_mode, int bool_graping)
+void meic_protocol_send_packet_dma(UART_HandleTypeDef *huart, int pitch ,int yaw)
 {
     // 1. 检查上一次 DMA 传输是否完成（防止数据被覆盖）
     if (huart->gState != HAL_UART_STATE_READY) {
@@ -120,8 +120,8 @@ void meic_protocol_send_packet_dma(UART_HandleTypeDef *huart, int work_mode, int
     visual_send_data.head[3] = 'C';
 
     // 3. 填充数据域
-    visual_send_data.work_mode = work_mode;
-    visual_send_data.bool_graping = bool_graping;
+    visual_send_data.yaw = yaw;
+    visual_send_data.pitch = pitch;
 
     // 4. 计算 CRC16 校验码 (长度减去 2 字节的 CRC 字段)
     uint32_t calc_len = sizeof(SendData_t) - 2;

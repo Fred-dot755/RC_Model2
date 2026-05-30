@@ -272,6 +272,7 @@ void StartDefaultTask(void *argument)
   for(;;)
   {
     set_yuntai_angle(45,0);
+    meic_protocol_send_packet_dma(&huart10, 45, 0);
 
     osDelay(5);
   }
@@ -333,13 +334,13 @@ void DM_Function(void *argument)
   {
     DM_CAN_Enable_Motor(2);
     DM_CAN_Enable_Motor(3);
-    DM_CAN_Enable_Motor(4);
-    DM_CAN_Enable_Motor(5);
+    // DM_CAN_Enable_Motor(4);
+    // DM_CAN_Enable_Motor(5);
 
     DM_CAN_Send_PosVel_Mode((R2_Extern.angle4  - unitree_pos[1] + dm4310_fb[1].position_deg) * 1.5,80,2);//上正
     DM_CAN_Send_PosVel_Mode(-R2_Extern.angle3,60,3);//上负
-    DM_CAN_Send_PosVel_Mode(R2_Extern.lift,400,4);
-    DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,400,5);
+    // DM_CAN_Send_PosVel_Mode(R2_Extern.lift,400,4);
+    // DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,400,5);
   
     //调试用
     // DM_CAN_Send_PosVel_Mode(0,0,2);
@@ -930,7 +931,7 @@ void Two_Area_Function(void *argument)
         R2_Extern.angle = 0;
         R2_Extern.speed = 0;
         R2_Extern.lift_mood = 0;
-        R2_Extern.angle4 = 90;
+        R2_Extern.angle4 = 80;
         R2_Extern.KFS_status_flag = 1;
         osDelay(200);
       }
@@ -945,7 +946,7 @@ void Two_Area_Function(void *argument)
       inverseKinematics(R2_Extern.x, R2_Extern.y, R2_Extern.z,&R2_Extern.angle1, &R2_Extern.angle2, &R2_Extern.angle3);
       if(unitree_pos[1]>= R2_Extern.angle2 - 5 && unitree_pos[1] <= R2_Extern.angle2 + 5 && dm4310_fb[1].position_deg >= R2_Extern.angle3 - 5 && dm4310_fb[1].position_deg <= R2_Extern.angle3 + 5)
       {
-        osDelay(2000);
+        osDelay(500);
         R2_Extern.KFS_status_flag = 4;
       }
       break;
@@ -959,7 +960,7 @@ void Two_Area_Function(void *argument)
         osDelay(500);
         if(R2_Extern.KFS_Get_flag == 1)
         {
-          osDelay(500);
+          osDelay(1000);
           if(R2_Extern.KFS_Get_flag == 1)
           {
             R2_Extern.KFS_status_flag = 0;
@@ -975,12 +976,20 @@ void Two_Area_Function(void *argument)
       case 5:
 
         R2_Extern.angle1 = 155;
+        R2_Extern.angle2 = 55;
         R2_Extern.angle4 = 80;
         if(unitree_pos[0] >= R2_Extern.angle1 - 5 && R2_Extern.angle1 <= unitree_pos[0] + 5)
         {
             R2_Extern.angle2 = angle_2 + 20;
             R2_Extern.angle3 = angle_3 + 20;
-            R2_Extern.KFS_status_flag = 0;
+            if(unitree_pos[1]>= R2_Extern.angle2 - 5 && unitree_pos[1] <= R2_Extern.angle2 + 5 && dm4310_fb[1].position_deg >= R2_Extern.angle3 - 5 && dm4310_fb[1].position_deg <= R2_Extern.angle3 + 5)
+            {
+              R2_Extern.angle2 = angle_2 + 30;
+              R2_Extern.angle3 = angle_3 + 30;
+              R2_Extern.KFS_status_flag = 0;
+              osDelay(500);
+            }
+            
         }
 
       break;
