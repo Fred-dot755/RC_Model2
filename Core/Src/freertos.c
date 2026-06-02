@@ -271,10 +271,10 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    set_yuntai_angle(45,0);
-    meic_protocol_send_packet_dma(&huart10, 45, 0);
+    set_yuntai_angle(0,0);
+    meic_protocol_send_packet_dma(&huart10, 0, 0);
 
-    osDelay(5);
+    osDelay(1);
   }
   /* USER CODE END StartDefaultTask */
 }
@@ -293,28 +293,28 @@ void Unitree_Function(void *argument)
   for(;;)
   {
     //1负3正，2左正右负
-    unitree_cmd_create(&unitree_cmd[1], 1, 1, 7.5, 0.3, -now_position.output_angle2, 0.0, 0.0);
-    unitree_communicate(1);
-    osDelay(10);
-    unitree_cmd_create(&unitree_cmd[3], 3, 1, 7.5, 0.3, now_position.output_angle2, 0.0, 0.0);
-    unitree_communicate(3);
-    osDelay(10);
-    unitree_cmd_create(&unitree_cmd[2], 2, 1, 1.0, 0.2, now_position.output_angle1, 0.0, 0.0);
-    unitree_communicate(2);
-    osDelay(10);
-
-    unitree_cmd_create(&unitree_cmd[1], 1, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
+    // unitree_cmd_create(&unitree_cmd[1], 1, 1, 7.5, 0.3, now_position.output_angle2, 0.0, 0.0);
     // unitree_communicate(1);
     // osDelay(10);
-    // unitree_cmd_create(&unitree_cmd[3], 3, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
+    // unitree_cmd_create(&unitree_cmd[3], 3, 1, 7.5, 0.3, -now_position.output_angle2, 0.0, 0.0);
     // unitree_communicate(3);
     // osDelay(10);
-    // unitree_cmd_create(&unitree_cmd[2], 2, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
+    // unitree_cmd_create(&unitree_cmd[2], 2, 1, 1.0, 0.2, now_position.output_angle1, 0.0, 0.0);
     // unitree_communicate(2);
     // osDelay(10);
 
+    unitree_cmd_create(&unitree_cmd[1], 1, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
+    unitree_communicate(1);
+    osDelay(10);
+    unitree_cmd_create(&unitree_cmd[3], 3, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
+    unitree_communicate(3);
+    osDelay(10);
+    unitree_cmd_create(&unitree_cmd[2], 2, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
+    unitree_communicate(2);
+    osDelay(10);
+
     //调试用
-    osDelay(5);
+    osDelay(3);
   }
   /* USER CODE END Unitree_Function */
 }
@@ -334,20 +334,20 @@ void DM_Function(void *argument)
   {
     DM_CAN_Enable_Motor(2);
     DM_CAN_Enable_Motor(3);
-    // DM_CAN_Enable_Motor(4);
-    // DM_CAN_Enable_Motor(5);
+    DM_CAN_Enable_Motor(4);
+    DM_CAN_Enable_Motor(5);
 
-    DM_CAN_Send_PosVel_Mode((R2_Extern.angle4  - unitree_pos[1] + dm4310_fb[1].position_deg) * 1.5,80,2);//上正
+    DM_CAN_Send_PosVel_Mode(-(R2_Extern.angle4  + unitree_pos[1] - dm4310_fb[1].position_deg) * 1.5,80,2);//上正
     DM_CAN_Send_PosVel_Mode(-R2_Extern.angle3,60,3);//上负
-    // DM_CAN_Send_PosVel_Mode(R2_Extern.lift,400,4);
-    // DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,400,5);
+    DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,400,4);
+    DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,400,5);
   
     //调试用
     // DM_CAN_Send_PosVel_Mode(0,0,2);
     // DM_CAN_Send_PosVel_Mode(0,0,3);
     // DM_CAN_Send_PosVel_Mode(0,0,4);
     // DM_CAN_Send_PosVel_Mode(0,0,5);
-    osDelay(5);
+    osDelay(3);
   }
   /* USER CODE END DM_Function */
 }
@@ -367,9 +367,9 @@ void DJI_Function(void *argument)
   {
     FDCAN_cmd_chassis_fdcan1_0x200(pid_3508[0], pid_3508[1], pid_3508[2], pid_3508[3]);
     FDCAN_cmd_chassis_fdcan1_0x1FF(pid_3508[4], pid_3508[5], pid_3508[6], pid_3508[7]);
-    FDCAN_cmd_chassis_fdcan3_0x200(pid_3508[8], pid_3508[9], pid_3508[10], pid_3508[11]);
+    // FDCAN_cmd_chassis_fdcan3_0x200(pid_3508[8], pid_3508[9], pid_3508[10], pid_3508[11]);
 
-    osDelay(5);
+    osDelay(3);
   }
   /* USER CODE END DJI_Function */
 }
@@ -423,7 +423,7 @@ void Remote_Function(void *argument)
     // chassic_control(R2_Extern.angle,R2_Extern.speed,R2_Extern.span+(-R2_Extern.error_balance*200));
 
 
-    osDelay(5);
+    osDelay(1);
   }
   /* USER CODE END Remote_Function */
 }
@@ -443,7 +443,7 @@ void DH_C_Function(void *argument)
   {
     computeDHTransform(unitree_pos[0], unitree_pos[1],dm4310_fb[1].position_deg , &R2_Extern.x_t, &R2_Extern.y_t, &R2_Extern.z_t);
     // inverseKinematics(x,y,z,&angle1,&angle2,&angle3);
-    osDelay(5);
+    osDelay(1);
   }
   /* USER CODE END DH_C_Function */
 }
@@ -577,7 +577,7 @@ void Angle_ring_Function(void *argument)
     R2_Extern.error_balance = fmodf(R2_Extern.angle_balance - continuous_angle, 360.0f);
     if (R2_Extern.error_balance > 180.0f) R2_Extern.error_balance -= 360.0f;
     if (R2_Extern.error_balance < -180.0f) R2_Extern.error_balance += 360.0f;
-    osDelay(5);
+    osDelay(1);
   }
   /* USER CODE END Angle_ring_Function */
 }
@@ -597,7 +597,7 @@ void L1_Mode_Function(void *argument)
   {
     L1_Control(&L1_Sensor1, L1_MODE_FAST);
     L1_Control(&L1_Sensor2, L1_MODE_FAST);
-    osDelay(5);
+    osDelay(1);
   }
   /* USER CODE END L1_Mode_Function */
 }
@@ -641,7 +641,7 @@ void Lift_Mode_Function(void *argument)
     {
       R2_Extern.lift = -30;
     }
-    osDelay(5);
+    osDelay(1);
   }
   /* USER CODE END Lift_Mode_Function */
 }
@@ -659,7 +659,7 @@ void One_Area_Function(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(5);
+    osDelay(1);
   }
   /* USER CODE END One_Area_Function */
 }
@@ -885,42 +885,6 @@ void Two_Area_Function(void *argument)
 
 //   }
 
-  // if(visual_data.workl_mode == 2 && R2_Extern.KFS_Get_flag == 1 && R2_Extern.check_1_flag == 1)
-  // {
-  //   R2_Extern.angle = 0;
-  //   R2_Extern.speed = 0;
-  //   R2_Extern.lift_mood = 0;
-  //   switch(R2_Extern.KFS_status_flag)
-  //   {
-  //     case 0:
-  //     R2_Extern.KFS_status_flag = 1;
-  //     osDelay(200);
-  //     break;
-
-  //     case 2:
-  //     up_stair();
-  //     R2_Extern.angle4 = 90;
-  //     R2_Extern.KFS_status_flag = 3;
-  //     break;
-
-  //     case 3:
-  //     inverseKinematics(R2_Extern.x, R2_Extern.y, R2_Extern.z,&R2_Extern.angle1, &R2_Extern.angle2, &R2_Extern.angle3);
-  //     if(unitree_pos[1]>= R2_Extern.angle2 - 5 && unitree_pos[1] <= R2_Extern.angle2 + 5 && dm4310_fb[1].position_deg >= R2_Extern.angle3 - 5 && dm4310_fb[1].position_deg <= R2_Extern.angle3 + 5)
-  //     {
-  //       osDelay(500);
-  //       R2_Extern.KFS_status_flag = 4;
-  //     }
-  //     break;
-
-  //     case 4:
-  //     R2_Extern.angle2 = 35;
-  //     R2_Extern.angle3 = 20;
-  //     R2_Extern.KFS_Get_flag = 0;
-  //     break;
-
-  //   }
-  // }
-
   if(visual_data.workl_mode == 2 && R2_Extern.get_init == 1)
   {
     switch(R2_Extern.KFS_status_flag)
@@ -976,7 +940,7 @@ void Two_Area_Function(void *argument)
       case 5:
 
         R2_Extern.angle1 = 155;
-        R2_Extern.angle2 = 55;
+        R2_Extern.angle2 = angle_2;
         R2_Extern.angle4 = 80;
         if(unitree_pos[0] >= R2_Extern.angle1 - 5 && R2_Extern.angle1 <= unitree_pos[0] + 5)
         {
@@ -1000,7 +964,7 @@ void Two_Area_Function(void *argument)
     }
   }
 
-    osDelay(3);
+    osDelay(1);
   }
   /* USER CODE END Two_Area_Function */
 }
@@ -1018,7 +982,7 @@ void Three_Area_Function(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(5);
+    osDelay(1);
   }
   /* USER CODE END Three_Area_Function */
 }
@@ -1126,7 +1090,7 @@ void Mid360_Function(void *argument)
 
     }
 
-    osDelay(5);
+    osDelay(1);
   }
   /* USER CODE END Mid360_Function */
 }

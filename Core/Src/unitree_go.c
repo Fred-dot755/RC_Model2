@@ -130,7 +130,7 @@ void unitree_extract_data(UnitreeMotorData_t *motor_r)
         }
         if(motor_r->motor_id == 3)
         {
-            unitree_pos[1] = motor_r->pos;
+            unitree_pos[1] = -motor_r->pos;
         }
 
         

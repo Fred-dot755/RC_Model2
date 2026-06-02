@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 
-float theta_offset[4] = {0.0f, 45.0f, 170.0f, 0.0f};
+float theta_offset[4] = {0.0f, 0.0f, 170.0f, 0.0f};
 float joint_scale[4]  = {1.0f, 1.0f, -1.0f, 1.0f};
 
 float joint_offset[4] = {0.0f, 180.0f, 180.0f, 0.0f};
