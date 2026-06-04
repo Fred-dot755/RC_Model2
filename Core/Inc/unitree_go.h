@@ -135,6 +135,6 @@ typedef struct
 }DataRecive_t;
 extern DataRecive_t unitree_data_receive[UNITREE_MOTOR_NUM];
 
-extern int unitree_pos[2];
+extern float unitree_pos[3];
 
 #endif /* __UNITREE_GO_H */

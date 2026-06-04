@@ -98,6 +98,7 @@ typedef struct
 
     int x, y, z;
     int angle1, angle2, angle3, angle4;
+    int angle5;
 
     int x_t, y_t, z_t;
 
@@ -130,7 +131,7 @@ typedef struct
     int KFS_status_flag;
     int KFS_Grap_flag;
 
-    int lingshi_flag;
+    float lingshi_flag;
 
 }My_extern;
 
@@ -164,6 +165,11 @@ void chsaaic_behind_up(void);
 void chsaaic_behind_down(void);
 void chsaaic_front_up(void);
 void chsaaic_front_down(void);
+void grap_on(void);
+void grap_off(void);
+
+void grab_angle(int angle);
+
 
 extern const float data_table[12][2];
 

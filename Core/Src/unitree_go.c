@@ -13,7 +13,7 @@ extern DMA_HandleTypeDef hdma_usart2_rx;
 
 int error_unitree = 0;
 
-int unitree_pos[2];
+float unitree_pos[3];
 
 // 全局变量定义
 UnitreeMotorCmd_t unitree_cmd[UNITREE_MOTOR_NUM];
@@ -131,6 +131,10 @@ void unitree_extract_data(UnitreeMotorData_t *motor_r)
         if(motor_r->motor_id == 3)
         {
             unitree_pos[1] = -motor_r->pos;
+        }
+        if(motor_r->motor_id == 1)
+        {
+            unitree_pos[2] = motor_r->pos;
         }
 
         

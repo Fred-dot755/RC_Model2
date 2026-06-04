@@ -111,6 +111,31 @@ void chsaaic_front_down(void)//前轮上升
     HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
 }
 
+void grap_on(void)//打开
+{
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+}
+
+void grap_off(void)//关闭
+{
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
+}
+
+#define angle3508_to_deg 8198 * 19 / 360
+void grab_angle(int angle)
+{
+    pid_3508[10] = angle3508_to_deg * angle;
+}
+
+
+
+
+
+
+
+
+
+
 const float data_table[12][2] = {
     {3.42f, -0.50f},
     {3.39f, -1.68f},
