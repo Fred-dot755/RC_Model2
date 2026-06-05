@@ -150,7 +150,7 @@ void PID_Calc_All(void)
 	pid_3508[8] =  Clamp(PID_Calc(&pid_3508_loc[8], 0.7, 0.05, 0.70, PID_Calc(&pid_3508_speed[8], 0.55, 0, 0.20, motor[8].ExpectAngle, motor[8].accumulated_distance), motor[8].NowSpeed),   -2000.0f, 2000.0f);
 	pid_3508[9] =  Clamp(PID_Calc(&pid_3508_loc[9], 0.7, 0.05, 0.70, PID_Calc(&pid_3508_speed[9], 0.55, 0, 0.20, motor[9].ExpectAngle, motor[9].accumulated_distance), motor[9].NowSpeed),   -2000.0f, 2000.0f);
 
-	pid_3508[10] = Clamp(PID_Calc(&pid_3508_loc[10], 1.40, 0.10, 0.70, PID_Calc(&pid_3508_speed[10], 0.55, 0, 0.20, motor[10].ExpectAngle, motor[10].accumulated_distance), motor[10].NowSpeed), -16384.0f, 16384.0f);
+	pid_3508[10] = Clamp(PID_Calc(&pid_3508_loc[10], 1.40, 0.0, 1.2, PID_Calc(&pid_3508_speed[10], 0.55, 0.20, 0.0, motor[10].ExpectAngle, motor[10].accumulated_distance), motor[10].NowSpeed), -16384.0f, 16384.0f);
 	pid_3508[11] = Clamp(PID_Calc(&pid_3508_loc[11], 1.40, 0.005, 3.50, PID_Calc(&pid_3508_speed[11], 0.55, 0, 0.20, motor[11].ExpectAngle, motor[11].accumulated_distance), motor[11].NowSpeed), -16384.0f, 16384.0f);
 
     //10 472552
@@ -402,8 +402,8 @@ void RC_Data_To_Chassis_Target(void) {
     
     float angle_rad = target_angle * PI / 180.0f;
     
-    float vx = target_speed * sinf(angle_rad);
-    float vy = -target_speed * cosf(angle_rad);
+    float vx = target_speed * cosf(angle_rad);
+    float vy = -target_speed * sinf(angle_rad);
     
     float speed_mag = sqrtf(vx * vx + vy * vy);
     if (speed_mag > MAX_CHASSIS_SPEED) {

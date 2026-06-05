@@ -124,7 +124,7 @@ void grap_off(void)//关闭
 #define angle3508_to_deg 8198 * 19 / 360
 void grab_angle(int angle)
 {
-    pid_3508[10] = angle3508_to_deg * angle;
+    motor[10].ExpectAngle = angle3508_to_deg * angle;
 }
 
 

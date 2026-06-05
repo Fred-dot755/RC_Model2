@@ -339,7 +339,7 @@ void DM_Function(void *argument)
     DM_CAN_Enable_Motor(4);
     DM_CAN_Enable_Motor(5);
 
-    DM_CAN_Send_PosVel_Mode(-(R2_Extern.angle4  + unitree_pos[1] - dm4310_fb[1].position_deg) * 1.5,80,2);//上正
+    DM_CAN_Send_PosVel_Mode(-(-R2_Extern.angle4  + unitree_pos[1] - dm4310_fb[1].position_deg) * 1.5,80,2);//上正
     DM_CAN_Send_PosVel_Mode(-R2_Extern.angle3,60,3);//上负
     DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,400,4);
     DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,400,5);
@@ -393,38 +393,209 @@ void Remote_Function(void *argument)
   {
     R2_Extern.angle = rc_data.angle;
     R2_Extern.speed = rc_data.distance *1;
-    if(R2_Extern.get_init == 0)
-    {
-      // R2_Extern.angle2 = angle_2;
-      // R2_Extern.angle3 = angle_3;
-      R2_Extern.angle2 = 122;
-      R2_Extern.angle3 = 45;
-      if(unitree_pos[1]>= R2_Extern.angle2 - 5 && unitree_pos[1] <= R2_Extern.angle2 + 5 && dm4310_fb[1].position_deg >= R2_Extern.angle3 - 5 && dm4310_fb[1].position_deg <= R2_Extern.angle3 + 5)
-      {
-        R2_Extern.get_init = 1;
-      }
-    }
+    // if(R2_Extern.get_init == 0)
+    // {
+    //   R2_Extern.angle2 = angle_2;
+    //   R2_Extern.angle3 = angle_3;
+    //   // R2_Extern.lift_mood = 1;
+    //   // osDelay(1000);
+    //   // chsaaic_behind_up();
+    //   // chsaaic_front_up();
+    //   // R2_Extern.angle2 = 145;
+    //   // R2_Extern.angle3 = 80;
+    //   // R2_Extern.angle4 = 0;
+    //   if(unitree_pos[1]>= R2_Extern.angle2 - 5 && unitree_pos[1] <= R2_Extern.angle2 + 5 && dm4310_fb[1].position_deg >= R2_Extern.angle3 - 5 && dm4310_fb[1].position_deg <= R2_Extern.angle3 + 5)
+    //   {
+    //     R2_Extern.get_init = 1;
+    //   }
+    // }
+
 
     if(rc_data.btn_1 == 1)
     {
-      R2_Extern.angle5 += 1;
-      osDelay(100);
+      R2_Extern.angle_balance_target += 1;
     }
-    else if(rc_data.btn_2 == 1)
+    if(rc_data.btn_2 == 1)
     {
-      R2_Extern.angle5 -= 1;
-      osDelay(100);
+      R2_Extern.angle_balance_target -= 1;
     }
-    else if(rc_data.btn_3 == 1)
+    if(rc_data.btn_3 == 1)
     {
-      R2_Extern.angle3 += 1;
-      osDelay(100);
+      R2_Extern.Area2_flag = 1;
     }
-    else if(rc_data.btn_4 == 1)
+    if(rc_data.btn_4 == 1)
     {
-      R2_Extern.angle3 -= 1;
-      osDelay(100);
+      R2_Extern.Area2_flag = 5;
     }
+
+    //     if(rc_data.btn_1 == 1 && rc_data.btn_2 == 1)
+    // {
+    //   R2_Extern.angle5 = -80;
+    //   osDelay(100);
+    // }
+    // else if(rc_data.btn_1 == 1 && rc_data.btn_3 == 1)
+    // {
+    //   R2_Extern.angle5 = 0;
+    //   osDelay(100);
+    // }
+    // else if(rc_data.btn_2 == 1 && rc_data.btn_3 == 1)
+    // {
+    //   grap_on();
+    //   osDelay(100);
+    // }
+    // else if(rc_data.btn_2 == 1 && rc_data.btn_4 == 1)
+    // {
+    //   grap_off();
+    //   osDelay(100);
+    // }
+    // else if(rc_data.btn_3 == 1 && rc_data.btn_4 == 1)
+    // {
+    //   R2_Extern.angle2 = 0;
+    //   osDelay(1000);
+    //   R2_Extern.angle3 = 80;
+    //   R2_Extern.angle4 = 0;
+    // }
+
+    
+      switch (R2_Extern.Area2_flag)
+      {
+      case 0:
+          // R2_Extern.angle = 0;
+          // R2_Extern.speed = 0;
+          // R2_Extern.angle_balance_target = 0;
+        break;
+
+      case 1:
+          if(R2_Extern.lift_mood == 0)
+          {
+            R2_Extern.lift_mood = 1;
+            osDelay(2000);
+          }
+          R2_Extern.angle = 0;
+          R2_Extern.speed = 0.5;
+          if(Area_Flag.qian_dis == 1 && R2_Extern.lift_mood == 1)
+          {
+              R2_Extern.angle = 0;
+              R2_Extern.speed = 0;
+              R2_Extern.Area2_flag = 2;
+          }
+        break;
+
+      case 2:
+          if(R2_Extern.chsaaic_behind_flag == 0)
+          {
+            chsaaic_behind_up();
+            R2_Extern.chsaaic_behind_flag = 1;
+            osDelay(500);
+          }
+          R2_Extern.lift_mood = 2;
+          osDelay(2000);
+          R2_Extern.Area2_flag = 3;
+        break;
+
+      case 3:
+          now_mood.mood = 1;
+          R2_Extern.angle = 0;
+          R2_Extern.speed = 0.3;
+          if(Area_Flag.hou_dis == 1)
+          {
+            now_mood.mood = 0;
+            R2_Extern.angle = 0;
+            R2_Extern.speed = 0;
+            chsaaic_behind_down();
+            R2_Extern.lift_mood = 0;
+            R2_Extern.chsaaic_behind_flag = 0;
+            osDelay(1000);
+            R2_Extern.Area2_flag = 4;
+          }
+        break;
+
+      case 4:
+          R2_Extern.angle = 0;
+          R2_Extern.speed = 0.5;
+          osDelay(500);
+          R2_Extern.Area2_flag = 0;
+          R2_Extern.complete_taijie_flag = 1;
+
+        break;
+//上台阶1到4
+
+      case 5:
+          if(R2_Extern.lift_mood == 0)
+          {
+            R2_Extern.lift_mood = 1;
+            osDelay(1000);
+          }
+          if(R2_Extern.chack_yaw_flag == 1)
+          {
+            R2_Extern.angle = 0;
+            R2_Extern.speed = 0.15;
+          }
+          else
+          {
+            R2_Extern.angle = 0;
+            R2_Extern.speed = 0;
+          }
+
+          if(Area_Flag.qian_dis == 2 && R2_Extern.lift_mood == 1)
+          {
+              R2_Extern.angle = 0;
+              R2_Extern.speed = 0;
+              R2_Extern.Area2_flag = 6;
+          }
+        break;
+
+      case 6:
+          if(R2_Extern.lift_mood == 1)
+          {
+            R2_Extern.lift_mood = 2;
+            chsaaic_front_up();
+            osDelay(2500);
+          }
+          R2_Extern.angle = 0;
+          R2_Extern.speed = 0.2;
+          now_mood.mood = 1;
+
+          if(Area_Flag.hou_dis == 0 && R2_Extern.lift_mood == 2)
+          {
+            now_mood.mood = 0;
+            R2_Extern.angle = 0;
+            R2_Extern.speed = 0;
+            osDelay(100);
+            R2_Extern.Area2_flag = 7;
+          }
+      break;
+
+      case 7:
+            R2_Extern.lift_mood = 1;
+            osDelay(2000);
+            chsaaic_front_down();
+            R2_Extern.Area2_flag = 8;
+
+      break;
+
+      case 8:
+          R2_Extern.angle = 0;
+          R2_Extern.speed = 0.3;
+          osDelay(1000);
+          R2_Extern.lift_mood = 0;
+          R2_Extern.Area2_flag = 0;
+          R2_Extern.complete_taijie_flag = 1;
+          if(R2_Extern.complete_erqu_flag == 1)
+          {
+            R2_Extern.start_sanqugoon_flag = 1;
+            R2_Extern.bool_meilin_flag = 1;
+          }
+      break;
+//下台阶5到8
+
+      default:
+        break;
+    }
+
+
+
+
     // if(R2_Extern.lingshi_flag == 0)
     // {
     //   osDelay(2000);
@@ -647,7 +818,7 @@ void Lift_Mode_Function(void *argument)
       //   R2_Extern.lift += 1;
       //   osDelay(1);
       // }
-      R2_Extern.lift = 500;
+      R2_Extern.lift = 490;
     }
     else if(R2_Extern.lift_mood == 0)
     {
