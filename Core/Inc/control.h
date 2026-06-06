@@ -100,6 +100,9 @@ typedef struct
     int angle1, angle2, angle3, angle4;
     int angle5;
 
+    int pitch_angle;
+    int yaw_angle;
+
     int x_t, y_t, z_t;
 
     int lift_mood;
@@ -126,6 +129,7 @@ typedef struct
     int complete_erqu_flag;
     int start_sanqugoon_flag;
     int bool_meilin_flag;
+    int sanqugoon_step;
 
     int KFS_Get_flag;
     int KFS_status_flag;

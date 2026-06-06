@@ -271,8 +271,8 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    set_yuntai_angle(0,0);
-    meic_protocol_send_packet_dma(&huart10, 0, 0);
+    set_yuntai_angle(R2_Extern.pitch_angle, R2_Extern.yaw_angle);
+    meic_protocol_send_packet_dma(&huart10, R2_Extern.pitch_angle, R2_Extern.yaw_angle);
 
     R2_Extern.lingshi_flag = unitree_pos[1] - unitree_pos[2];
 
@@ -336,13 +336,13 @@ void DM_Function(void *argument)
   {
     DM_CAN_Enable_Motor(2);
     DM_CAN_Enable_Motor(3);
-    DM_CAN_Enable_Motor(4);
-    DM_CAN_Enable_Motor(5);
+    // DM_CAN_Enable_Motor(4);
+    // DM_CAN_Enable_Motor(5);
 
     DM_CAN_Send_PosVel_Mode(-(-R2_Extern.angle4  + unitree_pos[1] - dm4310_fb[1].position_deg) * 1.5,80,2);//上正
     DM_CAN_Send_PosVel_Mode(-R2_Extern.angle3,60,3);//上负
-    DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,400,4);
-    DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,400,5);
+    // DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,400,4);
+    // DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,400,5);
   
     //调试用
     // DM_CAN_Send_PosVel_Mode(0,0,2);
@@ -391,12 +391,37 @@ void Remote_Function(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    R2_Extern.angle = rc_data.angle;
-    R2_Extern.speed = rc_data.distance *1;
+    // R2_Extern.angle = rc_data.angle;
+    // R2_Extern.speed = rc_data.distance *1;
+
+    // if(rc_data.btn_1 == 1)
+    // {
+    //   R2_Extern.angle2 += 1;
+    //   osDelay(200);
+    // }
+    // if(rc_data.btn_2 == 1)
+    // {
+    //   R2_Extern.angle2 -= 1;
+    //   osDelay(200);
+    // }
+    // if(rc_data.btn_3 == 1)
+    // {
+    //   R2_Extern.angle3 += 1;
+    //   osDelay(200);
+    // }
+    // if(rc_data.btn_4 == 1)
+    // {
+    //   R2_Extern.angle3 -= 1;
+    //   osDelay(200);
+    // }
+
     // if(R2_Extern.get_init == 0)
     // {
-    //   R2_Extern.angle2 = angle_2;
-    //   R2_Extern.angle3 = angle_3;
+    //   // R2_Extern.angle2 = angle_2;
+    //   // R2_Extern.angle3 = angle_3;
+    //   R2_Extern.angle2 = 60;
+    //   R2_Extern.angle3 = 90;
+    //   R2_Extern.angle4 = -20;
     //   // R2_Extern.lift_mood = 1;
     //   // osDelay(1000);
     //   // chsaaic_behind_up();
@@ -411,22 +436,22 @@ void Remote_Function(void *argument)
     // }
 
 
-    if(rc_data.btn_1 == 1)
-    {
-      R2_Extern.angle_balance_target += 1;
-    }
-    if(rc_data.btn_2 == 1)
-    {
-      R2_Extern.angle_balance_target -= 1;
-    }
-    if(rc_data.btn_3 == 1)
-    {
-      R2_Extern.Area2_flag = 1;
-    }
-    if(rc_data.btn_4 == 1)
-    {
-      R2_Extern.Area2_flag = 5;
-    }
+    // if(rc_data.btn_1 == 1)
+    // {
+    //   R2_Extern.angle_balance_target += 1;
+    // }
+    // if(rc_data.btn_2 == 1)
+    // {
+    //   R2_Extern.angle_balance_target -= 1;
+    // }
+    // if(rc_data.btn_3 == 1)
+    // {
+    //   R2_Extern.Area2_flag = 1;
+    // }
+    // if(rc_data.btn_4 == 1)
+    // {
+    //   R2_Extern.Area2_flag = 5;
+    // }
 
     //     if(rc_data.btn_1 == 1 && rc_data.btn_2 == 1)
     // {
@@ -457,141 +482,141 @@ void Remote_Function(void *argument)
     // }
 
     
-      switch (R2_Extern.Area2_flag)
-      {
-      case 0:
-          // R2_Extern.angle = 0;
-          // R2_Extern.speed = 0;
-          // R2_Extern.angle_balance_target = 0;
-        break;
+//       switch (R2_Extern.Area2_flag)
+//       {
+//       case 0:
+//           // R2_Extern.angle = 0;
+//           // R2_Extern.speed = 0;
+//           // R2_Extern.angle_balance_target = 0;
+//         break;
 
-      case 1:
-          if(R2_Extern.lift_mood == 0)
-          {
-            R2_Extern.lift_mood = 1;
-            osDelay(2000);
-          }
-          R2_Extern.angle = 0;
-          R2_Extern.speed = 0.5;
-          if(Area_Flag.qian_dis == 1 && R2_Extern.lift_mood == 1)
-          {
-              R2_Extern.angle = 0;
-              R2_Extern.speed = 0;
-              R2_Extern.Area2_flag = 2;
-          }
-        break;
+//       case 1:
+//           if(R2_Extern.lift_mood == 0)
+//           {
+//             R2_Extern.lift_mood = 1;
+//             osDelay(2000);
+//           }
+//           R2_Extern.angle = 0;
+//           R2_Extern.speed = 0.5;
+//           if(Area_Flag.qian_dis == 1 && R2_Extern.lift_mood == 1)
+//           {
+//               R2_Extern.angle = 0;
+//               R2_Extern.speed = 0;
+//               R2_Extern.Area2_flag = 2;
+//           }
+//         break;
 
-      case 2:
-          if(R2_Extern.chsaaic_behind_flag == 0)
-          {
-            chsaaic_behind_up();
-            R2_Extern.chsaaic_behind_flag = 1;
-            osDelay(500);
-          }
-          R2_Extern.lift_mood = 2;
-          osDelay(2000);
-          R2_Extern.Area2_flag = 3;
-        break;
+//       case 2:
+//           if(R2_Extern.chsaaic_behind_flag == 0)
+//           {
+//             chsaaic_behind_up();
+//             R2_Extern.chsaaic_behind_flag = 1;
+//             osDelay(500);
+//           }
+//           R2_Extern.lift_mood = 2;
+//           osDelay(2000);
+//           R2_Extern.Area2_flag = 3;
+//         break;
 
-      case 3:
-          now_mood.mood = 1;
-          R2_Extern.angle = 0;
-          R2_Extern.speed = 0.3;
-          if(Area_Flag.hou_dis == 1)
-          {
-            now_mood.mood = 0;
-            R2_Extern.angle = 0;
-            R2_Extern.speed = 0;
-            chsaaic_behind_down();
-            R2_Extern.lift_mood = 0;
-            R2_Extern.chsaaic_behind_flag = 0;
-            osDelay(1000);
-            R2_Extern.Area2_flag = 4;
-          }
-        break;
+//       case 3:
+//           now_mood.mood = 1;
+//           R2_Extern.angle = 0;
+//           R2_Extern.speed = 0.3;
+//           if(Area_Flag.hou_dis == 1)
+//           {
+//             now_mood.mood = 0;
+//             R2_Extern.angle = 0;
+//             R2_Extern.speed = 0;
+//             chsaaic_behind_down();
+//             R2_Extern.lift_mood = 0;
+//             R2_Extern.chsaaic_behind_flag = 0;
+//             osDelay(1000);
+//             R2_Extern.Area2_flag = 4;
+//           }
+//         break;
 
-      case 4:
-          R2_Extern.angle = 0;
-          R2_Extern.speed = 0.5;
-          osDelay(500);
-          R2_Extern.Area2_flag = 0;
-          R2_Extern.complete_taijie_flag = 1;
+//       case 4:
+//           R2_Extern.angle = 0;
+//           R2_Extern.speed = 0.5;
+//           osDelay(500);
+//           R2_Extern.Area2_flag = 0;
+//           R2_Extern.complete_taijie_flag = 1;
 
-        break;
-//上台阶1到4
+//         break;
+// //上台阶1到4
 
-      case 5:
-          if(R2_Extern.lift_mood == 0)
-          {
-            R2_Extern.lift_mood = 1;
-            osDelay(1000);
-          }
-          if(R2_Extern.chack_yaw_flag == 1)
-          {
-            R2_Extern.angle = 0;
-            R2_Extern.speed = 0.15;
-          }
-          else
-          {
-            R2_Extern.angle = 0;
-            R2_Extern.speed = 0;
-          }
+//       case 5:
+//           if(R2_Extern.lift_mood == 0)
+//           {
+//             R2_Extern.lift_mood = 1;
+//             osDelay(1000);
+//           }
+//           if(R2_Extern.chack_yaw_flag == 1)
+//           {
+//             R2_Extern.angle = 0;
+//             R2_Extern.speed = 0.15;
+//           }
+//           else
+//           {
+//             R2_Extern.angle = 0;
+//             R2_Extern.speed = 0;
+//           }
 
-          if(Area_Flag.qian_dis == 2 && R2_Extern.lift_mood == 1)
-          {
-              R2_Extern.angle = 0;
-              R2_Extern.speed = 0;
-              R2_Extern.Area2_flag = 6;
-          }
-        break;
+//           if(Area_Flag.qian_dis == 2 && R2_Extern.lift_mood == 1)
+//           {
+//               R2_Extern.angle = 0;
+//               R2_Extern.speed = 0;
+//               R2_Extern.Area2_flag = 6;
+//           }
+//         break;
 
-      case 6:
-          if(R2_Extern.lift_mood == 1)
-          {
-            R2_Extern.lift_mood = 2;
-            chsaaic_front_up();
-            osDelay(2500);
-          }
-          R2_Extern.angle = 0;
-          R2_Extern.speed = 0.2;
-          now_mood.mood = 1;
+//       case 6:
+//           if(R2_Extern.lift_mood == 1)
+//           {
+//             R2_Extern.lift_mood = 2;
+//             chsaaic_front_up();
+//             osDelay(2500);
+//           }
+//           R2_Extern.angle = 0;
+//           R2_Extern.speed = 0.2;
+//           now_mood.mood = 1;
 
-          if(Area_Flag.hou_dis == 0 && R2_Extern.lift_mood == 2)
-          {
-            now_mood.mood = 0;
-            R2_Extern.angle = 0;
-            R2_Extern.speed = 0;
-            osDelay(100);
-            R2_Extern.Area2_flag = 7;
-          }
-      break;
+//           if(Area_Flag.hou_dis == 0 && R2_Extern.lift_mood == 2)
+//           {
+//             now_mood.mood = 0;
+//             R2_Extern.angle = 0;
+//             R2_Extern.speed = 0;
+//             osDelay(100);
+//             R2_Extern.Area2_flag = 7;
+//           }
+//       break;
 
-      case 7:
-            R2_Extern.lift_mood = 1;
-            osDelay(2000);
-            chsaaic_front_down();
-            R2_Extern.Area2_flag = 8;
+//       case 7:
+//             R2_Extern.lift_mood = 1;
+//             osDelay(2000);
+//             chsaaic_front_down();
+//             R2_Extern.Area2_flag = 8;
 
-      break;
+//       break;
 
-      case 8:
-          R2_Extern.angle = 0;
-          R2_Extern.speed = 0.3;
-          osDelay(1000);
-          R2_Extern.lift_mood = 0;
-          R2_Extern.Area2_flag = 0;
-          R2_Extern.complete_taijie_flag = 1;
-          if(R2_Extern.complete_erqu_flag == 1)
-          {
-            R2_Extern.start_sanqugoon_flag = 1;
-            R2_Extern.bool_meilin_flag = 1;
-          }
-      break;
-//下台阶5到8
+//       case 8:
+//           R2_Extern.angle = 0;
+//           R2_Extern.speed = 0.3;
+//           osDelay(1000);
+//           R2_Extern.lift_mood = 0;
+//           R2_Extern.Area2_flag = 0;
+//           R2_Extern.complete_taijie_flag = 1;
+//           if(R2_Extern.complete_erqu_flag == 1)
+//           {
+//             R2_Extern.start_sanqugoon_flag = 1;
+//             R2_Extern.bool_meilin_flag = 1;
+//           }
+//       break;
+// //下台阶5到8
 
-      default:
-        break;
-    }
+//       default:
+//         break;
+//     }
 
 
 
@@ -873,213 +898,220 @@ void Two_Area_Function(void *argument)
   /* Infinite loop */
   for(;;)
   {
-//     if(visual_data.workl_mode == 2 && R2_Extern.check_1_flag == 0)
-//     {
-//         chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 2.22, -1.50);
-//         R2_Extern.angle = chassic_data.angle;
-//         R2_Extern.speed = chassic_data.distance;
-//         check_dingwei_2(visual_data.x_map, visual_data.y_map, 2.22, -1.50);
-//         if(R2_Extern.bool_check_1_flag == 1)
-//         {
-//             R2_Extern.angle = 0;
-//             R2_Extern.speed = 0;
-//             R2_Extern.check_1_flag = 1;
-//         }
-//     }
+    if(visual_data.workl_mode == 2 && R2_Extern.check_1_flag == 0)
+    {
+        chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 2.14, -1.56);
+        R2_Extern.angle = chassic_data.angle;
+        R2_Extern.speed = chassic_data.distance;
+        check_dingwei_2(visual_data.x_map, visual_data.y_map, 2.14, -1.56);
+        if(R2_Extern.bool_check_1_flag == 1)
+        {
+            R2_Extern.angle = 0;
+            R2_Extern.speed = 0;
+            R2_Extern.check_1_flag = 1;
+        }
+    }
 
-//     if(visual_data.workl_mode == 2 && R2_Extern.KFS_Get_flag == 0 && R2_Extern.check_1_flag == 1 && R2_Extern.bool_meilin_flag == 0)
-//     {
+    if(visual_data.workl_mode == 2 && R2_Extern.KFS_Get_flag == 0 && R2_Extern.check_1_flag == 1 && R2_Extern.bool_meilin_flag == 0)
+    {
 
       
-//           if(R2_Extern.complete_flag == 0)
-//           {
-//             if (R2_Extern.meilin_count_flag < visual_data.meilin_count)
-//             {
-//               MeilinPointCmd current_point = visual_data.meilin_points[R2_Extern.meilin_count_flag];
+          if(R2_Extern.complete_flag == 0)
+          {
+            if (R2_Extern.meilin_count_flag < visual_data.meilin_count)
+            {
+              MeilinPointCmd current_point = visual_data.meilin_points[R2_Extern.meilin_count_flag];
 
-//               if (current_point.cell == 0)
-//               {
-//                   R2_Extern.meilin_count_flag++; 
-//                   return;
-//               }
+              if (current_point.cell == 0)
+              {
+                  R2_Extern.meilin_count_flag++; 
+                  return;
+              }
 
-//               switch(current_point.horizontal_s)
-//               {
-//                 case 1: R2_Extern.angle_balance_target = 90; break;
-//                 case 2: R2_Extern.angle_balance_target = -90;  break;
-//                 case 3: R2_Extern.angle_balance_target = 0;   break;
-//                 case 4: R2_Extern.angle_balance_target = 180; break;
-//                 default: break;
-//               }
+              switch(current_point.horizontal_s)
+              {
+                case 1: R2_Extern.angle_balance_target = 90; break;
+                case 2: R2_Extern.angle_balance_target = -90;  break;
+                case 3: R2_Extern.angle_balance_target = 0;   break;
+                case 4: R2_Extern.angle_balance_target = 180; break;
+                default: break;
+              }
 
-//               if (R2_Extern.chack_yaw_flag == 1)
-//               {
-//                   switch(current_point.vertical_s)
-//                   {
-//                       case 5: R2_Extern.Area2_flag = 1; break;
-//                       case 6: R2_Extern.Area2_flag = 5; break;
-//                       default: break;
-//                   }
+              if (R2_Extern.chack_yaw_flag == 1)
+              {
+                  switch(current_point.vertical_s)
+                  {
+                      case 5: 
+                      R2_Extern.Area2_flag = 1; 
+                      R2_Extern.pitch_angle = 0;
+                      break;
+                      case 6: 
+                      R2_Extern.Area2_flag = 5; 
+                      R2_Extern.pitch_angle = 45;
+                      break;
+                      default: break;
+                  }
 
-//                   R2_Extern.complete_flag = 1;
-//               }
-//             }
+                  R2_Extern.complete_flag = 1;
+              }
+            }
 
-//           }
+          }
 
-//           if(R2_Extern.complete_taijie_flag == 1 && R2_Extern.complete_dingwei_flag == 1)
-//           {
-//             R2_Extern.complete_flag = 0;
-//             R2_Extern.complete_taijie_flag = 0;
-//             R2_Extern.meilin_count_flag++;
-//             if(R2_Extern.meilin_count_flag == visual_data.meilin_count)
-//             {
-//               if(R2_Extern.complete_erqu_flag == 0)
-//                 {
-//                   R2_Extern.complete_erqu_flag = 1;
-//                   R2_Extern.Area2_flag = 5;
-//                 }
-//             }
-//           }
+          if(R2_Extern.complete_taijie_flag == 1 && R2_Extern.complete_dingwei_flag == 1)
+          {
+            R2_Extern.complete_flag = 0;
+            R2_Extern.complete_taijie_flag = 0;
+            R2_Extern.meilin_count_flag++;
+            if(R2_Extern.meilin_count_flag == visual_data.meilin_count)
+            {
+              if(R2_Extern.complete_erqu_flag == 0)
+                {
+                  R2_Extern.complete_erqu_flag = 1;
+                  R2_Extern.Area2_flag = 5;
+                }
+            }
+          }
       
-//       switch (R2_Extern.Area2_flag)
-//       {
-//       case 0:
-//           R2_Extern.angle = 0;
-//           R2_Extern.speed = 0;
-//           R2_Extern.angle_balance_target = 0;
-//         break;
+      switch (R2_Extern.Area2_flag)
+      {
+      case 0:
+          R2_Extern.angle = 0;
+          R2_Extern.speed = 0;
+          R2_Extern.angle_balance_target = 0;
+        break;
 
-//       case 1:
-//           if(R2_Extern.lift_mood == 0)
-//           {
-//             R2_Extern.lift_mood = 1;
-//             osDelay(2000);
-//           }
-//           R2_Extern.angle = 0;
-//           R2_Extern.speed = 0.5;
-//           if(Area_Flag.qian_dis == 1 && R2_Extern.lift_mood == 1)
-//           {
-//               R2_Extern.angle = 0;
-//               R2_Extern.speed = 0;
-//               R2_Extern.Area2_flag = 2;
-//           }
-//         break;
+      case 1:
+          if(R2_Extern.lift_mood == 0)
+          {
+            R2_Extern.lift_mood = 1;
+            osDelay(2000);
+          }
+          R2_Extern.angle = 0;
+          R2_Extern.speed = 0.5;
+          if(Area_Flag.qian_dis == 1 && R2_Extern.lift_mood == 1)
+          {
+              R2_Extern.angle = 0;
+              R2_Extern.speed = 0;
+              R2_Extern.Area2_flag = 2;
+          }
+        break;
 
-//       case 2:
-//           if(R2_Extern.chsaaic_behind_flag == 0)
-//           {
-//             chsaaic_behind_up();
-//             R2_Extern.chsaaic_behind_flag = 1;
-//             osDelay(500);
-//           }
-//           R2_Extern.lift_mood = 2;
-//           osDelay(2000);
-//           R2_Extern.Area2_flag = 3;
-//         break;
+      case 2:
+          if(R2_Extern.chsaaic_behind_flag == 0)
+          {
+            chsaaic_behind_up();
+            R2_Extern.chsaaic_behind_flag = 1;
+            osDelay(500);
+          }
+          R2_Extern.lift_mood = 2;
+          osDelay(2000);
+          R2_Extern.Area2_flag = 3;
+        break;
 
-//       case 3:
-//           now_mood.mood = 1;
-//           R2_Extern.angle = 0;
-//           R2_Extern.speed = 0.3;
-//           if(Area_Flag.hou_dis == 1)
-//           {
-//             now_mood.mood = 0;
-//             R2_Extern.angle = 0;
-//             R2_Extern.speed = 0;
-//             chsaaic_behind_down();
-//             R2_Extern.lift_mood = 0;
-//             R2_Extern.chsaaic_behind_flag = 0;
-//             osDelay(1000);
-//             R2_Extern.Area2_flag = 4;
-//           }
-//         break;
+      case 3:
+          now_mood.mood = 1;
+          R2_Extern.angle = 0;
+          R2_Extern.speed = 0.3;
+          if(Area_Flag.hou_dis == 1)
+          {
+            now_mood.mood = 0;
+            R2_Extern.angle = 0;
+            R2_Extern.speed = 0;
+            chsaaic_behind_down();
+            R2_Extern.lift_mood = 0;
+            R2_Extern.chsaaic_behind_flag = 0;
+            osDelay(1000);
+            R2_Extern.Area2_flag = 4;
+          }
+        break;
 
-//       case 4:
-//           R2_Extern.angle = 0;
-//           R2_Extern.speed = 0.5;
-//           osDelay(500);
-//           R2_Extern.Area2_flag = 0;
-//           R2_Extern.complete_taijie_flag = 1;
+      case 4:
+          R2_Extern.angle = 0;
+          R2_Extern.speed = 0.5;
+          osDelay(500);
+          R2_Extern.Area2_flag = 0;
+          R2_Extern.complete_taijie_flag = 1;
 
-//         break;
-// //上台阶1到4
+        break;
+//上台阶1到4
 
-//       case 5:
-//           if(R2_Extern.lift_mood == 0)
-//           {
-//             R2_Extern.lift_mood = 1;
-//             osDelay(1000);
-//           }
-//           if(R2_Extern.chack_yaw_flag == 1)
-//           {
-//             R2_Extern.angle = 0;
-//             R2_Extern.speed = 0.15;
-//           }
-//           else
-//           {
-//             R2_Extern.angle = 0;
-//             R2_Extern.speed = 0;
-//           }
+      case 5:
+          if(R2_Extern.lift_mood == 0)
+          {
+            R2_Extern.lift_mood = 1;
+            osDelay(1000);
+          }
+          if(R2_Extern.chack_yaw_flag == 1)
+          {
+            R2_Extern.angle = 0;
+            R2_Extern.speed = 0.15;
+          }
+          else
+          {
+            R2_Extern.angle = 0;
+            R2_Extern.speed = 0;
+          }
 
-//           if(Area_Flag.qian_dis == 2 && R2_Extern.lift_mood == 1)
-//           {
-//               R2_Extern.angle = 0;
-//               R2_Extern.speed = 0;
-//               R2_Extern.Area2_flag = 6;
-//           }
-//         break;
+          if(Area_Flag.qian_dis == 2 && R2_Extern.lift_mood == 1)
+          {
+              R2_Extern.angle = 0;
+              R2_Extern.speed = 0;
+              R2_Extern.Area2_flag = 6;
+          }
+        break;
 
-//       case 6:
-//           if(R2_Extern.lift_mood == 1)
-//           {
-//             R2_Extern.lift_mood = 2;
-//             chsaaic_front_up();
-//             osDelay(2500);
-//           }
-//           R2_Extern.angle = 0;
-//           R2_Extern.speed = 0.2;
-//           now_mood.mood = 1;
+      case 6:
+          if(R2_Extern.lift_mood == 1)
+          {
+            R2_Extern.lift_mood = 2;
+            chsaaic_front_up();
+            osDelay(2500);
+          }
+          R2_Extern.angle = 0;
+          R2_Extern.speed = 0.2;
+          now_mood.mood = 1;
 
-//           if(Area_Flag.hou_dis == 0 && R2_Extern.lift_mood == 2)
-//           {
-//             now_mood.mood = 0;
-//             R2_Extern.angle = 0;
-//             R2_Extern.speed = 0;
-//             osDelay(100);
-//             R2_Extern.Area2_flag = 7;
-//           }
-//       break;
+          if(Area_Flag.hou_dis == 0 && R2_Extern.lift_mood == 2)
+          {
+            now_mood.mood = 0;
+            R2_Extern.angle = 0;
+            R2_Extern.speed = 0;
+            osDelay(100);
+            R2_Extern.Area2_flag = 7;
+          }
+      break;
 
-//       case 7:
-//             R2_Extern.lift_mood = 1;
-//             osDelay(2000);
-//             chsaaic_front_down();
-//             R2_Extern.Area2_flag = 8;
+      case 7:
+            R2_Extern.lift_mood = 1;
+            osDelay(2000);
+            chsaaic_front_down();
+            R2_Extern.Area2_flag = 8;
 
-//       break;
+      break;
 
-//       case 8:
-//           R2_Extern.angle = 0;
-//           R2_Extern.speed = 0.3;
-//           osDelay(1000);
-//           R2_Extern.lift_mood = 0;
-//           R2_Extern.Area2_flag = 0;
-//           R2_Extern.complete_taijie_flag = 1;
-//           if(R2_Extern.complete_erqu_flag == 1)
-//           {
-//             R2_Extern.start_sanqugoon_flag = 1;
-//             R2_Extern.bool_meilin_flag = 1;
-//           }
-//       break;
-// //下台阶5到8
+      case 8:
+          R2_Extern.angle = 0;
+          R2_Extern.speed = 0.3;
+          osDelay(1000);
+          R2_Extern.lift_mood = 0;
+          R2_Extern.Area2_flag = 0;
+          R2_Extern.complete_taijie_flag = 1;
+          if(R2_Extern.complete_erqu_flag == 1)
+          {
+            R2_Extern.start_sanqugoon_flag = 1;
+            R2_Extern.bool_meilin_flag = 1;
+            R2_Extern.sanqugoon_step = 0;
+          }
+      break;
+//下台阶5到8
 
-//       default:
-//         break;
-//     }
+      default:
+        break;
+    }
 
 
-//   }
+  }
 
   if(visual_data.workl_mode == 2 && R2_Extern.get_init == 1)
   {
@@ -1128,7 +1160,7 @@ void Two_Area_Function(void *argument)
         }
         else
         {
-          R2_Extern.KFS_status_flag = 5;
+          // R2_Extern.KFS_status_flag = 5;
         }
       }
       break;
@@ -1193,8 +1225,6 @@ void Three_Area_Function(void *argument)
 void Mid360_Function(void *argument)
 {
   /* USER CODE BEGIN Mid360_Function */
-  static BSTracker bs_tracker;
-  static uint8_t   bs_path_planned = 0;
 
   /* Infinite loop */
   for(;;)
@@ -1203,77 +1233,70 @@ void Mid360_Function(void *argument)
     {
       if (visual_data.workl_mode == 1)
       {
-          if (!bs_path_planned)
-          {
-              BSPath path;
-              bspline_plan_path(visual_data.x_map, visual_data.y_map,
-                                chassic_data.target_x, chassic_data.target_y,
-                                NULL, NULL, 0,
-                                &path, BSPLINE_PATH_SAMPLES);
-              bspline_tracker_init(&bs_tracker, &path,
-                                  visual_data.x_map, visual_data.y_map,
-                                  chassic_data.target_x, chassic_data.target_y);
-              bs_path_planned = 1;
-          }
-
-          float next_x, next_y;
-          int ret = bspline_tracker_next(&bs_tracker,
-                                        visual_data.x_map, visual_data.y_map,
-                                        &next_x, &next_y);
-          if (ret == 1)
-          {
-              chassic_control_auto(&chassic_data,
-                                  visual_data.x_map, visual_data.y_map,
-                                  next_x, next_y);
-          }
-          else
-          {
-              bs_path_planned = 0;
-          }
-      }
-      else
-      {
-          bs_path_planned = 0;
-          bspline_tracker_reset(&bs_tracker);
+        chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 0.7, 0.9);
+        R2_Extern.angle = chassic_data.angle;
+        R2_Extern.speed = chassic_data.distance;
+        check_dingwei_2(visual_data.x_map, visual_data.y_map, 0.7, 0.9);
+        if(R2_Extern.bool_check_1_flag == 1)
+        {
+          R2_Extern.angle = 0;
+          R2_Extern.speed = 0;
+        }
       }
 
 
       if(visual_data.workl_mode == 2)
       {
-        if(R2_Extern.complete_taijie_flag == 1 && R2_Extern.complete_dingwei_flag == 0)
+        if(R2_Extern.complete_taijie_flag == 1 && R2_Extern.complete_dingwei_flag == 0 && R2_Extern.start_sanqugoon_flag == 0)
         {
           chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, data_table[visual_data.meilin_points[R2_Extern.meilin_count_flag].cell-1][0], data_table[visual_data.meilin_points[R2_Extern.meilin_count_flag].cell-1][1]);
           R2_Extern.angle = chassic_data.angle;
           R2_Extern.speed = chassic_data.distance;
         }
 
-        if(R2_Extern.start_sanqugoon_flag == 1)
+        else if(R2_Extern.start_sanqugoon_flag == 1)
         {
-          float dx1 = visual_data.x_map - 8.40f;
-          float dy1 = visual_data.y_map - (-3.60f);
+          // 三圈果定位：依次经过两个中间点
+          float dx1 = visual_data.x_map - 8.32f;
+          float dy1 = visual_data.y_map - (-4.0f);
           float dist1 = sqrtf(dx1 * dx1 + dy1 * dy1);
 
-          float dx2 = visual_data.x_map - 11.17f;
-          float dy2 = visual_data.y_map - (-3.60f);
+          float dx2 = visual_data.x_map - 11.02f;
+          float dy2 = visual_data.y_map - (-4.24f);
           float dist2 = sqrtf(dx2 * dx2 + dy2 * dy2);
 
-          if(dist2 <= 0.05f)
+          switch(R2_Extern.sanqugoon_step)
           {
-            R2_Extern.complete_dingwei_flag = 1;
-            R2_Extern.angle = 0;
-            R2_Extern.speed = 0;
-          }
-          else if(dist1 <= 0.05f)
-          {
-            chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 11.17, -3.60);
-            R2_Extern.angle = chassic_data.angle;
-            R2_Extern.speed = chassic_data.distance;
-          }
-          else
-          {
-            chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 8.40, -3.60);
-            R2_Extern.angle = chassic_data.angle;
-            R2_Extern.speed = chassic_data.distance;
+            case 0: // 走向点1 (8.32, -4.00)
+              if(dist1 <= 0.10f)
+              {
+                R2_Extern.sanqugoon_step = 1; // 切换到点2
+              }
+              else
+              {
+                chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 8.32, -4.0);
+                R2_Extern.angle = chassic_data.angle;
+                R2_Extern.speed = chassic_data.distance;
+              }
+              break;
+
+            case 1: // 走向点2 (11.02, -4.24)
+              if(dist2 <= 0.10f)
+              {
+                R2_Extern.complete_dingwei_flag = 1;
+                R2_Extern.angle = 0;
+                R2_Extern.speed = 0;
+              }
+              else
+              {
+                chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 11.02, -4.24);
+                R2_Extern.angle = chassic_data.angle;
+                R2_Extern.speed = chassic_data.distance;
+              }
+              break;
+
+            default:
+              break;
           }
         }
       }
@@ -1281,7 +1304,10 @@ void Mid360_Function(void *argument)
 
       if(visual_data.workl_mode == 3)
       {
-        
+        //10.74 -2.20
+        //10.65 0.66
+        //10.10 0.66
+        //9.60  0.66
       }
 
     }

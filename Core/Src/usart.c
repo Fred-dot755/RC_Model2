@@ -1208,34 +1208,34 @@ void USAR_UART9_IDLECallback(UART_HandleTypeDef *huart)
 void USAR_UART10_IDLECallback(UART_HandleTypeDef *huart)
 {
 
-    HAL_UART_AbortReceive(&huart10);
-    
-    SCB_InvalidateDCache_by_Addr((uint32_t*)USART10_BUF, USART10_RX_BUF_LENGTH);
-    
- 
-    Process_RC_Packet((char*)USART10_BUF, USART10_RX_BUF_LENGTH);
-
-    memset(USART10_BUF,0,USART10_RX_BUF_LENGTH);
-
-    HAL_UART_Receive_DMA(huart, (uint8_t *)USART10_BUF, USART10_RX_BUF_LENGTH);
-    
-
     // HAL_UART_AbortReceive(&huart10);
     
-    // SCB_InvalidateDCache_by_Addr((uint32_t*)USART10_RX_BUF, USART10_RX_BUF_LENGTH);
+    // SCB_InvalidateDCache_by_Addr((uint32_t*)USART10_BUF, USART10_RX_BUF_LENGTH);
     
-    //  meic_protocol_parse_packet(USART10_RX_BUF, USART10_RX_BUF_LENGTH, &visual_data);
-    // if(R2_Extern.KFS_status_flag == 1)
-    // {
-    //   R2_Extern.x = visual_data.xyz_in_base[0] + 150;
-    //   R2_Extern.y = visual_data.xyz_in_base[1];
-    //   R2_Extern.z = visual_data.xyz_in_base[2] + 100;
-    //   R2_Extern.KFS_status_flag = 2;
-    // }
+ 
+    // Process_RC_Packet((char*)USART10_BUF, USART10_RX_BUF_LENGTH);
 
-    // memset(USART10_RX_BUF,0,USART10_RX_BUF_LENGTH);
+    // memset(USART10_BUF,0,USART10_RX_BUF_LENGTH);
 
-    // HAL_UART_Receive_DMA(huart, (uint8_t *)USART10_RX_BUF, USART10_RX_BUF_LENGTH);
+    // HAL_UART_Receive_DMA(huart, (uint8_t *)USART10_BUF, USART10_RX_BUF_LENGTH);
+    
+
+    HAL_UART_AbortReceive(&huart10);
+    
+    SCB_InvalidateDCache_by_Addr((uint32_t*)USART10_RX_BUF, USART10_RX_BUF_LENGTH);
+    
+     meic_protocol_parse_packet(USART10_RX_BUF, USART10_RX_BUF_LENGTH, &visual_data);
+    if(R2_Extern.KFS_status_flag == 1)
+    {
+      R2_Extern.x = visual_data.xyz_in_base[0] + 150;
+      R2_Extern.y = visual_data.xyz_in_base[1];
+      R2_Extern.z = visual_data.xyz_in_base[2] + 100;
+      R2_Extern.KFS_status_flag = 2;
+    }
+
+    memset(USART10_RX_BUF,0,USART10_RX_BUF_LENGTH);
+
+    HAL_UART_Receive_DMA(huart, (uint8_t *)USART10_RX_BUF, USART10_RX_BUF_LENGTH);
 
 }
 

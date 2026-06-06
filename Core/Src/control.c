@@ -30,7 +30,7 @@ void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float no
     
     float MAX_SPEED = 2.0; 
     double ONE_METER = 0.5;
-    double DEADZONE = 0.02;
+    double DEADZONE = 0.001;
 
     if (real_distance < DEADZONE) 
     {
@@ -137,18 +137,18 @@ void grab_angle(int angle)
 
 
 const float data_table[12][2] = {
-    {3.42f, -0.50f},
-    {3.39f, -1.68f},
-    {3.35f, -2.88f},
-    {4.60f, -0.50f},
-    {4.60f, -1.69f},
-    {4.58f, -2.88f},
-    {5.77f, -0.50f},
-    {5.75f, -1.69f},
-    {5.74f, -2.88f},
-    {7.04f, -0.48f},
-    {7.00f, -1.79f},
-    {6.89f, -2.88f}
+    {3.27f, -0.47f},//1
+    {3.27f, -1.64f},//2
+    {3.28f, -2.85f},//3
+    {4.50f, -0.50f},//4
+    {4.50f, -1.66f},//5
+    {4.47f, -2.88f},//6
+    {5.67f, -0.50f},//7
+    {5.71f, -1.72f},//8
+    {5.71f, -2.87f},//9
+    {6.94f, -0.60f},//10
+    {6.90f, -1.78f},//11
+    {6.89f, -2.95f}//12
 };
 
 void check_dingwei(float current_x, float current_y, int cell_index)
@@ -164,7 +164,7 @@ void check_dingwei(float current_x, float current_y, int cell_index)
     float dy = current_y - data_table[cell_index][1];
     float dist = sqrtf(dx * dx + dy * dy);
 
-    R2_Extern.complete_dingwei_flag = (dist <= 1.0f) ? 1 : 0;
+    R2_Extern.complete_dingwei_flag = (dist <= 0.05f) ? 1 : 0;
 }
 
 void check_dingwei_2(float current_x, float current_y, float target_x, float target_y)
@@ -173,7 +173,7 @@ void check_dingwei_2(float current_x, float current_y, float target_x, float tar
     float dy = current_y - target_y;
     float dist = sqrtf(dx * dx + dy * dy);
 
-    R2_Extern.bool_check_1_flag = (dist <= 0.2f) ? 1 : 0;
+    R2_Extern.bool_check_1_flag = (dist <= 0.07f) ? 1 : 0;
 }
 
 //3区控制

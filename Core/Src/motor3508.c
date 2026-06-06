@@ -292,9 +292,8 @@ void set_yuntai_angle(float angle_pitch , float angle_yaw)
     float angle_yaw_temp = angle_yaw * CUR_TO_RADS;     // 偏航角度转换为弧度
 
     
-    // 设置电机期望角度，俯仰电机取负值可能是为了方向校正
-    motor[8].ExpectAngle = -angle_pitch_temp;  // 设置俯仰电机(编号9)的期望角度
-    motor[9].ExpectAngle = angle_yaw_temp;     // 设置偏航电机(编号8)的期望角度
+    motor[9].ExpectAngle = -angle_pitch_temp; 
+    motor[8].ExpectAngle = angle_yaw_temp; 
 }
 
 
