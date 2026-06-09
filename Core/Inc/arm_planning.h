@@ -8,13 +8,13 @@
 
 typedef struct {
     int angle1;
-    int angle2;
+    int angle3;
     int target_angle1;
-    int target_angle2;
+    int target_angle3;
     int err_angle1;
-    int err_angle2;
+    int err_angle3;
     int output_angle1;
-    int output_angle2;
+    int output_angle3;
 
     int grab_state;//抓取状态 0:未抓取 1:抓取
     int put_state;//放置状态 0:未放置 1:放置
@@ -36,7 +36,7 @@ extern grep_mood now_mood;
 
 void arm_unitree_planning_init(void);
 void judgment_moving(void);
-void arm_unitree_planning_update(int angle1, int angle2);
+void arm_unitree_planning_update(int angle1, int angle3);
 int get_smooth_speed(int target_speed, int current_speed);
 void up_stair(void);
 

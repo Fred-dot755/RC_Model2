@@ -295,10 +295,12 @@ void Unitree_Function(void *argument)
   for(;;)
   {
     //1负3正，2左正右负
-    unitree_cmd_create(&unitree_cmd[1], 1, 1, 5.5, 0.3, now_position.output_angle2, 0.0, 0.0);
-    unitree_communicate(1);
-    osDelay(10);
-    unitree_cmd_create(&unitree_cmd[3], 3, 1, 5.5, 0.3, -now_position.output_angle2, 0.0, 0.0);
+    // unitree_cmd_create(&unitree_cmd[1], 1, 1, 5.5, 0.3, now_position.output_angle3, 0.0, 0.0);
+    // unitree_communicate(1);
+    // osDelay(10);
+
+    //小臂变为宇树电机了
+    unitree_cmd_create(&unitree_cmd[3], 3, 1, 5.5, 0.3, -now_position.output_angle3, 0.0, 0.0);
     unitree_communicate(3);
     osDelay(10);
     unitree_cmd_create(&unitree_cmd[2], 2, 1, 1.0, 0.2, now_position.output_angle1, 0.0, 0.0);
@@ -308,6 +310,7 @@ void Unitree_Function(void *argument)
     // unitree_cmd_create(&unitree_cmd[1], 1, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
     // unitree_communicate(1);
     // osDelay(10);
+
     // unitree_cmd_create(&unitree_cmd[3], 3, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
     // unitree_communicate(3);
     // osDelay(10);
@@ -340,7 +343,7 @@ void DM_Function(void *argument)
     // DM_CAN_Enable_Motor(5);
 
     DM_CAN_Send_PosVel_Mode(-(-R2_Extern.angle4  + unitree_pos[1] - dm4310_fb[1].position_deg) * 1.5,80,2);//上正
-    DM_CAN_Send_PosVel_Mode(-R2_Extern.angle3,60,3);//上负
+    DM_CAN_Send_PosVel_Mode(-R2_Extern.angle2,60,3);//上负    小臂电机改为8009了
     // DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,400,4);
     // DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,400,5);
   
@@ -749,7 +752,7 @@ void inverseKinematics_Function(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    arm_unitree_planning_update(R2_Extern.angle1, R2_Extern.angle2);
+    arm_unitree_planning_update(R2_Extern.angle1, R2_Extern.angle3);
     osDelay(50);
   }
   /* USER CODE END inverseKinematics_Function */

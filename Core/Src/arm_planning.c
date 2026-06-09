@@ -14,15 +14,15 @@ static int arm_goto_active = 0;
 void arm_unitree_planning_init(void)
 {
     now_position.angle1 = 0;
-    now_position.angle2 = 0;
+    now_position.angle3 = 0;
 
     now_position.target_angle1 = 0;
-    now_position.target_angle2 = 0;
+    now_position.target_angle3 = 0;
 
-    now_position.output_angle1 = unitree_pos[0]; 
-    now_position.output_angle2 = unitree_pos[1];
+    now_position.output_angle1 = unitree_pos[0];
+    now_position.output_angle3 = unitree_pos[1];
     
-    now_position.speed_update_counter = 0; 
+    now_position.speed_update_counter = 0;
 }
 
 int get_smooth_speed(int target_speed, int current_speed) 
@@ -58,68 +58,68 @@ int get_smooth_speed(int target_speed, int current_speed)
 void judgment_moving(void)
 {
     int angle_diff1 = abs(now_position.target_angle1 - now_position.output_angle1);
-    int angle_diff2 = abs(now_position.target_angle2 - now_position.output_angle2);
+    int angle_diff3 = abs(now_position.target_angle3 - now_position.output_angle3);
     
-    if(angle_diff1 <= 1 && angle_diff2 <= 1 && 
-       now_position.err_angle1 == 0 && now_position.err_angle2 == 0)
+    if(angle_diff1 <= 1 && angle_diff3 <= 1 &&
+       now_position.err_angle1 == 0 && now_position.err_angle3 == 0)
     {
-        now_position.bool_moving = 0; 
+        now_position.bool_moving = 0;
     }
     else
     {
-        now_position.bool_moving = 1; 
+        now_position.bool_moving = 1;
     }
 }
 
-void arm_unitree_planning_update(int angle1, int angle2)
+void arm_unitree_planning_update(int angle1, int angle3)
 {
     now_position.target_angle1 = angle1;
-    now_position.target_angle2 = angle2;
+    now_position.target_angle3 = angle3;
 
     int last_err_angle1 = now_position.err_angle1;
-    int last_err_angle2 = now_position.err_angle2;
+    int last_err_angle3 = now_position.err_angle3;
 
     float diff1 = now_position.target_angle1 - now_position.output_angle1;
-    float diff2 = now_position.target_angle2 - now_position.output_angle2;
+    float diff3 = now_position.target_angle3 - now_position.output_angle3;
 
     while (diff1 > 180.0f) diff1 -= 360.0f;
     while (diff1 < -180.0f) diff1 += 360.0f;
-    while (diff2 > 180.0f) diff2 -= 360.0f;
-    while (diff2 < -180.0f) diff2 += 360.0f;
+    while (diff3 > 180.0f) diff3 -= 360.0f;
+    while (diff3 < -180.0f) diff3 += 360.0f;
 
     float error1 = diff1;
-    float error2 = diff2;
+    float error3 = diff3;
 
     int target_err1 = (int)(error1 / 20.0f);
-    int target_err2 = (int)(error2 / 20.0f);
+    int target_err3 = (int)(error3 / 20.0f);
 
     if (target_err1 == 0 && (int)error1 != 0) target_err1 = (error1 > 0) ? 1 : -1;
-    if (target_err2 == 0 && (int)error2 != 0) target_err2 = (error2 > 0) ? 1 : -1;
+    if (target_err3 == 0 && (int)error3 != 0) target_err3 = (error3 > 0) ? 1 : -1;
 
     if(target_err1 > 5) target_err1 = 5;
     if(target_err1 < -5) target_err1 = -5;
-    if(target_err2 > 5) target_err2 = 5;
-    if(target_err2 < -5) target_err2 = -5;
+    if(target_err3 > 5) target_err3 = 5;
+    if(target_err3 < -5) target_err3 = -5;
 
     now_position.speed_update_counter++;
-    if (now_position.speed_update_counter >= SPEED_UPDATE_DELAY) 
+    if (now_position.speed_update_counter >= SPEED_UPDATE_DELAY)
     {
         now_position.speed_update_counter = 0; // 重置计数器
         
         now_position.err_angle1 = get_smooth_speed(target_err1, last_err_angle1);
-        now_position.err_angle2 = get_smooth_speed(target_err2, last_err_angle2);
-    } 
-    else 
+        now_position.err_angle3 = get_smooth_speed(target_err3, last_err_angle3);
+    }
+    else
     {
         now_position.err_angle1 = last_err_angle1;
-        now_position.err_angle2 = last_err_angle2;
+        now_position.err_angle3 = last_err_angle3;
     }
 
     now_position.output_angle1 += now_position.err_angle1;
-    now_position.output_angle2 += now_position.err_angle2;
+    now_position.output_angle3 += now_position.err_angle3;
 
     now_position.angle1 = unitree_pos[0];
-    now_position.angle2 = unitree_pos[1];
+    now_position.angle3 = unitree_pos[1];
     
     judgment_moving();
 }
