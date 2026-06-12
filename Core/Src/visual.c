@@ -16,11 +16,6 @@ ReceiveData_t visual_data;
 SendData_t visual_send_data;
 #endif
 
-
-
-ReceiveData_t visual_data;
-SendData_t visual_send_data;
-
 static const uint16_t CRC16_INIT = 0xffff;
 static const uint16_t CRC16_TABLE[256] = 
 {

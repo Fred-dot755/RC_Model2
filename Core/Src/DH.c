@@ -166,8 +166,8 @@ bool inverseKinematics(int target_x, int target_y, int target_z, int* angle1, in
     if (*angle2 < 0) {
         *angle2 = 0;
         reachable = false;
-    } else if (*angle2 > 150) {
-        *angle2 = 150;
+    } else if (*angle2 > 170) {
+        *angle2 = 170;
         reachable = false;
     }
 
@@ -175,25 +175,10 @@ bool inverseKinematics(int target_x, int target_y, int target_z, int* angle1, in
         *angle3 = 0;
         reachable = false;
     } 
-    else if (*angle3 > 150) {
-        *angle3 = 150;
+    else if (*angle3 > 170) {
+        *angle3 = 170;
         reachable = false;
     }
-    // else {
-    //     // 2. 计算动态上限：90 + angle2
-    //     int max_angle3 = 90 + *angle2;
-        
-    //     // 3. 绝对上限为 170
-        // if (max_angle3 > 170) {
-        //     max_angle3 = 170;
-        // }
-
-        // // 4. 执行上限拦截
-        // if (*angle3 > max_angle3) {
-        //     *angle3 = max_angle3;
-        //     reachable = false;
-        // }
-    // }
     
     return reachable; 
 }

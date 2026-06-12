@@ -134,6 +134,8 @@ typedef struct
     int KFS_Get_flag;
     int KFS_status_flag;
     int KFS_Grap_flag;
+    int bool_KFS_flag;
+    int car_flag;
 
     float lingshi_flag;
 

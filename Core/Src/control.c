@@ -28,7 +28,7 @@ void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float no
     }
     chassic_data->angle = -raw_angle;
     
-    float MAX_SPEED = 2.0; 
+    float MAX_SPEED = 3.0; 
     double ONE_METER = 0.5;
     double DEADZONE = 0.001;
 
@@ -42,7 +42,7 @@ void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float no
     }
     else 
     {
-        chassic_data->distance = 4 * real_distance;
+        chassic_data->distance = 6 * real_distance;
     }
 }
 

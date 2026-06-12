@@ -9,8 +9,8 @@
 #define PI 3.14159265358979323846f
 
 #define L1  100.0f
-#define L2  445.0f  // Link 1
-#define L3  480.0f  // Link 2
+#define L2  432.0f  // Link 1
+#define L3  493.0f  // Link 2
 
 // 初始角度偏移（度）
 extern float theta_offset[4];

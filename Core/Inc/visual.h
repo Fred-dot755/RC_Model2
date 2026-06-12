@@ -22,6 +22,7 @@ typedef struct
     uint8_t cell;        // 点位：1~12，0无效
     uint8_t horizontal_s;    // 左1 右2 前3 后4，0无
     uint8_t vertical_s;  // 上5 下6，0无
+    uint8_t has_true_kfs;  // 1 有真KFS，需要抓；0 没有
 } __attribute__((packed)) MeilinPointCmd;
 
 

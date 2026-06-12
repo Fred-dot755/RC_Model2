@@ -128,8 +128,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim6);
 
-  L1_Init(&L1_Sensor1, &huart8);
-  L1_Init(&L1_Sensor2, &huart9);
+  L1_Init(&L1_Sensor1, &huart9);
+  L1_Init(&L1_Sensor2, &huart8);
 
   fdcan_filter_init();
   PID_Init_All();
@@ -144,11 +144,8 @@ int main(void)
   
   unitree_init();
 
-  while(unitree_angle_init[1] == 0 && unitree_angle_init[2] == 0 && unitree_angle_init[3] == 0)
+  while(unitree_angle_init[2] == 0 && unitree_angle_init[3] == 0)
   {
-    unitree_cmd_create(&unitree_cmd[1], 1, 1, 0.0, 0.0, 0, 0.0, 0.0);
-    unitree_communicate(1);
-    HAL_Delay(100);
     unitree_cmd_create(&unitree_cmd[2], 2, 1, 0.0, 0.0, 0, 0.0, 0.0);
     unitree_communicate(2);
     HAL_Delay(100);

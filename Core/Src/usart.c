@@ -1179,7 +1179,7 @@ void USAR_UART8_IDLECallback(UART_HandleTypeDef *huart)
     SCB_InvalidateDCache_by_Addr((uint32_t*)USART8_RX_BUF, USART8_RX_BUF_LENGTH);
     
  
-    L1_Protocol_Parse(&L1_Sensor1, USART8_RX_BUF, USART8_RX_BUF_LENGTH);
+    L1_Protocol_Parse(&L1_Sensor2, USART8_RX_BUF, USART8_RX_BUF_LENGTH);
 
     memset(USART8_RX_BUF,0,USART8_RX_BUF_LENGTH);
 
@@ -1197,7 +1197,7 @@ void USAR_UART9_IDLECallback(UART_HandleTypeDef *huart)
     SCB_InvalidateDCache_by_Addr((uint32_t*)USART9_RX_BUF, USART9_RX_BUF_LENGTH);
     
  
-    L1_Protocol_Parse(&L1_Sensor2, USART9_RX_BUF, USART9_RX_BUF_LENGTH);
+    L1_Protocol_Parse(&L1_Sensor1, USART9_RX_BUF, USART9_RX_BUF_LENGTH);
 
     memset(USART9_RX_BUF,0,USART9_RX_BUF_LENGTH);
 
@@ -1229,7 +1229,7 @@ void USAR_UART10_IDLECallback(UART_HandleTypeDef *huart)
     {
       R2_Extern.x = visual_data.xyz_in_base[0] + 150;
       R2_Extern.y = visual_data.xyz_in_base[1];
-      R2_Extern.z = visual_data.xyz_in_base[2] + 100;
+      R2_Extern.z = visual_data.xyz_in_base[2] + 50;
       R2_Extern.KFS_status_flag = 2;
     }
 
