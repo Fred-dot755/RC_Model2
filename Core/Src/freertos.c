@@ -271,8 +271,8 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    set_yuntai_angle(R2_Extern.pitch_angle, R2_Extern.yaw_angle);
-    meic_protocol_send_packet_dma(&huart10, R2_Extern.pitch_angle, R2_Extern.yaw_angle);
+    // set_yuntai_angle(R2_Extern.pitch_angle, R2_Extern.yaw_angle);
+    // meic_protocol_send_packet_dma(&huart10, R2_Extern.pitch_angle, R2_Extern.yaw_angle);
     // set_yuntai_angle(45, 0);
     // meic_protocol_send_packet_dma(&huart10, 45,0);
 
@@ -294,28 +294,13 @@ void Unitree_Function(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    //1负3正，2左正右负
-    // unitree_cmd_create(&unitree_cmd[1], 1, 1, 5.5, 0.3, now_position.output_angle3, 0.0, 0.0);
-    // unitree_communicate(1);
-    // osDelay(10);
-
     //小臂变为宇树电机了
     unitree_cmd_create(&unitree_cmd[3], 3, 1, 2.0, 0.1, now_position.output_angle3, 0.0, 0.0);
     unitree_communicate(3);
     osDelay(10);
-    unitree_cmd_create(&unitree_cmd[2], 2, 1, 1.0, 0.2, now_position.output_angle1, 0.0, 0.0);
-    unitree_communicate(2);
-    osDelay(10);
-
-    // unitree_cmd_create(&unitree_cmd[1], 1, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
-    // unitree_communicate(1);
-    // osDelay(10);
 
     // unitree_cmd_create(&unitree_cmd[3], 3, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
     // unitree_communicate(3);
-    // osDelay(10);
-    // unitree_cmd_create(&unitree_cmd[2], 2, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
-    // unitree_communicate(2);
     // osDelay(10);
 
     //调试用
@@ -341,17 +326,21 @@ void DM_Function(void *argument)
     DM_CAN_Enable_Motor(3);
     DM_CAN_Enable_Motor(4);
     DM_CAN_Enable_Motor(5);
+    // DM_CAN_Enable_Motor(6);
+    // DM_CAN_Enable_Motor(7);
 
-    DM_CAN_Send_PosVel_Mode(-(-R2_Extern.angle4  - unitree_pos[1] + dm4310_fb[1].position_deg) * 1.5,80,2);//上正
-    DM_CAN_Send_PosVel_Mode(-R2_Extern.angle2,60,3);//上负    小臂电机改为8009了
-    DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,400,4);
-    DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,400,5);
+    // DM_CAN_Send_PosVel_Mode(-(-R2_Extern.angle4  - unitree_pos[1] + dm4310_fb[1].position_deg) * 1.5,80,2);//上正
+    // DM_CAN_Send_PosVel_Mode(-R2_Extern.angle2,60,3);//上负    小臂电机改为8009了
+    // DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,400,4);
+    // DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,400,5);
   
     //调试用
-    // DM_CAN_Send_PosVel_Mode(0,0,2);
-    // DM_CAN_Send_PosVel_Mode(0,0,3);
-    // DM_CAN_Send_PosVel_Mode(0,0,4);
-    // DM_CAN_Send_PosVel_Mode(0,0,5);
+    DM_CAN_Send_PosVel_Mode(0,0,2);
+    DM_CAN_Send_PosVel_Mode(0,0,3);
+    DM_CAN_Send_PosVel_Mode(0,0,4);
+    DM_CAN_Send_PosVel_Mode(0,0,5);
+    // DM_CAN_Send_PosVel_Mode(0,0,6);
+    // DM_CAN_Send_PosVel_Mode(0,0,7);
     osDelay(3);
   }
   /* USER CODE END DM_Function */
@@ -373,7 +362,6 @@ void DJI_Function(void *argument)
     FDCAN_cmd_chassis_fdcan1_0x200(pid_3508[0], pid_3508[1], pid_3508[2], pid_3508[3]);
     FDCAN_cmd_chassis_fdcan1_0x1FF(pid_3508[4], pid_3508[5], pid_3508[6], pid_3508[7]);
     FDCAN_cmd_chassis_fdcan3_0x200(pid_3508[8], pid_3508[9], pid_3508[10], pid_3508[11]);
-    grab_angle(R2_Extern.angle5);
 
     osDelay(3);
   }
@@ -418,25 +406,25 @@ void Remote_Function(void *argument)
     //   osDelay(200);
     // }
 
-    if(R2_Extern.get_init == 0)
-    {
-      // R2_Extern.angle2 = angle_2;
-      // R2_Extern.angle3 = angle_3;
-      R2_Extern.angle2 = 30;
-      R2_Extern.angle3 = 45;
-      R2_Extern.angle4 = 0;
-      // R2_Extern.lift_mood = 1;
-      // osDelay(1000);
-      // chsaaic_behind_up();
-      // chsaaic_front_up();
-      // R2_Extern.angle2 = 145;
-      // R2_Extern.angle3 = 80;
-      // R2_Extern.angle4 = 0;
-      if(unitree_pos[1]>= R2_Extern.angle3 - 5 && unitree_pos[1] <= R2_Extern.angle3 + 5 && dm4310_fb[1].position_deg >= R2_Extern.angle2 - 5 && dm4310_fb[1].position_deg <= R2_Extern.angle2 + 5)
-      {
-        R2_Extern.get_init = 1;
-      }
-    }
+    // if(R2_Extern.get_init == 0)
+    // {
+    //   // R2_Extern.angle2 = angle_2;
+    //   // R2_Extern.angle3 = angle_3;
+    //   R2_Extern.angle2 = 30;
+    //   R2_Extern.angle3 = 45;
+    //   R2_Extern.angle4 = 0;
+    //   // R2_Extern.lift_mood = 1;
+    //   // osDelay(1000);
+    //   // chsaaic_behind_up();
+    //   // chsaaic_front_up();
+    //   // R2_Extern.angle2 = 145;
+    //   // R2_Extern.angle3 = 80;
+    //   // R2_Extern.angle4 = 0;
+    //   if(unitree_pos[1]>= R2_Extern.angle3 - 5 && unitree_pos[1] <= R2_Extern.angle3 + 5 && dm4310_fb[1].position_deg >= R2_Extern.angle2 - 5 && dm4310_fb[1].position_deg <= R2_Extern.angle2 + 5)
+    //   {
+    //     R2_Extern.get_init = 1;
+    //   }
+    // }
 
 
     // if(rc_data.btn_1 == 1)

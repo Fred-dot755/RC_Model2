@@ -34,6 +34,8 @@ extern "C" {
 // 达妙电机常量定义
 #define DM_MOTOR_CAN_ID        0x01   // 电机CAN ID（可通过调试助手设置）
 #define DM_FEEDBACK_ID         0x00   // 默认反馈ID，若修改需同步调整
+#define DM_FIRST_MOTOR_ID      0x02U
+#define DM_MOTOR_COUNT         6U
 
 #define DM_PI 3.1415926535f
 
@@ -72,7 +74,7 @@ typedef struct {
 /* USER CODE END Exported types */
 
 /* USER CODE BEGIN Exported variables */
-extern DM4310_Feedback_t dm4310_fb[4];
+extern DM4310_Feedback_t dm4310_fb[DM_MOTOR_COUNT];
 
 /* USER CODE END Exported variables */
 
