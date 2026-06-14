@@ -92,12 +92,12 @@ void MX_FDCAN2_Init(void)
   hfdcan2.Instance = FDCAN2;
   hfdcan2.Init.FrameFormat = FDCAN_FRAME_CLASSIC;
   hfdcan2.Init.Mode = FDCAN_MODE_NORMAL;
-  hfdcan2.Init.AutoRetransmission = DISABLE;
+  hfdcan2.Init.AutoRetransmission = ENABLE;
   hfdcan2.Init.TransmitPause = DISABLE;
   hfdcan2.Init.ProtocolException = DISABLE;
-  hfdcan2.Init.NominalPrescaler = 24;
-  hfdcan2.Init.NominalSyncJumpWidth = 1;
-  hfdcan2.Init.NominalTimeSeg1 = 2;
+  hfdcan2.Init.NominalPrescaler = 12;
+  hfdcan2.Init.NominalSyncJumpWidth = 2;
+  hfdcan2.Init.NominalTimeSeg1 = 7;
   hfdcan2.Init.NominalTimeSeg2 = 2;
   hfdcan2.Init.DataPrescaler = 1;
   hfdcan2.Init.DataSyncJumpWidth = 1;
@@ -451,7 +451,11 @@ void fdcan2_filter_init(void)
     HAL_FDCAN_Start(&hfdcan2);
     
     // Activate notification for RX FIFO0
-    HAL_FDCAN_ActivateNotification(&hfdcan2, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0);
+    HAL_FDCAN_ActivateNotification(&hfdcan2,
+                                   FDCAN_IT_RX_FIFO0_NEW_MESSAGE |
+                                   FDCAN_IT_RX_FIFO0_FULL |
+                                   FDCAN_IT_RX_FIFO0_MESSAGE_LOST,
+                                   0);
 }
 
 void fdcan3_filter_init(void)
@@ -489,14 +493,24 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
 {
     FDCAN_RxHeaderTypeDef RxHeader;
     uint8_t RxData[8];
-    
-    if(HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &RxHeader, RxData) == HAL_OK)
+
+    (void)RxFifo0ITs;
+
+    while (HAL_FDCAN_GetRxFifoFillLevel(hfdcan, FDCAN_RX_FIFO0) > 0U)
     {
+        if (HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0,
+                                   &RxHeader, RxData) != HAL_OK) {
+            break;
+        }
+
         if(hfdcan->Instance == FDCAN1)
         {
             Motor3508_Process_Rx_Message(hfdcan, &RxHeader, RxData);
         }
-        if(hfdcan->Instance == FDCAN2)
+        if((hfdcan->Instance == FDCAN2) &&
+           (RxHeader.IdType == FDCAN_STANDARD_ID) &&
+           (RxHeader.RxFrameType == FDCAN_DATA_FRAME) &&
+           (RxHeader.DataLength >= FDCAN_DLC_BYTES_6))
         {
             DM_Process_Rx_Message(RxHeader.Identifier, RxData);
         }

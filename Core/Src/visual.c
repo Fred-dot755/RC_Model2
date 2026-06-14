@@ -125,7 +125,9 @@ void meic_protocol_send_packet_dma(UART_HandleTypeDef *huart, int pitch ,int yaw
     // 5. 填充 CRC 校验码
     visual_send_data.crc16 = crc_result;
 
-    SCB_CleanDCache_by_Addr((uint32_t *)&visual_send_data, sizeof(SendData_t));
+    if ((SCB->CCR & SCB_CCR_DC_Msk) != 0U) {
+        SCB_CleanDCache_by_Addr((uint32_t *)&visual_send_data, sizeof(SendData_t));
+    }
 
     // 7. 触发 DMA 发送
     HAL_UART_Transmit_DMA(huart, (uint8_t *)&visual_send_data, sizeof(SendData_t));

@@ -288,7 +288,7 @@ void set_yuntai_angle(float angle_pitch , float angle_yaw)
 {
 
     // 将角度从度转换为弧度
-    float angle_pitch_temp = (angle_pitch+100) * CUR_TO_RADS;  // 俯仰角度转换为弧度
+    float angle_pitch_temp = (angle_pitch+90) * CUR_TO_RADS;  // 俯仰角度转换为弧度
     float angle_yaw_temp = angle_yaw * CUR_TO_RADS;     // 偏航角度转换为弧度
 
     

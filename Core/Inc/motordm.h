@@ -36,16 +36,22 @@ extern "C" {
 #define DM_FEEDBACK_ID         0x00   // 默认反馈ID，若修改需同步调整
 #define DM_FIRST_MOTOR_ID      0x02U
 #define DM_MOTOR_COUNT         6U
+#define DM_ACTIVE_MOTOR_MASK   ((1UL << 2) | (1UL << 3) | (1UL << 6) | (1UL << 7))
+#define DM_MOTOR_IS_ACTIVE(id) ((DM_ACTIVE_MOTOR_MASK & (1UL << (id))) != 0U)
 
 #define DM_PI 3.1415926535f
 
-// 物理量限幅（需与达妙调试助手中的设置一致，以下为常见默认值）
-#define DM_P_MIN  -12.5f
-#define DM_P_MAX   12.5f
-#define DM_V_MIN  -45.0f
-#define DM_V_MAX   45.0f
-#define DM_T_MIN  -40.0f  // 说明书显示峰值扭矩为40NM
-#define DM_T_MAX   40.0f
+// MIT feedback ranges. These must match the values stored in the motor.
+#define DM_P_MIN          -12.5f
+#define DM_P_MAX           12.5f
+#define DM4310_V_MIN      -30.0f
+#define DM4310_V_MAX       30.0f
+#define DM4310_T_MIN      -10.0f
+#define DM4310_T_MAX       10.0f
+#define DM8009_V_MIN      -45.0f
+#define DM8009_V_MAX       45.0f
+#define DM8009_T_MIN      -54.0f
+#define DM8009_T_MAX       54.0f
 
 /* USER CODE END Private defines */
 

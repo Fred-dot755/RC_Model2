@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 
-float theta_offset[4] = {0.0f, 0.0f, 170.0f, 0.0f};
+float theta_offset[4] = {0.0f, 30.0f, 170.0f, 0.0f};
 float joint_scale[4]  = {1.0f, 1.0f, -1.0f, 1.0f};
 
 float joint_offset[4] = {0.0f, 180.0f, 180.0f, 0.0f};
@@ -108,7 +108,7 @@ static void projectToReachableRegion(float* r, float* d, float max_reach, float 
 }
 
 static void dhAnglesToJointAngles(float a1, float a2, float a3, int* j1, int* j2, int* j3) {
-    *j1 = (int)roundf(wrapTo360((a1 - theta_offset[0]) * joint_scale[0]));
+    *j1 = (int)roundf(wrapTo180((a1 - theta_offset[0]) * joint_scale[0]));
     *j2 = (int)roundf((a2 - theta_offset[1]) * joint_scale[1]);
     *j3 = (int)roundf((a3 - theta_offset[2]) * joint_scale[2]);
 }

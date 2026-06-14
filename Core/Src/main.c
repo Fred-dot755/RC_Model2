@@ -143,15 +143,12 @@ int main(void)
   
   unitree_init();
 
-  // while(unitree_angle_init[2] == 0 && unitree_angle_init[3] == 0)
-  // {
-  //   unitree_cmd_create(&unitree_cmd[2], 2, 1, 0.0, 0.0, 0, 0.0, 0.0);
-  //   unitree_communicate(2);
-  //   HAL_Delay(100);
-  //   unitree_cmd_create(&unitree_cmd[3], 3, 1, 0.0, 0.0, 0, 0.0, 0.0);
-  //   unitree_communicate(3);
-  //   HAL_Delay(100);
-  // }
+  while(unitree_angle_init[3] == 0)
+  {
+    unitree_cmd_create(&unitree_cmd[3], 3, 1, 0.0, 0.0, 0, 0.0, 0.0);
+    unitree_communicate(3);
+    HAL_Delay(100);
+  }
 
   DM_Motor_Init();
 

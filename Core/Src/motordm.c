@@ -35,6 +35,25 @@ static int dm_float_to_uint(float x_float, float x_min, float x_max, int bits) {
     return (int) ((x_float - offset) * ((float)((1 << bits) - 1)) / span);
 }
 
+static void dm_get_feedback_ranges(uint8_t motor_id,
+                                   float *v_min,
+                                   float *v_max,
+                                   float *t_min,
+                                   float *t_max)
+{
+    if ((motor_id == 2U) || (motor_id == 6U) || (motor_id == 7U)) {
+        *v_min = DM4310_V_MIN;
+        *v_max = DM4310_V_MAX;
+        *t_min = DM4310_T_MIN;
+        *t_max = DM4310_T_MAX;
+    } else {
+        *v_min = DM8009_V_MIN;
+        *v_max = DM8009_V_MAX;
+        *t_min = DM8009_T_MIN;
+        *t_max = DM8009_T_MAX;
+    }
+}
+
 /* USER CODE END Private defines */
 
 /* USER CODE BEGIN Private variables */
@@ -57,6 +76,9 @@ void DM_Motor_Init(void)
     for (uint8_t motor_id = DM_FIRST_MOTOR_ID;
          motor_id < (DM_FIRST_MOTOR_ID + DM_MOTOR_COUNT);
          motor_id++) {
+        if (!DM_MOTOR_IS_ACTIVE(motor_id)) {
+            continue;
+        }
         DM_CAN_Enable_Motor(motor_id);
         HAL_Delay(100);
     }
@@ -64,6 +86,9 @@ void DM_Motor_Init(void)
     for (uint8_t motor_id = DM_FIRST_MOTOR_ID;
          motor_id < (DM_FIRST_MOTOR_ID + DM_MOTOR_COUNT);
          motor_id++) {
+        if (!DM_MOTOR_IS_ACTIVE(motor_id)) {
+            continue;
+        }
         DM_CAN_Save_Zero_Motor(motor_id);
         HAL_Delay(100);
     }
@@ -77,16 +102,28 @@ void DM_Motor_Init(void)
   */
 void DM_Process_Rx_Message(uint32_t StdId, uint8_t* data)
 {
-    if ((data == NULL) ||
-        (StdId < DM_FIRST_MOTOR_ID) ||
-        (StdId >= (DM_FIRST_MOTOR_ID + DM_MOTOR_COUNT))) {
+    if (data == NULL) {
         return;
     }
 
-    uint32_t motor_index = StdId - DM_FIRST_MOTOR_ID;
+    uint8_t motor_id = data[0] & 0x0FU;
+    if ((motor_id < DM_FIRST_MOTOR_ID) ||
+        (motor_id >= (DM_FIRST_MOTOR_ID + DM_MOTOR_COUNT))) {
+        return;
+    }
+
+    /*
+     * DM feedback uses byte 0 to identify the motor. The CAN identifier is
+     * either the configured master ID or, in some setups, the motor ID.
+     */
+    if ((StdId != DM_FEEDBACK_ID) && (StdId != motor_id)) {
+        return;
+    }
+
+    uint32_t motor_index = motor_id - DM_FIRST_MOTOR_ID;
     DM4310_Feedback_t *feedback = &dm4310_fb[motor_index];
 
-    feedback->id = data[0] & 0x0FU;
+    feedback->id = motor_id;
     feedback->error = (data[0] >> 4) & 0x0FU;
 
     feedback->pos_raw = (uint16_t)(((uint16_t)data[1] << 8) | data[2]);
@@ -103,10 +140,17 @@ void DM_Process_Rx_Message(uint32_t StdId, uint8_t* data)
 
     feedback->position_rad = current_abs_rad - feedback->pos_offset_rad;
     feedback->position_deg = -feedback->position_rad * (180.0f / DM_PI);
+
+    float v_min;
+    float v_max;
+    float t_min;
+    float t_max;
+    dm_get_feedback_ranges(motor_id, &v_min, &v_max, &t_min, &t_max);
+
     feedback->velocity_rads =
-        dm_uint_to_float(feedback->vel_raw, DM_V_MIN, DM_V_MAX, 12);
+        dm_uint_to_float(feedback->vel_raw, v_min, v_max, 12);
     feedback->torque_Nm =
-        dm_uint_to_float(feedback->tor_raw, DM_T_MIN, DM_T_MAX, 12);
+        dm_uint_to_float(feedback->tor_raw, t_min, t_max, 12);
 }
 
 /**

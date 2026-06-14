@@ -21,8 +21,9 @@ static uint8_t L1_CalcBCC(uint8_t *dat, uint16_t len) {
  * @brief 核心发送函数：包含 H7 Cache 刷新逻辑
  */
 static void L1_UART_Transmit_DMA_Safe(L1_Data_t *sensor, uint8_t *pData, uint16_t Size) {
-    // 关键：将 Cache 里的新数据强制刷新到 SRAM，否则 DMA 发出的校验位是错的
-    SCB_CleanDCache_by_Addr((uint32_t*)pData, Size);
+    if ((SCB->CCR & SCB_CCR_DC_Msk) != 0U) {
+        SCB_CleanDCache_by_Addr((uint32_t*)pData, Size);
+    }
     HAL_UART_Transmit_DMA(sensor->huart, pData, Size);
 }
 

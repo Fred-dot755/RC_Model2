@@ -23,11 +23,18 @@
 #include "usart.h"
 
 /* USER CODE BEGIN 0 */
-uint8_t USART1_BUF[256],USART1_RX_BUF[USART1_RX_BUF_LENGTH];
-uint8_t USART7_BUF[256],USART7_RX_BUF[USART7_RX_BUF_LENGTH];
-uint8_t USART8_BUF[256],USART8_RX_BUF[USART8_RX_BUF_LENGTH];
-uint8_t USART9_BUF[256],USART9_RX_BUF[USART9_RX_BUF_LENGTH];
-uint8_t USART10_BUF[256],USART10_RX_BUF[USART10_RX_BUF_LENGTH];
+uint8_t USART1_BUF[256],USART1_RX_BUF[USART1_RX_BUF_LENGTH] __attribute__((aligned(32)));
+uint8_t USART7_BUF[256],USART7_RX_BUF[USART7_RX_BUF_LENGTH] __attribute__((aligned(32)));
+uint8_t USART8_BUF[256],USART8_RX_BUF[USART8_RX_BUF_LENGTH] __attribute__((aligned(32)));
+uint8_t USART9_BUF[256],USART9_RX_BUF[USART9_RX_BUF_LENGTH] __attribute__((aligned(32)));
+uint8_t USART10_BUF[256],USART10_RX_BUF[USART10_RX_BUF_LENGTH] __attribute__((aligned(32)));
+
+static void UART_InvalidateRxBuffer(void *buffer, int32_t length)
+{
+    if ((SCB->CCR & SCB_CCR_DC_Msk) != 0U) {
+        SCB_InvalidateDCache_by_Addr(buffer, length);
+    }
+}
 
 
 
@@ -1158,7 +1165,7 @@ void USAR_UART7_IDLECallback(UART_HandleTypeDef *huart)
 
     HAL_UART_AbortReceive(&huart7);
     
-    SCB_InvalidateDCache_by_Addr((uint32_t*)USART7_RX_BUF, USART7_RX_BUF_LENGTH);
+    UART_InvalidateRxBuffer(USART7_RX_BUF, USART7_RX_BUF_LENGTH);
     
  
     gyroscope_data_decode(USART7_RX_BUF, 82);
@@ -1176,7 +1183,7 @@ void USAR_UART8_IDLECallback(UART_HandleTypeDef *huart)
 
    HAL_UART_AbortReceive(&huart8);
     
-    SCB_InvalidateDCache_by_Addr((uint32_t*)USART8_RX_BUF, USART8_RX_BUF_LENGTH);
+    UART_InvalidateRxBuffer(USART8_RX_BUF, USART8_RX_BUF_LENGTH);
     
  
     L1_Protocol_Parse(&L1_Sensor2, USART8_RX_BUF, USART8_RX_BUF_LENGTH);
@@ -1194,7 +1201,7 @@ void USAR_UART9_IDLECallback(UART_HandleTypeDef *huart)
 
    HAL_UART_AbortReceive(&huart9);
     
-    SCB_InvalidateDCache_by_Addr((uint32_t*)USART9_RX_BUF, USART9_RX_BUF_LENGTH);
+    UART_InvalidateRxBuffer(USART9_RX_BUF, USART9_RX_BUF_LENGTH);
     
  
     L1_Protocol_Parse(&L1_Sensor1, USART9_RX_BUF, USART9_RX_BUF_LENGTH);
@@ -1208,34 +1215,34 @@ void USAR_UART9_IDLECallback(UART_HandleTypeDef *huart)
 void USAR_UART10_IDLECallback(UART_HandleTypeDef *huart)
 {
 
-    // HAL_UART_AbortReceive(&huart10);
-    
-    // SCB_InvalidateDCache_by_Addr((uint32_t*)USART10_BUF, USART10_RX_BUF_LENGTH);
-    
- 
-    // Process_RC_Packet((char*)USART10_BUF, USART10_RX_BUF_LENGTH);
-
-    // memset(USART10_BUF,0,USART10_RX_BUF_LENGTH);
-
-    // HAL_UART_Receive_DMA(huart, (uint8_t *)USART10_BUF, USART10_RX_BUF_LENGTH);
-    
-
     HAL_UART_AbortReceive(&huart10);
     
-    SCB_InvalidateDCache_by_Addr((uint32_t*)USART10_RX_BUF, USART10_RX_BUF_LENGTH);
+    SCB_InvalidateDCache_by_Addr((uint32_t*)USART10_BUF, USART10_RX_BUF_LENGTH);
     
-     meic_protocol_parse_packet(USART10_RX_BUF, USART10_RX_BUF_LENGTH, &visual_data);
-    if(R2_Extern.KFS_status_flag == 1)
-    {
-      R2_Extern.x = visual_data.xyz_in_base[0] + 150;
-      R2_Extern.y = visual_data.xyz_in_base[1];
-      R2_Extern.z = visual_data.xyz_in_base[2] + 50;
-      R2_Extern.KFS_status_flag = 2;
-    }
+ 
+    Process_RC_Packet((char*)USART10_BUF, USART10_RX_BUF_LENGTH);
 
-    memset(USART10_RX_BUF,0,USART10_RX_BUF_LENGTH);
+    memset(USART10_BUF,0,USART10_RX_BUF_LENGTH);
 
-    HAL_UART_Receive_DMA(huart, (uint8_t *)USART10_RX_BUF, USART10_RX_BUF_LENGTH);
+    HAL_UART_Receive_DMA(huart, (uint8_t *)USART10_BUF, USART10_RX_BUF_LENGTH);
+    
+
+    // HAL_UART_AbortReceive(&huart10);
+    
+    // UART_InvalidateRxBuffer(USART10_RX_BUF, USART10_RX_BUF_LENGTH);
+    
+    //  meic_protocol_parse_packet(USART10_RX_BUF, USART10_RX_BUF_LENGTH, &visual_data);
+    // if(R2_Extern.KFS_status_flag == 1)
+    // {
+    //   R2_Extern.x = visual_data.xyz_in_base[0] + 175;
+    //   R2_Extern.y = visual_data.xyz_in_base[1];
+    //   R2_Extern.z = visual_data.xyz_in_base[2] + 175;
+    //   R2_Extern.KFS_status_flag = 2;
+    // }
+
+    // memset(USART10_RX_BUF,0,USART10_RX_BUF_LENGTH);
+
+    // HAL_UART_Receive_DMA(huart, (uint8_t *)USART10_RX_BUF, USART10_RX_BUF_LENGTH);
 
 }
 

@@ -324,21 +324,22 @@ void DM_Function(void *argument)
   {
     DM_CAN_Enable_Motor(2);
     DM_CAN_Enable_Motor(3);
-    DM_CAN_Enable_Motor(4);
-    DM_CAN_Enable_Motor(5);
-    // DM_CAN_Enable_Motor(6);
-    // DM_CAN_Enable_Motor(7);
+    // DM_CAN_Enable_Motor(4);
+    // DM_CAN_Enable_Motor(5);
+    DM_CAN_Enable_Motor(6);
+    DM_CAN_Enable_Motor(7);
 
-    // DM_CAN_Send_PosVel_Mode(-(-R2_Extern.angle4  - unitree_pos[1] + dm4310_fb[1].position_deg) * 1.5,80,2);//上正
-    // DM_CAN_Send_PosVel_Mode(-R2_Extern.angle2,60,3);//上负    小臂电机改为8009了
+    DM_CAN_Send_PosVel_Mode(-(-R2_Extern.angle4  - unitree_pos[1] + dm4310_fb[1].position_deg) * 1.5,80,2);//上正
+    DM_CAN_Send_PosVel_Mode(-R2_Extern.angle2,60,3);//上负    小臂电机改为8009了
     // DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,400,4);
     // DM_CAN_Send_PosVel_Mode(-R2_Extern.lift,400,5);
-  
+    DM_CAN_Send_PosVel_Mode(-R2_Extern.angle5,100,6);//爪子
+    DM_CAN_Send_PosVel_Mode(R2_Extern.angle1 * 1.625f,100,7);//云台：angle1为[-180, 180)相对角度
+
     //调试用
-    DM_CAN_Send_PosVel_Mode(0,0,2);
-    DM_CAN_Send_PosVel_Mode(0,0,3);
-    DM_CAN_Send_PosVel_Mode(0,0,4);
-    DM_CAN_Send_PosVel_Mode(0,0,5);
+    // DM_CAN_Send_PosVel_Mode(0,0,2);
+    // DM_CAN_Send_PosVel_Mode(0,0,3);
+    // // IDs 4 and 5 are disabled by DM_ACTIVE_MOTOR_MASK until their CAN faults are fixed.
     // DM_CAN_Send_PosVel_Mode(0,0,6);
     // DM_CAN_Send_PosVel_Mode(0,0,7);
     osDelay(3);
@@ -382,8 +383,8 @@ void Remote_Function(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    // R2_Extern.angle = rc_data.angle;
-    // R2_Extern.speed = rc_data.distance *1;
+    R2_Extern.angle = rc_data.angle;
+    R2_Extern.speed = rc_data.distance *1;
 
     // if(rc_data.btn_1 == 1)
     // {
@@ -429,21 +430,24 @@ void Remote_Function(void *argument)
 
     // if(rc_data.btn_1 == 1)
     // {
-    //   R2_Extern.angle_balance_target += 1;
+    //   // R2_Extern.angle_balance_target += 1;
+    //   R2_Extern.angle5 = 0;
     // }
     // if(rc_data.btn_2 == 1)
     // {
-    //   R2_Extern.angle_balance_target -= 1;
-
+    //   // R2_Extern.angle_balance_target -= 1;
+    //   R2_Extern.angle5 = 120;
     // }
     // if(rc_data.btn_3 == 1)
     // {
-    //   R2_Extern.Area2_flag = 1;
+    //   // R2_Extern.Area2_flag = 1;
+    //   R2_Extern.angle5 = 100;
 
     // }
     // if(rc_data.btn_4 == 1)
     // {
-    //   R2_Extern.Area2_flag = 5;
+    //   // R2_Extern.Area2_flag = 5;
+    //   R2_Extern.lift_mood = 1;
 
     // }
 
@@ -843,7 +847,7 @@ void Lift_Mode_Function(void *argument)
       //   R2_Extern.lift += 1;
       //   osDelay(1);
       // }
-      R2_Extern.lift = 490;
+      R2_Extern.lift = 475;
     }
     else if(R2_Extern.lift_mood == 0)
     {
@@ -1171,9 +1175,9 @@ void Two_Area_Function(void *argument)
         break;
 
         case 4:
-        R2_Extern.angle2 = 30;
-        R2_Extern.angle3 = 60;
-        R2_Extern.angle4 = -80;
+        R2_Extern.angle2 = angle_2;
+        R2_Extern.angle3 = angle_3;
+        // R2_Extern.angle4 = -80;
         if(unitree_pos[1]>= R2_Extern.angle3 - 5 && unitree_pos[1] <= R2_Extern.angle3 + 5 && dm4310_fb[1].position_deg >= R2_Extern.angle2 - 5 && dm4310_fb[1].position_deg <= R2_Extern.angle2 + 5)
         {
           osDelay(1000);
@@ -1259,87 +1263,87 @@ void Mid360_Function(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    if(visual_data.i == 1)
-    {
-      if (visual_data.workl_mode == 1)
-      {
-        chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 0.7, 0.9);
-        R2_Extern.angle = chassic_data.angle;
-        R2_Extern.speed = chassic_data.distance;
-        check_dingwei_2(visual_data.x_map, visual_data.y_map, 0.7, 0.9);
-        if(R2_Extern.bool_check_1_flag == 1)
-        {
-          R2_Extern.angle = 0;
-          R2_Extern.speed = 0;
-        }
-      }
+    // if(visual_data.i == 1)
+    // {
+    //   if (visual_data.workl_mode == 1)
+    //   {
+    //     chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 0.7, 0.9);
+    //     R2_Extern.angle = chassic_data.angle;
+    //     R2_Extern.speed = chassic_data.distance;
+    //     check_dingwei_2(visual_data.x_map, visual_data.y_map, 0.7, 0.9);
+    //     if(R2_Extern.bool_check_1_flag == 1)
+    //     {
+    //       R2_Extern.angle = 0;
+    //       R2_Extern.speed = 0;
+    //     }
+    //   }
 
 
-      if(visual_data.workl_mode == 2)
-      {
-        if(R2_Extern.complete_taijie_flag == 1 && R2_Extern.complete_dingwei_flag == 0 && R2_Extern.start_sanqugoon_flag == 0 && R2_Extern.chack_yaw_flag == 1)
-        {
-          chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, data_table[visual_data.meilin_points[R2_Extern.meilin_count_flag].cell-1][0], data_table[visual_data.meilin_points[R2_Extern.meilin_count_flag].cell-1][1]);
-          R2_Extern.angle = chassic_data.angle;
-          R2_Extern.speed = chassic_data.distance;
-        }
-        else if(R2_Extern.start_sanqugoon_flag == 1)
-        {
-          // 三圈果定位：依次经过两个中间点
-          float dx1 = visual_data.x_map - 8.32f;
-          float dy1 = visual_data.y_map - (-4.0f);
-          float dist1 = sqrtf(dx1 * dx1 + dy1 * dy1);
+    //   if(visual_data.workl_mode == 2)
+    //   {
+    //     if(R2_Extern.complete_taijie_flag == 1 && R2_Extern.complete_dingwei_flag == 0 && R2_Extern.start_sanqugoon_flag == 0 && R2_Extern.chack_yaw_flag == 1)
+    //     {
+    //       chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, data_table[visual_data.meilin_points[R2_Extern.meilin_count_flag].cell-1][0], data_table[visual_data.meilin_points[R2_Extern.meilin_count_flag].cell-1][1]);
+    //       R2_Extern.angle = chassic_data.angle;
+    //       R2_Extern.speed = chassic_data.distance;
+    //     }
+    //     else if(R2_Extern.start_sanqugoon_flag == 1)
+    //     {
+    //       // 三圈果定位：依次经过两个中间点
+    //       float dx1 = visual_data.x_map - 8.32f;
+    //       float dy1 = visual_data.y_map - (-4.0f);
+    //       float dist1 = sqrtf(dx1 * dx1 + dy1 * dy1);
 
-          float dx2 = visual_data.x_map - 11.02f;
-          float dy2 = visual_data.y_map - (-4.24f);
-          float dist2 = sqrtf(dx2 * dx2 + dy2 * dy2);
+    //       float dx2 = visual_data.x_map - 11.02f;
+    //       float dy2 = visual_data.y_map - (-4.24f);
+    //       float dist2 = sqrtf(dx2 * dx2 + dy2 * dy2);
 
-          switch(R2_Extern.sanqugoon_step)
-          {
-            case 0: // 走向点1 (8.32, -4.00)
-              if(dist1 <= 0.10f)
-              {
-                R2_Extern.sanqugoon_step = 1; // 切换到点2
-              }
-              else
-              {
-                chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 8.32, -4.0);
-                R2_Extern.angle = chassic_data.angle;
-                R2_Extern.speed = chassic_data.distance;
-              }
-              break;
+    //       switch(R2_Extern.sanqugoon_step)
+    //       {
+    //         case 0: // 走向点1 (8.32, -4.00)
+    //           if(dist1 <= 0.10f)
+    //           {
+    //             R2_Extern.sanqugoon_step = 1; // 切换到点2
+    //           }
+    //           else
+    //           {
+                // chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 8.32, -4.0);
+    //             R2_Extern.angle = chassic_data.angle;
+    //             R2_Extern.speed = chassic_data.distance;
+    //           }
+    //           break;
 
-            case 1: // 走向点2 (11.02, -4.24)
-              if(dist2 <= 0.10f)
-              {
-                R2_Extern.complete_dingwei_flag = 1;
-                R2_Extern.angle = 0;
-                R2_Extern.speed = 0;
-              }
-              else
-              {
-                chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 11.02, -4.24);
-                R2_Extern.angle = chassic_data.angle;
-                R2_Extern.speed = chassic_data.distance;
-              }
-              break;
+    //         case 1: // 走向点2 (11.02, -4.24)
+    //           if(dist2 <= 0.10f)
+    //           {
+    //             R2_Extern.complete_dingwei_flag = 1;
+    //             R2_Extern.angle = 0;
+    //             R2_Extern.speed = 0;
+    //           }
+    //           else
+    //           {
+    //             chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 11.02, -4.24);
+    //             R2_Extern.angle = chassic_data.angle;
+    //             R2_Extern.speed = chassic_data.distance;
+    //           }
+    //           break;
 
-            default:
-              break;
-          }
-        }
-      }
+    //         default:
+    //           break;
+    //       }
+    //     }
+    //   }
 
 
-      if(visual_data.workl_mode == 3)
-      {
-        //10.74 -2.20
-        //10.65 0.66
-        //10.10 0.66
-        //9.60  0.66
-      }
+    //   if(visual_data.workl_mode == 3)
+    //   {
+    //     //10.74 -2.20
+    //     //10.65 0.66
+    //     //10.10 0.66
+    //     //9.60  0.66
+    //   }
 
-    }
+    // }
 
     osDelay(5);
   }
