@@ -1,3 +1,1 @@
-﻿# DM_Robocon
-# RC_Model2
-#R2机器人代码
+﻿# R2机器人代码
