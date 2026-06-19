@@ -1186,7 +1186,7 @@ void USAR_UART8_IDLECallback(UART_HandleTypeDef *huart)
     UART_InvalidateRxBuffer(USART8_RX_BUF, USART8_RX_BUF_LENGTH);
     
  
-    L1_Protocol_Parse(&L1_Sensor2, USART8_RX_BUF, USART8_RX_BUF_LENGTH);
+    L1_Protocol_Parse(&L1_Sensor1, USART8_RX_BUF, USART8_RX_BUF_LENGTH);
 
     memset(USART8_RX_BUF,0,USART8_RX_BUF_LENGTH);
 
@@ -1204,7 +1204,7 @@ void USAR_UART9_IDLECallback(UART_HandleTypeDef *huart)
     UART_InvalidateRxBuffer(USART9_RX_BUF, USART9_RX_BUF_LENGTH);
     
  
-    L1_Protocol_Parse(&L1_Sensor1, USART9_RX_BUF, USART9_RX_BUF_LENGTH);
+    L1_Protocol_Parse(&L1_Sensor2, USART9_RX_BUF, USART9_RX_BUF_LENGTH);
 
     memset(USART9_RX_BUF,0,USART9_RX_BUF_LENGTH);
 
@@ -1215,34 +1215,34 @@ void USAR_UART9_IDLECallback(UART_HandleTypeDef *huart)
 void USAR_UART10_IDLECallback(UART_HandleTypeDef *huart)
 {
 
-    HAL_UART_AbortReceive(&huart10);
-    
-    SCB_InvalidateDCache_by_Addr((uint32_t*)USART10_BUF, USART10_RX_BUF_LENGTH);
-    
- 
-    Process_RC_Packet((char*)USART10_BUF, USART10_RX_BUF_LENGTH);
-
-    memset(USART10_BUF,0,USART10_RX_BUF_LENGTH);
-
-    HAL_UART_Receive_DMA(huart, (uint8_t *)USART10_BUF, USART10_RX_BUF_LENGTH);
-    
-
     // HAL_UART_AbortReceive(&huart10);
     
-    // UART_InvalidateRxBuffer(USART10_RX_BUF, USART10_RX_BUF_LENGTH);
+    // SCB_InvalidateDCache_by_Addr((uint32_t*)USART10_BUF, USART10_RX_BUF_LENGTH);
     
-    //  meic_protocol_parse_packet(USART10_RX_BUF, USART10_RX_BUF_LENGTH, &visual_data);
-    // if(R2_Extern.KFS_status_flag == 1)
-    // {
-    //   R2_Extern.x = visual_data.xyz_in_base[0] + 175;
-    //   R2_Extern.y = visual_data.xyz_in_base[1];
-    //   R2_Extern.z = visual_data.xyz_in_base[2] + 175;
-    //   R2_Extern.KFS_status_flag = 2;
-    // }
+ 
+    // Process_RC_Packet((char*)USART10_BUF, USART10_RX_BUF_LENGTH);
 
-    // memset(USART10_RX_BUF,0,USART10_RX_BUF_LENGTH);
+    // memset(USART10_BUF,0,USART10_RX_BUF_LENGTH);
 
-    // HAL_UART_Receive_DMA(huart, (uint8_t *)USART10_RX_BUF, USART10_RX_BUF_LENGTH);
+    // HAL_UART_Receive_DMA(huart, (uint8_t *)USART10_BUF, USART10_RX_BUF_LENGTH);
+    
+
+    HAL_UART_AbortReceive(&huart10);
+    
+    UART_InvalidateRxBuffer(USART10_RX_BUF, USART10_RX_BUF_LENGTH);
+    
+     meic_protocol_parse_packet(USART10_RX_BUF, USART10_RX_BUF_LENGTH, &visual_data);
+    if(R2_Extern.KFS_status_flag == 1)
+    {
+      R2_Extern.x = visual_data.xyz_in_base[0] + 300;
+      R2_Extern.y = visual_data.xyz_in_base[1];
+      R2_Extern.z = visual_data.xyz_in_base[2] + 400;
+      R2_Extern.KFS_status_flag = 2;
+    }
+
+    memset(USART10_RX_BUF,0,USART10_RX_BUF_LENGTH);
+
+    HAL_UART_Receive_DMA(huart, (uint8_t *)USART10_RX_BUF, USART10_RX_BUF_LENGTH);
 
 }
 
@@ -1250,34 +1250,15 @@ void USAR_UART10_IDLECallback(UART_HandleTypeDef *huart)
 void USAR_UART1_IDLECallback(UART_HandleTypeDef *huart)
 {
 
-    // HAL_UART_AbortReceive(&huart1);
+    HAL_UART_AbortReceive(&huart1);
     
-    // SCB_InvalidateDCache_by_Addr((uint32_t*)USART1_RX_BUF, USART1_RX_BUF_LENGTH);
+    SCB_InvalidateDCache_by_Addr((uint32_t*)USART1_RX_BUF, USART1_RX_BUF_LENGTH);
     
- 
-    //  meic_protocol_parse_packet(USART1_RX_BUF, USART1_RX_BUF_LENGTH, &visual_data);
-    // if(now_mood.mood == 1)
-    // {
-    //   now_mood.mood = 2;
-    // }
-    // R2_Extern.x = visual_data.xyz_in_base[0] + 150;
-    // R2_Extern.y = visual_data.xyz_in_base[1];
-    // R2_Extern.z = visual_data.xyz_in_base[2] + 250;
+    DT35_Data_Decode(USART1_RX_BUF, USART1_RX_BUF_LENGTH);
 
-    // memset(USART1_RX_BUF,0,USART1_RX_BUF_LENGTH);
+    memset(USART1_RX_BUF,0,USART1_RX_BUF_LENGTH);
 
-    // HAL_UART_Receive_DMA(huart, (uint8_t *)USART1_RX_BUF, USART1_RX_BUF_LENGTH);
-
-
-    // HAL_UART_AbortReceive(&huart1);
-    
-    // SCB_InvalidateDCache_by_Addr((uint32_t*)USART1_RX_BUF, USART1_RX_BUF_LENGTH);
-    
-    // L1_Protocol_Parse(&L1_Sensor2, USART1_RX_BUF, USART1_RX_BUF_LENGTH);
-
-    // memset(USART1_RX_BUF,0,USART1_RX_BUF_LENGTH);
-
-    // HAL_UART_Receive_DMA(huart, (uint8_t *)USART1_RX_BUF, USART1_RX_BUF_LENGTH);
+    HAL_UART_Receive_DMA(huart, (uint8_t *)USART1_RX_BUF, USART1_RX_BUF_LENGTH);
     
 }
 

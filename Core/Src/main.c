@@ -118,17 +118,17 @@ int main(void)
   MX_USART2_UART_Init();
   MX_USART3_UART_Init();
   MX_SPI2_Init();
-  MX_SPI6_Init();
   MX_TIM6_Init();
   MX_USART10_UART_Init();
   MX_UART7_Init();
   MX_UART9_Init();
   MX_SPI3_Init();
   MX_UART8_Init();
+  MX_SPI6_Init();
   /* USER CODE BEGIN 2 */
 
-  L1_Init(&L1_Sensor1, &huart9);
-  L1_Init(&L1_Sensor2, &huart8);
+  L1_Init(&L1_Sensor1, &huart8);
+  L1_Init(&L1_Sensor2, &huart9);
 
   fdcan_filter_init();
   PID_Init_All();
@@ -157,7 +157,11 @@ int main(void)
   //RGB变白，顺利启动
   RGB_Color_Ctrl(255,1,255);
 
+  R2_Extern.work_mode = 2;
   R2_Extern.lift_mood = 0;
+  // R2_Extern.angle_balance_target = -90;
+  // chsaaic_behind_up();
+  // chsaaic_front_up();
 
   HAL_Delay(1000);
   

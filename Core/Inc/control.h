@@ -120,6 +120,26 @@ typedef struct
     int bool_check_1_flag;
 
     int chack_yaw_flag;
+
+    int check_angle1_flag;
+    int check_angle2_flag;
+    int check_angle3_flag;
+    int check_angle4_flag;
+    int check_angle5_flag;
+
+    int work_mode;
+
+    //area1
+    int Area1_flag;
+    int Area1_step;
+
+    int Area1_1_flag;//开始跑点
+    int Area1_2_flag;//激光纠偏
+    int Area1_timer;
+
+
+
+    //area2
     int meilin_count_flag;
     int horizontal_s_flag;
     int vertical_s_flag;
@@ -136,6 +156,9 @@ typedef struct
     int KFS_Grap_flag;
     int bool_KFS_flag;
     int car_flag;
+
+    //area3
+    int Area3_flag;
 
     float lingshi_flag;
 
@@ -155,14 +178,12 @@ extern My_extern R2_Extern;
 extern Area2_control_t Area_Flag;
 
 
-void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float now_y, float target_x, float target_y);
+void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float now_y, float target_x, float target_y , float max_speed);
 
-void zhuazi_mode_1_5(void);
-void zhuazi_mode_2(void);
-void zhuazi_mode_3(void);
-void zhuazi_mode_4(void);
-void zhuazi_mode_6(void);
-void zhuazi_mode_7(void);
+
+void quzhua(float x, float y);
+void back_keep_x(float x, float angle, float speed);
+void back_keep_y(float y, float angle, float speed);
 
 
 void chassic_up(void);
@@ -171,12 +192,15 @@ void chsaaic_behind_up(void);
 void chsaaic_behind_down(void);
 void chsaaic_front_up(void);
 void chsaaic_front_down(void);
-void grap_on(void);
-void grap_off(void);
+void zhuazi_open(void);
+void zhuazi_close(void);
+void fangkuang_open(void);
+void fangkuang_close(void);
 
-void grab_angle(int angle);
-
-
+extern const float area_1_dt35[6][2];
+extern const float area_1[10][2];
+extern const float area_2[10][2];
+extern const float area_3[10][2];
 extern const float data_table[12][2];
 
 void check_dingwei(float current_x, float current_y, int cell_index);
@@ -184,6 +208,12 @@ void check_dingwei(float current_x, float current_y, int cell_index);
 extern float v[4];
 void v_update(void);
 void check_dingwei_2(float current_x, float current_y, float target_x, float target_y);
+
+
+void put_kfs(void);
+void put_kfs_1(void);
+void put_kfs_2(void);
+void put_kfs_3(void);
 
 
 #endif // __CONTROL_H

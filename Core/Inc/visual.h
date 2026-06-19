@@ -36,6 +36,7 @@ typedef struct {
     float x_map;
     float y_map;
     int target_cell;
+    int targetid;
     //float yaw_map;
     int i;
     uint8_t meilin_count;               // 有效点数量，最多9
@@ -65,6 +66,6 @@ bool meic_protocol_parse_packet(const uint8_t *packet, uint16_t len, ReceiveData
 extern ReceiveData_t visual_data;
 extern SendData_t visual_send_data;
 
-void meic_protocol_send_packet_dma(UART_HandleTypeDef *huart, int pitch ,int yaw);
+void meic_protocol_send_packet_dma(UART_HandleTypeDef *huart, int pitch ,int yaw ,int work_mode);
 
 #endif
