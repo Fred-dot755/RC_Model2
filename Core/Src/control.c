@@ -50,19 +50,19 @@ void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float no
 
 //1区控制
 const float area_1_dt35[6][2] = {
-    {0.0f, 0.0f},
-    {0.0f, 0.0f},
-    {0.0f, 0.0f},
-    {1030.0f, 212.0f},
-    {0.0f, 0.0f},
-    {0.0f, 0.0f}
+    {412.0f, 212.0f},
+    {620.0f, 212.0f},
+    {812.0f, 212.0f},
+    {1044.0f, 212.0f},
+    {1218.0f, 212.0f},
+    {1426.0f, 389.0f}
 };
 
 void quzhua(float x, float y)
 {
     const float DEADZONE_MM = 2.0f;
     const float MAX_SPEED_M = 0.5f;
-    const float SLOW_DIST_M = 0.1f;
+    const float SLOW_DIST_M = 0.8f;
 
     if (dt35_data.dist[2] < 10 || dt35_data.dist[2] > 5900 ||
         dt35_data.dist[3] < 10 || dt35_data.dist[3] > 5900)
@@ -106,7 +106,11 @@ void quzhua(float x, float y)
     if (distance_m >= SLOW_DIST_M)
         R2_Extern.speed = MAX_SPEED_M;
     else
-        R2_Extern.speed = MAX_SPEED_M * (distance_m / SLOW_DIST_M) * 1.5;
+        R2_Extern.speed = MAX_SPEED_M * (distance_m / SLOW_DIST_M) * 2.5;
+        if(R2_Extern.speed < 0.2)
+        {
+            R2_Extern.speed = 0.2;
+        }
 }
 
 
@@ -294,6 +298,11 @@ void check_dingwei_2(float current_x, float current_y, float target_x, float tar
 }
 
 //3区控制
+const float area_3_dt35[6][2] = {
+    {460.0,0},
+    {962.0,0},
+    {1570.0,0}
+};
 
 void put_kfs(void)
 {

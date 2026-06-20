@@ -13,14 +13,23 @@ static int arm_goto_active = 0;
 
 void arm_unitree_planning_init(void)
 {
-    now_position.angle1 = 0;
-    now_position.angle3 = 0;
+    int current_angle1 = (int)dm4310_fb[5].position_deg;
+    int current_angle3 = (int)unitree_pos[1];
 
-    now_position.target_angle1 = 0;
-    now_position.target_angle3 = 0;
+    now_position.angle1 = current_angle1;
+    now_position.angle3 = current_angle3;
 
-    now_position.output_angle1 = unitree_pos[0];
-    now_position.output_angle3 = unitree_pos[1];
+    now_position.target_angle1 = current_angle1;
+    now_position.target_angle3 = current_angle3;
+
+    now_position.output_angle1 = current_angle1;
+    now_position.output_angle3 = current_angle3;
+    now_position.err_angle1 = 0;
+    now_position.err_angle3 = 0;
+    now_position.bool_moving = 0;
+
+    R2_Extern.angle1 = current_angle1;
+    R2_Extern.angle3 = current_angle3;
     
     now_position.speed_update_counter = 0;
 }

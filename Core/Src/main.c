@@ -29,6 +29,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "arm_planning.h"
 
 /* USER CODE END Includes */
 
@@ -149,6 +150,7 @@ int main(void)
     unitree_communicate(3);
     HAL_Delay(100);
   }
+  // arm_unitree_planning_init();
 
   DM_Motor_Init();
 
@@ -157,7 +159,7 @@ int main(void)
   //RGB变白，顺利启动
   RGB_Color_Ctrl(255,1,255);
 
-  R2_Extern.work_mode = 2;
+  R2_Extern.work_mode = 1;
   R2_Extern.lift_mood = 0;
   // R2_Extern.angle_balance_target = -90;
   // chsaaic_behind_up();

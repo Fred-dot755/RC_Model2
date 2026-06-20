@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 
-float theta_offset[4] = {0.0f, 30.0f, 170.0f, 0.0f};
+float theta_offset[4] = {0.0f, 30.0f, 180.0f, 0.0f};
 float joint_scale[4]  = {1.0f, 1.0f, -1.0f, 1.0f};
 
 float joint_offset[4] = {0.0f, 180.0f, 180.0f, 0.0f};
@@ -113,6 +113,45 @@ static void dhAnglesToJointAngles(float a1, float a2, float a3, int* j1, int* j2
     *j3 = (int)roundf((a3 - theta_offset[2]) * joint_scale[2]);
 }
 
+static bool jointAnglesInLimit(int j2, int j3)
+{
+    return (j2 >= 0 && j2 <= 170 && j3 >= 0 && j3 <= 170);
+}
+
+static void findClosestLimitedJointAngles(float target_r, float target_d, int* j2, int* j3)
+{
+    float best_error = 1.0e30f;
+    int best_j2 = 0;
+    int best_j3 = 0;
+
+    for (int cand_j2 = 0; cand_j2 <= 170; cand_j2++)
+    {
+        float th2 = (joint_scale[1] * cand_j2 + theta_offset[1]) * PI / 180.0f;
+        float c2 = cosf(th2);
+        float s2 = sinf(th2);
+
+        for (int cand_j3 = 0; cand_j3 <= 170; cand_j3++)
+        {
+            float th3 = (joint_scale[2] * cand_j3 + theta_offset[2]) * PI / 180.0f;
+            float cand_r = L2 * c2 + L3 * cosf(th2 + th3);
+            float cand_d = L2 * s2 + L3 * sinf(th2 + th3);
+            float err_r = cand_r - target_r;
+            float err_d = cand_d - target_d;
+            float err = err_r * err_r + err_d * err_d;
+
+            if (err < best_error)
+            {
+                best_error = err;
+                best_j2 = cand_j2;
+                best_j3 = cand_j3;
+            }
+        }
+    }
+
+    *j2 = best_j2;
+    *j3 = best_j3;
+}
+
 
 
 bool inverseKinematics(int target_x, int target_y, int target_z, int* angle1, int* angle2, int* angle3)
@@ -121,25 +160,35 @@ bool inverseKinematics(int target_x, int target_y, int target_z, int* angle1, in
     float y = (float)target_y;
     float z = (float)target_z;
 
-    float r = -sqrtf(x*x + y*y); 
     float d = z - L1;
 
     float max_reach = L2 + L3;
     float min_reach = fabsf(L2 - L3);
-    float distance_to_base = sqrtf(x*x + y*y + d*d); 
-    bool reachable = true;
-
-    if (distance_to_base > max_reach || distance_to_base < min_reach) {
-        float distance = distance_to_base;
-        if (distance > max_reach) {
-            r = r * max_reach / distance;
-            d = d * max_reach / distance;
-        } else if (distance < min_reach && distance > 1e-6f) {
-            r = r * min_reach / distance;
-            d = d * min_reach / distance;
-        }
-        reachable = false;
+    float rho = sqrtf(x*x + y*y);
+    float max_horizontal_sq = max_reach * max_reach - d * d;
+    if (max_horizontal_sq < 0.0f) {
+        d = (d > 0.0f) ? max_reach : -max_reach;
+        max_horizontal_sq = 0.0f;
     }
+
+    float max_horizontal = sqrtf(max_horizontal_sq);
+    if (rho > max_horizontal && rho > 1e-6f) {
+        float scale = max_horizontal / rho;
+        x *= scale;
+        y *= scale;
+        rho = max_horizontal;
+    }
+
+    float min_horizontal_sq = min_reach * min_reach - d * d;
+    if (min_horizontal_sq > 0.0f && rho < sqrtf(min_horizontal_sq) && rho > 1e-6f) {
+        float min_horizontal = sqrtf(min_horizontal_sq);
+        float scale = min_horizontal / rho;
+        x *= scale;
+        y *= scale;
+        rho = min_horizontal;
+    }
+
+    float r = -rho; 
 
     float theta1_rad = atan2f(-y, -x);
 
@@ -161,24 +210,10 @@ bool inverseKinematics(int target_x, int target_y, int target_z, int* angle1, in
     float a4 = -(a2 + a3); 
 
     dhAnglesToJointAngles(a1, a2, a3, angle1, angle2, angle3);
-    
 
-    if (*angle2 < 0) {
-        *angle2 = 0;
-        reachable = false;
-    } else if (*angle2 > 170) {
-        *angle2 = 170;
-        reachable = false;
-    }
-
-    if (*angle3 < 0) {
-        *angle3 = 0;
-        reachable = false;
-    } 
-    else if (*angle3 > 170) {
-        *angle3 = 170;
-        reachable = false;
+    if (!jointAnglesInLimit(*angle2, *angle3)) {
+        findClosestLimitedJointAngles(r, d, angle2, angle3);
     }
     
-    return reachable; 
+    return true; 
 }

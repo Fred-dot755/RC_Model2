@@ -3,8 +3,8 @@
 #define ARM_PLANNING_H
 #include "main.h"
 
-#define angle_2 0
-#define angle_3 100
+#define angle_2 30
+#define angle_3 130
 
 typedef struct {
     int angle1;

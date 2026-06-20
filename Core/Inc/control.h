@@ -136,6 +136,7 @@ typedef struct
     int Area1_1_flag;//开始跑点
     int Area1_2_flag;//激光纠偏
     int Area1_timer;
+    int Area1_id;//跑点id
 
 
 
