@@ -1059,7 +1059,9 @@ void One_Area_Function(void *argument)
         break;
 
         case 8:
-          back_keep_y(area_1_dt35[R2_Extern.Area1_id-1][1]+200,0,0);
+          // back_keep_x(area_1_dt35[5][0]+200,0,0);
+          // back_keep_y(area_1_dt35[R2_Extern.Area1_id-1][1]+600,0,0);
+          quzhua(area_1_dt35[5][0]+200, area_1_dt35[5][1]+600);
         break;
 
         default:
@@ -1110,11 +1112,11 @@ void Two_Area_Function(void *argument)
               R2_Extern.KFS_Grap_flag = current_point.has_true_kfs;
               if(R2_Extern.KFS_Grap_flag == 1)
               {
-                R2_Extern.bool_KFS_flag = 0;
+                R2_Extern.bool_KFS_flag = 1;
               }
               else
               {
-                R2_Extern.bool_KFS_flag = 1;
+                R2_Extern.bool_KFS_flag = 0;
               }
 
               if (current_point.cell == 0)
@@ -1139,12 +1141,12 @@ void Two_Area_Function(void *argument)
                       case 5: 
                       R2_Extern.Area2_flag = 1; 
                       R2_Extern.pitch_angle = 10;
-                      R2_Extern.yaw_angle = 10;
+                      R2_Extern.yaw_angle = -10;
                       break;
                       case 6: 
                       R2_Extern.Area2_flag = 5; 
                       R2_Extern.pitch_angle = 45;
-                      R2_Extern.yaw_angle = 10;
+                      R2_Extern.yaw_angle = -10;
                       break;
                       default: break;
                   }
@@ -1170,7 +1172,7 @@ void Two_Area_Function(void *argument)
             }
           }
       
-      if(R2_Extern.bool_KFS_flag == 1)
+      if(R2_Extern.bool_KFS_flag == 0)
       {
         switch (R2_Extern.Area2_flag)
         {
@@ -1319,7 +1321,7 @@ void Two_Area_Function(void *argument)
 
   }
 
-  if(visual_data.workl_mode == 2 && R2_Extern.KFS_Grap_flag == 1 && R2_Extern.bool_KFS_flag == 0 && R2_Extern.car_flag == 1)
+  if(visual_data.workl_mode == 2 && R2_Extern.KFS_Grap_flag == 1 && R2_Extern.bool_KFS_flag == 1)
   {
       switch(R2_Extern.KFS_status_flag)
       {
@@ -1328,7 +1330,7 @@ void Two_Area_Function(void *argument)
         {
           R2_Extern.angle = 0;
           R2_Extern.speed = 0;
-          R2_Extern.lift_mood = 0;//降下去
+          // R2_Extern.lift_mood = 0;//降下去
           // R2_Extern.angle4 = 90;
           R2_Extern.lift_mood = 2;
           // R2_Extern.lift_mood = 1;
@@ -1337,7 +1339,7 @@ void Two_Area_Function(void *argument)
         }
         else
         {
-          // R2_Extern.speed = 0.2;
+          R2_Extern.speed = 0.2;
         }
         break;
 
@@ -1389,7 +1391,8 @@ void Two_Area_Function(void *argument)
             // R2_Extern.KFS_status_flag = 5;
             R2_Extern.lift_mood = 0;
             R2_Extern.angle4 = 0;
-            R2_Extern.bool_KFS_flag = 1;
+            R2_Extern.bool_KFS_flag = 0;
+            R2_Extern.car_flag = 0;
             
           }
         }
@@ -1525,7 +1528,7 @@ void Mid360_Function(void *argument)
               }
               else
               {
-                chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, area_2[0][0], area_2[0][1] , 2.0);
+                chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, area_2[0][0], area_2[0][1] , 1.0);
                 R2_Extern.angle = chassic_data.angle;
                 R2_Extern.speed = chassic_data.distance;
               }
@@ -1572,4 +1575,5 @@ void Mid360_Function(void *argument)
 /* USER CODE BEGIN Application */
 
 /* USER CODE END Application */
+
 

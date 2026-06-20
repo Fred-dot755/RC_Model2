@@ -62,7 +62,7 @@ void quzhua(float x, float y)
 {
     const float DEADZONE_MM = 2.0f;
     const float MAX_SPEED_M = 0.5f;
-    const float SLOW_DIST_M = 0.8f;
+    const float SLOW_DIST_M = 0.5f;
 
     if (dt35_data.dist[2] < 10 || dt35_data.dist[2] > 5900 ||
         dt35_data.dist[3] < 10 || dt35_data.dist[3] > 5900)
@@ -107,18 +107,18 @@ void quzhua(float x, float y)
         R2_Extern.speed = MAX_SPEED_M;
     else
         R2_Extern.speed = MAX_SPEED_M * (distance_m / SLOW_DIST_M) * 2.5;
-        if(R2_Extern.speed < 0.2)
+        if(R2_Extern.speed < 0.1)
         {
-            R2_Extern.speed = 0.2;
+            R2_Extern.speed = 0.1;
         }
 }
 
 
 void back_keep_x(float x, float angle, float speed)
 {
-    const float DEADZONE_MM = 1.0f;
-    const float MAX_X_SPEED_M = 0.3f;
-    const float SLOW_DIST_M = 0.1f;
+    const float DEADZONE_MM = 2.0f;
+    const float MAX_X_SPEED_M = 0.5f;
+    const float SLOW_DIST_M = 0.5f;
 
     float right_dist_mm = (float)dt35_data.dist[2];
     float left_error_mm = x - right_dist_mm;
@@ -136,7 +136,7 @@ void back_keep_x(float x, float angle, float speed)
         if (distance_m >= SLOW_DIST_M)
             left_adjust_speed = MAX_X_SPEED_M;
         else
-            left_adjust_speed = MAX_X_SPEED_M * (distance_m / SLOW_DIST_M) * 1.5f;
+            left_adjust_speed = MAX_X_SPEED_M * (distance_m / SLOW_DIST_M) * 2.5f;
 
         if (left_adjust_speed > MAX_X_SPEED_M)
             left_adjust_speed = MAX_X_SPEED_M;
@@ -151,6 +151,10 @@ void back_keep_x(float x, float angle, float speed)
 
     R2_Extern.angle = atan2f(-left_speed, forward_speed) * 180.0f / PI;
     R2_Extern.speed = sqrtf(forward_speed * forward_speed + left_speed * left_speed);
+    if(R2_Extern.speed < 0.2)
+        {
+            R2_Extern.speed = 0.2;
+        }
 }
 
 
