@@ -40,7 +40,8 @@ typedef struct {
     //float yaw_map;
     int i;
     uint8_t meilin_count;               // 有效点数量，最多9
-    MeilinPointCmd meilin_points[9];   // 不足9个填{0,0,0}
+    MeilinPointCmd meilin_points[10];   // 不足10个填{0,0,0}
+    int hmi_start;
     uint16_t crc16;  // CRC16校验值（用于数据完整性校验）
     
 } __attribute__((packed)) ReceiveData_t;

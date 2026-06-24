@@ -968,6 +968,14 @@ void One_Area_Function(void *argument)
   /* Infinite loop */
   for(;;)
   {
+    if(visual_data.hmi_start != 1)
+    {
+      R2_Extern.angle = 0;
+      R2_Extern.speed = 0;
+      osDelay(5);
+      continue;
+    }
+
     if(visual_data.workl_mode == 1 && R2_Extern.Area1_1_flag == 1)
     {
       switch(R2_Extern.Area1_flag)
@@ -1097,12 +1105,21 @@ void Two_Area_Function(void *argument)
   /* Infinite loop */
   for(;;)
   {
+    if(visual_data.hmi_start != 1)
+    {
+      R2_Extern.angle = 0;
+      R2_Extern.speed = 0;
+      osDelay(5);
+      continue;
+    }
+
     if(visual_data.workl_mode == 2 && R2_Extern.check_1_flag == 0)
     {
-        chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 2.14, -1.56 , 1.0);
+        float target_y = (R2_Extern.Track_flag == 0) ? -1.56f : 1.56f;
+        chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 2.14f, target_y, 1.0);
         R2_Extern.angle = chassic_data.angle;
         R2_Extern.speed = chassic_data.distance;
-        check_dingwei_2(visual_data.x_map, visual_data.y_map, 2.14, -1.56);
+        check_dingwei_2(visual_data.x_map, visual_data.y_map, 2.14f, target_y);
         if(R2_Extern.bool_check_1_flag == 1)
         {
             R2_Extern.angle = 0;
@@ -1455,6 +1472,14 @@ void Three_Area_Function(void *argument)
   /* Infinite loop */
   for(;;)
   {
+    if(visual_data.hmi_start != 1)
+    {
+      R2_Extern.angle = 0;
+      R2_Extern.speed = 0;
+      osDelay(5);
+      continue;
+    }
+
     if(visual_data.workl_mode == 3)
     {
       switch (R2_Extern.Area3_step)
@@ -1505,6 +1530,18 @@ void Mid360_Function(void *argument)
   /* Infinite loop */
   for(;;)
   {
+    if(visual_data.hmi_start != 1)
+    {
+      R2_Extern.angle = 0;
+      R2_Extern.speed = 0;
+      osDelay(5);
+      continue;
+    }
+
+    const float (*area_1)[2] = (R2_Extern.Track_flag == 0) ? area_1_red : area_1_blue;
+    const float (*area_2)[2] = (R2_Extern.Track_flag == 0) ? area_2_red : area_2_blue;
+    const float (*data_table)[2] = (R2_Extern.Track_flag == 0) ? data_table_red : data_table_blue;
+
     if(visual_data.i == 1)
     {
       if (visual_data.workl_mode == 1)
@@ -1629,12 +1666,12 @@ void Track_Mode_Function(void *argument)
     }
     if(R2_Extern.Track_Mode %2 == 0)
     {
-      R2_Extern.Track_flag = 0;
+      R2_Extern.Track_flag = 0;//红
       RGB_Color_Ctrl(1,1,255);//绿
     }
     else if (R2_Extern.Track_Mode %2 == 1)
     {
-      R2_Extern.Track_flag = 1;
+      R2_Extern.Track_flag = 1;//蓝
       RGB_Color_Ctrl(255,255,1);//黄
     }
     osDelay(10);

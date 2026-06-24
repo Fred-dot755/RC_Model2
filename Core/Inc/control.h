@@ -203,10 +203,14 @@ void fangkuang_open(void);
 void fangkuang_close(void);
 
 extern const float area_1_dt35[6][2];
-extern const float area_1[10][2];
-extern const float area_2[10][2];
-extern const float area_3[10][2];
-extern const float data_table[12][2];
+extern const float area_1_red[10][2];
+extern const float area_2_red[10][2];
+extern const float area_3_red[10][2];
+extern const float area_1_blue[10][2];
+extern const float area_2_blue[10][2];
+extern const float area_3_blue[10][2];
+extern const float data_table_red[12][2];
+extern const float data_table_blue[12][2];
 
 void check_dingwei(float current_x, float current_y, int cell_index);
 

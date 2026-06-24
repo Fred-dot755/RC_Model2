@@ -251,20 +251,36 @@ void fangkuang_close(void)//放矿关闭
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_RESET);
 }
 
-const float area_1[10][2] = {
+//红区
+const float area_1_red[10][2] = {
     {0.62f,0.38f}
 };
 
-const float area_2[10][2] = {
+const float area_2_red[10][2] = {
     {8.32f,-4.0f},
     {11.02f,-4.24f}
 };
 
-const float area_3[10][2] = {
+const float area_3_red[10][2] = {
     {8.32f,-4.0f}
 };
 
-const float data_table[12][2] = {
+//蓝区
+const float area_1_blue[10][2] = {
+    {0.62f,-0.38f}
+};
+
+const float area_2_blue[10][2] = {
+    {8.32f,4.0f},
+    {11.02f,4.24f}
+};
+
+const float area_3_blue[10][2] = {
+    {8.32f,4.0f}
+};
+
+
+const float data_table_red[12][2] = {
     {3.27f, -0.47f},//1
     {3.27f, -1.64f},//2
     {3.28f, -2.85f},//3
@@ -279,6 +295,21 @@ const float data_table[12][2] = {
     {6.89f, -2.95f}//12
 };
 
+const float data_table_blue[12][2] = {
+    {3.27f, 0.47f},//1
+    {3.27f, 1.64f},//2
+    {3.28f, 2.85f},//3
+    {4.50f, 0.50f},//4
+    {4.50f, 1.66f},//5
+    {4.47f, 2.88f},//6
+    {5.67f, 0.50f},//7
+    {5.71f, 1.72f},//8
+    {5.71f, 2.87f},//9
+    {6.94f, 0.60f},//10
+    {6.90f, 1.78f},//11
+    {6.89f, 2.95f}//12
+};
+
 void check_dingwei(float current_x, float current_y, int cell_index)
 {
     // cell_index: 0~11，对应 data_table[0]~data_table[11]
@@ -288,8 +319,10 @@ void check_dingwei(float current_x, float current_y, int cell_index)
         return;
     }
 
-    float dx = current_x - data_table[cell_index][0];
-    float dy = current_y - data_table[cell_index][1];
+    const float (*table)[2] = (R2_Extern.Track_flag == 0) ? data_table_red : data_table_blue;
+
+    float dx = current_x - table[cell_index][0];
+    float dy = current_y - table[cell_index][1];
     float dist = sqrtf(dx * dx + dy * dy);
 
     R2_Extern.complete_dingwei_flag = (dist <= 0.05f) ? 1 : 0;

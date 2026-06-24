@@ -399,6 +399,13 @@ void RC_Data_To_Chassis_Target(void) {
     float target_angle = R2_Extern.angle;
     // float target_speed = rc_data.distance * 3;
     // float target_angle = rc_data.angle;
+
+    if (visual_data.hmi_start != 1) {
+        chassis_controller.state.target_vx = 0.0f;
+        chassis_controller.state.target_vy = 0.0f;
+        chassis_controller.state.target_theta = ops.HIPNUCAngleZ * PI / 180.0f;
+        return;
+    }
     
     float angle_rad = target_angle * PI / 180.0f;
     
