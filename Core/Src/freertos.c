@@ -1149,8 +1149,16 @@ void Two_Area_Function(void *argument)
 
               if (current_point.cell == 0)
               {
-                  R2_Extern.meilin_count_flag++; 
-                  return;
+                  R2_Extern.meilin_count_flag++;
+                  continue;
+              }
+
+              if (current_point.cell > 15)
+              {
+                  R2_Extern.angle = 0;
+                  R2_Extern.speed = 0;
+                  R2_Extern.meilin_count_flag++;
+                  continue;
               }
 
               switch(current_point.horizontal_s)
@@ -1162,17 +1170,27 @@ void Two_Area_Function(void *argument)
                 default: break;
               }
 
-              if (R2_Extern.chack_yaw_flag == 1)
+              if (current_point.cell >= 13 && current_point.cell <= 15)
+              {
+                  R2_Extern.bool_KFS_flag = 0;
+                  R2_Extern.KFS_Grap_flag = 0;
+                  if (R2_Extern.chack_yaw_flag == 1)
+                  {
+                      R2_Extern.Area2_flag = current_point.cell;
+                      R2_Extern.complete_flag = 1;
+                  }
+              }
+              else if (R2_Extern.chack_yaw_flag == 1)
               {
                   switch(current_point.vertical_s)
                   {
-                      case 5: 
-                      R2_Extern.Area2_flag = 1; 
+                      case 5:
+                      R2_Extern.Area2_flag = 1;
                       R2_Extern.pitch_angle = 10;
                       R2_Extern.yaw_angle = -10;
                       break;
-                      case 6: 
-                      R2_Extern.Area2_flag = 5; 
+                      case 6:
+                      R2_Extern.Area2_flag = 5;
                       R2_Extern.pitch_angle = 45;
                       R2_Extern.yaw_angle = -10;
                       break;
@@ -1339,6 +1357,30 @@ void Two_Area_Function(void *argument)
               R2_Extern.sanqugoon_step = 0;
             }
         break;
+
+        case 13:
+            R2_Extern.angle = 0;
+            R2_Extern.speed = 0;
+            R2_Extern.complete_taijie_flag = 1;
+            R2_Extern.complete_dingwei_flag = 1;
+            R2_Extern.Area2_flag = 0;
+          break;
+
+        case 14:
+            R2_Extern.angle = 0;
+            R2_Extern.speed = 0;
+            R2_Extern.complete_taijie_flag = 1;
+            R2_Extern.complete_dingwei_flag = 1;
+            R2_Extern.Area2_flag = 0;
+          break;
+
+        case 15:
+            R2_Extern.angle = 0;
+            R2_Extern.speed = 0;
+            R2_Extern.complete_taijie_flag = 1;
+            R2_Extern.complete_dingwei_flag = 1;
+            R2_Extern.Area2_flag = 0;
+          break;
 //下台阶5到8
 
         default:
