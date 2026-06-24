@@ -402,8 +402,12 @@ void RC_Data_To_Chassis_Target(void) {
     
     float angle_rad = target_angle * PI / 180.0f;
     
-    float vx = target_speed * cosf(angle_rad);
-    float vy = -target_speed * sinf(angle_rad);
+    float vx_map = target_speed * cosf(angle_rad);
+    float vy_map = -target_speed * sinf(angle_rad);
+    float yaw_rad = ops.HIPNUCAngleZ * PI / 180.0f;
+
+    float vx =  cosf(yaw_rad) * vx_map + sinf(yaw_rad) * vy_map;
+    float vy = -sinf(yaw_rad) * vx_map + cosf(yaw_rad) * vy_map;
     
     float speed_mag = sqrtf(vx * vx + vy * vy);
     if (speed_mag > MAX_CHASSIS_SPEED) {

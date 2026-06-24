@@ -746,7 +746,7 @@ void Remote_mode_function(void *argument)
     }
 
     //检测姿态
-    if(abs(ops.HIPNUCaccelerationZ - R2_Extern.angle_balance) < 2)
+    if(fabsf(R2_Extern.error_balance) < 2.0f)
     {
       R2_Extern.chack_yaw_flag = 1;
     }
