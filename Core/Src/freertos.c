@@ -1,4 +1,4 @@
-/* USER CODE BEGIN Header */
+﻿/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * File Name          : freertos.c
@@ -1207,6 +1207,8 @@ void Two_Area_Function(void *argument)
           {
             R2_Extern.complete_flag = 0;
             R2_Extern.complete_taijie_flag = 0;
+            R2_Extern.complete_dingwei_flag = 0;
+            R2_Extern.bool_check_1_flag = 0;
             R2_Extern.meilin_count_flag++;
             if(R2_Extern.meilin_count_flag == visual_data.meilin_count)
             {
@@ -1359,27 +1361,33 @@ void Two_Area_Function(void *argument)
         break;
 
         case 13:
-            R2_Extern.angle = 0;
-            R2_Extern.speed = 0;
-            R2_Extern.complete_taijie_flag = 1;
-            R2_Extern.complete_dingwei_flag = 1;
-            R2_Extern.Area2_flag = 0;
+            chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 1, 1 , 0.5);//暂时写死
+            R2_Extern.angle = chassic_data.angle;
+            R2_Extern.speed = chassic_data.distance;
+            check_dingwei_2(visual_data.x_map, visual_data.y_map, 1, 1);
+            if(R2_Extern.bool_check_1_flag == 1)
+            {
+              R2_Extern.angle = 0;
+              R2_Extern.speed = 0;
+              R2_Extern.KFS_status_flag = 1;
+            }
           break;
 
         case 14:
-            R2_Extern.angle = 0;
-            R2_Extern.speed = 0;
-            R2_Extern.complete_taijie_flag = 1;
-            R2_Extern.complete_dingwei_flag = 1;
-            R2_Extern.Area2_flag = 0;
+
           break;
 
         case 15:
-            R2_Extern.angle = 0;
-            R2_Extern.speed = 0;
-            R2_Extern.complete_taijie_flag = 1;
-            R2_Extern.complete_dingwei_flag = 1;
-            R2_Extern.Area2_flag = 0;
+            chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 1, 1 , 0.5);//暂时写死
+            R2_Extern.angle = chassic_data.angle;
+            R2_Extern.speed = chassic_data.distance;
+            check_dingwei_2(visual_data.x_map, visual_data.y_map, 1, 1);
+            if(R2_Extern.bool_check_1_flag == 1)
+            {
+              R2_Extern.angle = 0;
+              R2_Extern.speed = 0;
+              R2_Extern.KFS_status_flag = 1;
+            }
           break;
 //下台阶5到8
 
@@ -1463,6 +1471,12 @@ void Two_Area_Function(void *argument)
             R2_Extern.angle4 = 0;
             R2_Extern.bool_KFS_flag = 0;
             R2_Extern.car_flag = 0;
+            if(R2_Extern.Area2_flag == 13 || R2_Extern.Area2_flag == 15)
+            {
+              R2_Extern.complete_dingwei_flag = 1;
+              R2_Extern.complete_taijie_flag = 1;
+              R2_Extern.Area2_flag = 0;
+            }
             
           }
         }
@@ -1621,9 +1635,18 @@ void Mid360_Function(void *argument)
       {
         if(R2_Extern.complete_taijie_flag == 1 && R2_Extern.complete_dingwei_flag == 0 && R2_Extern.start_sanqugoon_flag == 0 && R2_Extern.chack_yaw_flag == 1)
         {
-          chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, data_table[visual_data.meilin_points[R2_Extern.meilin_count_flag].cell-1][0], data_table[visual_data.meilin_points[R2_Extern.meilin_count_flag].cell-1][1] , 0.5);
-          R2_Extern.angle = chassic_data.angle;
-          R2_Extern.speed = chassic_data.distance;
+          uint8_t current_cell = visual_data.meilin_points[R2_Extern.meilin_count_flag].cell;
+          if(current_cell >= 1 && current_cell <= 12)
+          {
+            chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, data_table[current_cell-1][0], data_table[current_cell-1][1] , 0.5);
+            R2_Extern.angle = chassic_data.angle;
+            R2_Extern.speed = chassic_data.distance;
+          }
+          else
+          {
+            R2_Extern.angle = 0;
+            R2_Extern.speed = 0;
+          }
         }
         else if(R2_Extern.start_sanqugoon_flag == 1)
         {
