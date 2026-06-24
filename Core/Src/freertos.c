@@ -152,6 +152,13 @@ const osThreadAttr_t Mid360_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
+/* Definitions for Track_Mode */
+osThreadId_t Track_ModeHandle;
+const osThreadAttr_t Track_Mode_attributes = {
+  .name = "Track_Mode",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -173,6 +180,7 @@ void One_Area_Function(void *argument);
 void Two_Area_Function(void *argument);
 void Three_Area_Function(void *argument);
 void Mid360_Function(void *argument);
+void Track_Mode_Function(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -247,6 +255,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of Mid360 */
   Mid360Handle = osThreadNew(Mid360_Function, NULL, &Mid360_attributes);
+
+  /* creation of Track_Mode */
+  Track_ModeHandle = osThreadNew(Track_Mode_Function, NULL, &Track_Mode_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -1446,6 +1457,33 @@ void Three_Area_Function(void *argument)
   {
     if(visual_data.workl_mode == 3)
     {
+      switch (R2_Extern.Area3_step)
+      {
+      case 0:
+      if(R2_Extern.Track_Mode == 0)
+      {
+        R2_Extern.angle_balance_target = 90;
+      }
+      else if(R2_Extern.Track_Mode == 1)
+      {
+        R2_Extern.angle_balance_target = -90;
+      }
+      R2_Extern.Area3_step = 1;
+        
+        break;
+      case 1:
+        
+        break;
+      case 2:
+
+        break;
+      case 3:
+
+        break;
+      
+      default:
+        break;
+      }
 
     }
     osDelay(1);
@@ -1571,9 +1609,41 @@ void Mid360_Function(void *argument)
   /* USER CODE END Mid360_Function */
 }
 
+/* USER CODE BEGIN Header_Track_Mode_Function */
+/**
+* @brief Function implementing the Track_Mode thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Track_Mode_Function */
+void Track_Mode_Function(void *argument)
+{
+  /* USER CODE BEGIN Track_Mode_Function */
+  /* Infinite loop */
+  for(;;)
+  {
+    if(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_15) == GPIO_PIN_SET)
+    {
+      R2_Extern.Track_Mode += 1;
+      osDelay(1000);
+    }
+    if(R2_Extern.Track_Mode %2 == 0)
+    {
+      R2_Extern.Track_flag = 0;
+      RGB_Color_Ctrl(1,1,255);//绿
+    }
+    else if (R2_Extern.Track_Mode %2 == 1)
+    {
+      R2_Extern.Track_flag = 1;
+      RGB_Color_Ctrl(255,255,1);//黄
+    }
+    osDelay(10);
+  }
+  /* USER CODE END Track_Mode_Function */
+}
+
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
 
 /* USER CODE END Application */
-
 

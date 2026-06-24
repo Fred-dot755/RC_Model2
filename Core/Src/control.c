@@ -64,16 +64,18 @@ void quzhua(float x, float y)
     const float MAX_SPEED_M = 0.5f;
     const float SLOW_DIST_M = 0.5f;
 
-    if (dt35_data.dist[2] < 10 || dt35_data.dist[2] > 5900 ||
+    int x_dist_index = (R2_Extern.Track_flag == 1) ? 1 : 2;
+
+    if (dt35_data.dist[x_dist_index] < 10 || dt35_data.dist[x_dist_index] > 5900 ||
         dt35_data.dist[3] < 10 || dt35_data.dist[3] > 5900)
     {
         return;
     }
 
-    float right_dist_mm = (float)dt35_data.dist[2];
+    float x_dist_mm = (float)dt35_data.dist[x_dist_index];
     float back_dist_mm = (float)dt35_data.dist[3];
 
-    float left_error_mm = x - right_dist_mm;
+    float left_error_mm = (R2_Extern.Track_flag == 1) ? (x_dist_mm - x) : (x - x_dist_mm);
     float forward_error_mm = y - back_dist_mm;
 
     if (fabsf(left_error_mm) <= DEADZONE_MM)
@@ -120,8 +122,9 @@ void back_keep_x(float x, float angle, float speed)
     const float MAX_X_SPEED_M = 0.5f;
     const float SLOW_DIST_M = 0.5f;
 
-    float right_dist_mm = (float)dt35_data.dist[2];
-    float left_error_mm = x - right_dist_mm;
+    int x_dist_index = (R2_Extern.Track_flag == 1) ? 1 : 2;
+    float x_dist_mm = (float)dt35_data.dist[x_dist_index];
+    float left_error_mm = (R2_Extern.Track_flag == 1) ? (x_dist_mm - x) : (x - x_dist_mm);
     float left_adjust_speed = 0.0f;
 
     if (fabsf(left_error_mm) <= DEADZONE_MM)

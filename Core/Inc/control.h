@@ -129,6 +129,9 @@ typedef struct
 
     int work_mode;
 
+    int Track_Mode;
+    int Track_flag;
+
     //area1
     int Area1_flag;
     int Area1_step;
@@ -160,6 +163,7 @@ typedef struct
 
     //area3
     int Area3_flag;
+    int Area3_step;
 
     float lingshi_flag;
 
