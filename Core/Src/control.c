@@ -42,7 +42,7 @@ void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float no
     }
     else 
     {
-        chassic_data->distance = 2 * real_distance;
+        chassic_data->distance = 1.0 * (real_distance/ ONE_METER) * MAX_SPEED;
     }
 }
 
