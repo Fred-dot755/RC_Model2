@@ -42,6 +42,7 @@ typedef struct {
     uint8_t meilin_count;               // 有效点数量，最多9
     MeilinPointCmd meilin_points[10];   // 不足10个填{0,0,0}
     int hmi_start;
+    int hmi_color;
     uint16_t crc16;  // CRC16校验值（用于数据完整性校验）
     
 } __attribute__((packed)) ReceiveData_t;

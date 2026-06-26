@@ -93,12 +93,19 @@ void DM_Motor_Init(void)
         HAL_Delay(100);
     }
 
+    HAL_Delay(100);
     DM_CAN_Save_Zero_Motor(2);
+    HAL_Delay(100);
     DM_CAN_Save_Zero_Motor(3);
+    HAL_Delay(100);
     DM_CAN_Save_Zero_Motor(4);
+    HAL_Delay(100);
     DM_CAN_Save_Zero_Motor(5);
+    HAL_Delay(100);
     DM_CAN_Save_Zero_Motor(6);
+    HAL_Delay(100);
     DM_CAN_Save_Zero_Motor(7);
+    HAL_Delay(100);
 }
 
 /**

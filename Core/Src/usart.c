@@ -1186,7 +1186,7 @@ void USAR_UART8_IDLECallback(UART_HandleTypeDef *huart)
     UART_InvalidateRxBuffer(USART8_RX_BUF, USART8_RX_BUF_LENGTH);
     
  
-    L1_Protocol_Parse(&L1_Sensor1, USART8_RX_BUF, USART8_RX_BUF_LENGTH);
+    L1_Protocol_Parse(&L1_Sensor2, USART8_RX_BUF, USART8_RX_BUF_LENGTH);
 
     memset(USART8_RX_BUF,0,USART8_RX_BUF_LENGTH);
 
@@ -1204,7 +1204,7 @@ void USAR_UART9_IDLECallback(UART_HandleTypeDef *huart)
     UART_InvalidateRxBuffer(USART9_RX_BUF, USART9_RX_BUF_LENGTH);
     
  
-    L1_Protocol_Parse(&L1_Sensor2, USART9_RX_BUF, USART9_RX_BUF_LENGTH);
+    L1_Protocol_Parse(&L1_Sensor1, USART9_RX_BUF, USART9_RX_BUF_LENGTH);
 
     memset(USART9_RX_BUF,0,USART9_RX_BUF_LENGTH);
 

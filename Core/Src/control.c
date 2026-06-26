@@ -29,7 +29,7 @@ void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float no
     chassic_data->angle = -raw_angle;
     
     float MAX_SPEED = max_speed; 
-    double ONE_METER = 0.5;
+    double ONE_METER = 1.0;
     double DEADZONE = 0.02;
 
     if (real_distance < DEADZONE) 
@@ -49,22 +49,30 @@ void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float no
 
 
 //1区控制
+// const float area_1_dt35[6][2] = {
+//     {412.0f, 216.0f},
+//     {610.0f, 215.0f},
+//     {808.0f, 219.0f},
+//     {1005.0f, 212.0f},
+//     {1210.0f, 334.0f},
+//     {1426.0f, 334.0f}
+// };
 const float area_1_dt35[6][2] = {
-    {412.0f, 212.0f},
-    {620.0f, 212.0f},
-    {812.0f, 212.0f},
-    {1044.0f, 212.0f},
-    {1218.0f, 212.0f},
-    {1426.0f, 389.0f}
+    {392.0f, 216.0f},
+    {590.0f, 215.0f},
+    {788.0f, 219.0f},
+    {985.0f, 212.0f},
+    {1190.0f, 334.0f},
+    {1406.0f, 334.0f}
 };
 
 void quzhua(float x, float y)
 {
-    const float DEADZONE_MM = 2.0f;
+    const float DEADZONE_MM = 1.0f;
     const float MAX_SPEED_M = 0.5f;
     const float SLOW_DIST_M = 0.5f;
 
-    int x_dist_index = (R2_Extern.Track_flag == 1) ? 1 : 2;
+    int x_dist_index = (visual_data.hmi_color == 2) ? 1 : 2;
 
     if (dt35_data.dist[x_dist_index] < 10 || dt35_data.dist[x_dist_index] > 5900 ||
         dt35_data.dist[3] < 10 || dt35_data.dist[3] > 5900)
@@ -75,8 +83,8 @@ void quzhua(float x, float y)
     float x_dist_mm = (float)dt35_data.dist[x_dist_index];
     float back_dist_mm = (float)dt35_data.dist[3];
 
-    float left_error_mm = (R2_Extern.Track_flag == 1) ? (x_dist_mm - x) : (x - x_dist_mm);
-    float forward_error_mm = y - back_dist_mm;
+    float left_error_mm = (visual_data.hmi_color == 2) ? (x - x_dist_mm) : (x_dist_mm - x);
+    float forward_error_mm = (visual_data.hmi_color == 2) ? (y - back_dist_mm) : (back_dist_mm - y);
 
     if (fabsf(left_error_mm) <= DEADZONE_MM)
     {
@@ -103,7 +111,7 @@ void quzhua(float x, float y)
     float distance_mm = sqrtf(left_error_mm * left_error_mm + forward_error_mm * forward_error_mm);
     float distance_m = distance_mm / 1000.0f;
 
-    R2_Extern.angle = atan2f(-left_error_mm, forward_error_mm) * 180.0f / PI;
+    R2_Extern.angle = atan2f(left_error_mm, forward_error_mm) * 180.0f / PI;
 
     if (distance_m >= SLOW_DIST_M)
         R2_Extern.speed = MAX_SPEED_M;
@@ -122,9 +130,9 @@ void back_keep_x(float x, float angle, float speed)
     const float MAX_X_SPEED_M = 0.5f;
     const float SLOW_DIST_M = 0.5f;
 
-    int x_dist_index = (R2_Extern.Track_flag == 1) ? 1 : 2;
+    int x_dist_index = (visual_data.hmi_color == 2) ? 1 : 2;
     float x_dist_mm = (float)dt35_data.dist[x_dist_index];
-    float left_error_mm = (R2_Extern.Track_flag == 1) ? (x_dist_mm - x) : (x - x_dist_mm);
+    float left_error_mm = (visual_data.hmi_color == 2) ? (x - x_dist_mm) : (x_dist_mm - x);
     float left_adjust_speed = 0.0f;
 
     if (fabsf(left_error_mm) <= DEADZONE_MM)
@@ -173,7 +181,7 @@ void back_keep_y(float y, float angle, float speed)
     }
 
     float back_dist_mm = (float)dt35_data.dist[3];
-    float forward_error_mm = y - back_dist_mm;
+    float forward_error_mm = (visual_data.hmi_color == 2) ? (y - back_dist_mm) : (back_dist_mm - y);
     float forward_adjust_speed = 0.0f;
 
     if (fabsf(forward_error_mm) <= DEADZONE_MM)
@@ -267,12 +275,12 @@ const float area_3_red[10][2] = {
 
 //蓝区
 const float area_1_blue[10][2] = {
-    {0.62f,-0.38f}
+    {0.62f,-0.79f}
 };
 
 const float area_2_blue[10][2] = {
-    {8.32f,4.0f},
-    {11.02f,4.24f}
+    {7.89f,4.89f},
+    {10.60f,5.54f}
 };
 
 const float area_3_blue[10][2] = {
@@ -296,18 +304,18 @@ const float data_table_red[12][2] = {
 };
 
 const float data_table_blue[12][2] = {
-    {3.27f, 0.47f},//1
-    {3.27f, 1.64f},//2
-    {3.28f, 2.85f},//3
-    {4.50f, 0.50f},//4
-    {4.50f, 1.66f},//5
-    {4.47f, 2.88f},//6
-    {5.67f, 0.50f},//7
-    {5.71f, 1.72f},//8
-    {5.71f, 2.87f},//9
-    {6.94f, 0.60f},//10
-    {6.90f, 1.78f},//11
-    {6.89f, 2.95f}//12
+    {3.48f, 0.72f},//1
+    {3.29f, 1.90f},//2
+    {3.14f, 3.09f},//3   
+    {4.34f, 3.32f},//6
+    {4.44f, 2.14f},//5
+    {4.67f, 0.90f},//4
+    {5.51f, 3.49f},//9
+    {5.69f, 2.27f},//8
+    {5.81f, 1.12f},//7
+    {6.65f, 3.67f},//12
+    {6.84f, 2.53f},//11
+    {7.06f, 1.34f}//10
 };
 
 void check_dingwei(float current_x, float current_y, int cell_index)

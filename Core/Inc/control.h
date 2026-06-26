@@ -13,6 +13,7 @@
 #define LIFT_TOP_POS    490  // 上升最高位置
 #define LIFT_BOT_POS    10   // 下降最低位置
 
+#define guangdian HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_13)
 
 typedef struct
 {
@@ -165,7 +166,7 @@ typedef struct
     int Area3_flag;
     int Area3_step;
 
-    float lingshi_flag;
+    int lingshi_flag;
 
 }My_extern;
 

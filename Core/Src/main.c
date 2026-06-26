@@ -128,8 +128,8 @@ int main(void)
   MX_SPI6_Init();
   /* USER CODE BEGIN 2 */
 
-  L1_Init(&L1_Sensor1, &huart8);
-  L1_Init(&L1_Sensor2, &huart9);
+  L1_Init(&L1_Sensor1, &huart9);
+  L1_Init(&L1_Sensor2, &huart8);
 
   fdcan_filter_init();
   PID_Init_All();
@@ -144,12 +144,12 @@ int main(void)
   
   unitree_init();
 
-  while(unitree_angle_init[3] == 0)
-  {
-    unitree_cmd_create(&unitree_cmd[3], 3, 1, 0.0, 0.0, 0, 0.0, 0.0);
-    unitree_communicate(3);
-    HAL_Delay(100);
-  }
+  // while(unitree_angle_init[3] == 0)
+  // {
+  //   unitree_cmd_create(&unitree_cmd[3], 3, 1, 0.0, 0.0, 0, 0.0, 0.0);
+  //   unitree_communicate(3);
+  //   HAL_Delay(100);
+  // }
   // arm_unitree_planning_init();
 
   DM_Motor_Init();
@@ -161,7 +161,8 @@ int main(void)
 
   R2_Extern.work_mode = 1;
   R2_Extern.lift_mood = 0;
-  R2_Extern.Track_Mode = 0;//0红，1蓝
+  R2_Extern.Track_Mode = 1;//0红，1蓝
+  visual_data.hmi_start = 1;
   // R2_Extern.angle_balance_target = -90;
   // chsaaic_behind_up();
   // chsaaic_front_up();
