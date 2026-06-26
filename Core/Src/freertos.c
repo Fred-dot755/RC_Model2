@@ -317,9 +317,9 @@ void Unitree_Function(void *argument)
   for(;;)
   {
     //小臂变为宇树电机了
-    // unitree_cmd_create(&unitree_cmd[3], 3, 1, 5.7, 0.1, now_position.output_angle3, 0.0, 0.0);
-    // unitree_communicate(3);
-    // osDelay(10);
+    unitree_cmd_create(&unitree_cmd[3], 3, 1, 5.7, 0.1, now_position.output_angle3, 0.0, 0.0);
+    unitree_communicate(3);
+    osDelay(10);
 
     // unitree_cmd_create(&unitree_cmd[3], 3, 1, 0.0, 0.0, 0.0, 0.0, 0.0);
     // unitree_communicate(3);
@@ -357,7 +357,7 @@ void DM_Function(void *argument)
       // DM_CAN_Send_PosVel_Mode(R2_Extern.lift-40,400,5);
       DM_CAN_Send_PosVel_Mode(R2_Extern.lift,800,4);
       DM_CAN_Send_PosVel_Mode(R2_Extern.lift,800,5);
-    DM_CAN_Send_PosVel_Mode(R2_Extern.angle5,100,6);//爪子
+    DM_CAN_Send_PosVel_Mode(R2_Extern.angle5,800,6);//爪子
     DM_CAN_Send_PosVel_Mode(R2_Extern.angle1 * 1.625f,100,7);//云台：angle1为[-180, 180)相对角度
 
     //调试用
@@ -889,10 +889,10 @@ void Angle_ring_Function(void *argument)
     while (balance_diff > 180.0f) balance_diff -= 360.0f;
     while (balance_diff < -180.0f) balance_diff += 360.0f;
 
-    if (balance_diff > 0.6f) {
-        R2_Extern.angle_balance += 0.6f;
-    } else if (balance_diff < -0.6f) {
-        R2_Extern.angle_balance -= 0.6f;
+    if (balance_diff > 0.9f) {
+        R2_Extern.angle_balance += 0.9f;
+    } else if (balance_diff < -0.9f) {
+        R2_Extern.angle_balance -= 0.9f;
     } else {
         R2_Extern.angle_balance = R2_Extern.angle_balance_target;  // 差值小于 1 度，直接到位
     }
@@ -997,14 +997,14 @@ void One_Area_Function(void *argument)
       switch(R2_Extern.Area1_flag)
       {
         case 0:
-        // R2_Extern.Area1_id = visual_data.targetid;
-        R2_Extern.Area1_id = 6;
+        R2_Extern.Area1_id = visual_data.targetid;
+        // R2_Extern.Area1_id = 6;
         if(R2_Extern.Area1_id == 0)
         {
           break;
         }
-        R2_Extern.lift_mood = 1;
-        R2_Extern.angle5 = 93;
+        // R2_Extern.lift_mood = 1;
+        // R2_Extern.angle5 = 93;
         if(R2_Extern.Track_Mode == 0)
         {
           R2_Extern.angle_balance_target = -90;
@@ -1036,8 +1036,8 @@ void One_Area_Function(void *argument)
         break;
 
         case 2:
-          // zhuazi_open();
-          fangkuang_open();
+          zhuazi_open();
+          // fangkuang_open();
           quzhua(area_1_dt35[R2_Extern.Area1_id-1][0], area_1_dt35[R2_Extern.Area1_id-1][1]);
           if(R2_Extern.Area1_2_flag == 1)
           {
@@ -1072,8 +1072,8 @@ void One_Area_Function(void *argument)
             //     R2_Extern.Area1_timer = HAL_GetTick();
             //     R2_Extern.Area1_flag = 40;
             // }
-            // zhuazi_close();
-            fangkuang_close();
+            zhuazi_close();
+            // fangkuang_close();
             osDelay(500);
             R2_Extern.Area1_flag = 5;
         break;
@@ -1091,13 +1091,13 @@ void One_Area_Function(void *argument)
           if(R2_Extern.check_angle5_flag == 1)
           {
             osDelay(500);
-            if(R2_Extern.Area1_id != 0)
-            {
-              R2_Extern.Area1_id = R2_Extern.Area1_id - 1;
-              R2_Extern.angle5 = 93;
-              R2_Extern.Area1_flag = 2;
-            }
-            // R2_Extern.Area1_flag = 6;
+            // if(R2_Extern.Area1_id != 0)
+            // {
+            //   R2_Extern.Area1_id = R2_Extern.Area1_id - 1;
+            //   R2_Extern.angle5 = 93;
+            //   R2_Extern.Area1_flag = 2;
+            // }//循环取逻辑
+            R2_Extern.Area1_flag = 6;
           }
         break;
 
@@ -1108,7 +1108,7 @@ void One_Area_Function(void *argument)
           // R2_Extern.angle = 0;
           // R2_Extern.speed = 0;
           // R2_Extern.Area1_flag = 7;
-          quzhua(area_1_dt35[5][0]+200, area_1_dt35[5][1]+600);
+          quzhua(area_1_dt35[2][0]+200, area_1_dt35[2][1]+600);
           if(R2_Extern.Area1_2_flag == 1)
           {
             R2_Extern.angle = 0;
@@ -1127,7 +1127,7 @@ void One_Area_Function(void *argument)
 
         case 8:
           // back_keep_x(area_1_dt35[5][0]+200,0,0);
-          // back_keep_y(area_1_dt35[R2_Extern.Area1_id-1][1]+600,0,0);
+          back_keep_y(area_1_dt35[R2_Extern.Area1_id-1][1]+600,0,0);
           // quzhua(area_1_dt35[5][0]+200, area_1_dt35[5][1]+600);
         break;
 
@@ -1185,7 +1185,7 @@ void Two_Area_Function(void *argument)
             if (R2_Extern.meilin_count_flag < visual_data.meilin_count)
             {
               MeilinPointCmd current_point = visual_data.meilin_points[R2_Extern.meilin_count_flag];
-              // R2_Extern.KFS_Grap_flag = current_point.has_true_kfs;//取矿，暂时注释
+              R2_Extern.KFS_Grap_flag = current_point.has_true_kfs;//取矿，暂时注释
               if(R2_Extern.KFS_Grap_flag == 1)
               {
                 R2_Extern.bool_KFS_flag = 1;
@@ -1532,13 +1532,13 @@ void Two_Area_Function(void *argument)
           }
           else
           {
-            // R2_Extern.KFS_status_flag = 5;
             R2_Extern.lift_mood = 0;
             R2_Extern.angle4 = 0;
             R2_Extern.bool_KFS_flag = 0;
             R2_Extern.car_flag = 0;
             if(R2_Extern.Area2_flag == 13 || R2_Extern.Area2_flag == 15)
             {
+              
               R2_Extern.complete_dingwei_flag = 1;
               R2_Extern.complete_taijie_flag = 1;
               R2_Extern.Area2_flag = 0;
@@ -1546,27 +1546,6 @@ void Two_Area_Function(void *argument)
             
           }
         }
-        break;
-
-        case 5:
-
-          R2_Extern.angle1 = 155;
-          R2_Extern.angle2 = angle_2;
-          // R2_Extern.angle4 = 80;
-          if(unitree_pos[0] >= R2_Extern.angle1 - 5 && R2_Extern.angle1 <= unitree_pos[0] + 5)
-          {
-              R2_Extern.angle2 = angle_2 + 20;
-              R2_Extern.angle3 = angle_3 + 20;
-              if(unitree_pos[1]>= R2_Extern.angle3 - 5 && unitree_pos[1] <= R2_Extern.angle3 + 5 && dm4310_fb[1].position_deg >= R2_Extern.angle2 - 5 && dm4310_fb[1].position_deg <= R2_Extern.angle2 + 5)
-              {
-                R2_Extern.angle2 = angle_2 + 30;
-                R2_Extern.angle3 = angle_3 + 30;
-                R2_Extern.KFS_status_flag = 0;
-                osDelay(500);
-              }
-            
-          }
-
         break;
 
         default:
