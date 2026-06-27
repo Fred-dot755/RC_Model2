@@ -47,7 +47,6 @@ void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float no
 }
 
 
-
 //1区控制
 // const float area_1_dt35[6][2] = {
 //     {412.0f, 216.0f},
@@ -283,6 +282,7 @@ const float area_2_blue[10][2] = {
     {10.60f,5.54f}
 };
 
+
 const float area_3_blue[10][2] = {
     {8.32f,4.0f}
 };
@@ -317,6 +317,7 @@ const float data_table_blue[12][2] = {
     {6.84f, 2.53f},//11
     {7.06f, 1.34f}//10
 };
+
 
 void check_dingwei(float current_x, float current_y, int cell_index)
 {

@@ -889,10 +889,10 @@ void Angle_ring_Function(void *argument)
     while (balance_diff > 180.0f) balance_diff -= 360.0f;
     while (balance_diff < -180.0f) balance_diff += 360.0f;
 
-    if (balance_diff > 0.9f) {
-        R2_Extern.angle_balance += 0.9f;
-    } else if (balance_diff < -0.9f) {
-        R2_Extern.angle_balance -= 0.9f;
+    if (balance_diff > 0.3f) {
+        R2_Extern.angle_balance += 0.3f;
+    } else if (balance_diff < -0.3f) {
+        R2_Extern.angle_balance -= 0.3f;
     } else {
         R2_Extern.angle_balance = R2_Extern.angle_balance_target;  // 差值小于 1 度，直接到位
     }
@@ -1185,7 +1185,7 @@ void Two_Area_Function(void *argument)
             if (R2_Extern.meilin_count_flag < visual_data.meilin_count)
             {
               MeilinPointCmd current_point = visual_data.meilin_points[R2_Extern.meilin_count_flag];
-              R2_Extern.KFS_Grap_flag = current_point.has_true_kfs;//取矿，暂时注释
+              // R2_Extern.KFS_Grap_flag = current_point.has_true_kfs;//取矿，暂时注释
               if(R2_Extern.KFS_Grap_flag == 1)
               {
                 R2_Extern.bool_KFS_flag = 1;
@@ -1423,36 +1423,61 @@ void Two_Area_Function(void *argument)
         break;
 
         case 13:
-            chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 1, 1 , 0.5);//暂时写死
+            chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 2.48, 0.57 , 1.0);//暂时写死
             R2_Extern.angle = chassic_data.angle;
             R2_Extern.speed = chassic_data.distance;
             check_dingwei_2(visual_data.x_map, visual_data.y_map, 1, 1);
+            R2_Extern.lift_mood = 1;
             if(R2_Extern.bool_check_1_flag == 1)
             {
               R2_Extern.angle = 0;
               R2_Extern.speed = 0;
-              R2_Extern.KFS_Grap_flag = 1;
-              R2_Extern.bool_KFS_flag = 1;
-              R2_Extern.KFS_status_flag = 1;
+              R2_Extern.lift_mood = 1;
+              // R2_Extern.KFS_Grap_flag = 1;
+              // R2_Extern.bool_KFS_flag = 1;
+              // R2_Extern.KFS_status_flag = 1;
+              R2_Extern.Area2_flag = 14;
             }
           break;
 
         case 14:
 
+              // R2_Extern.complete_dingwei_flag = 1;
+              // R2_Extern.complete_taijie_flag = 1;//这两行是为了让点遍历推进
+              float target_y = (R2_Extern.Track_flag == 0) ? -1.69f : 1.69f;
+              chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 2.17f, target_y, 1.0);
+              R2_Extern.angle = chassic_data.angle;
+              R2_Extern.speed = chassic_data.distance;
+              check_dingwei_2(visual_data.x_map, visual_data.y_map, 2.17f, target_y);
+              if(R2_Extern.bool_check_1_flag == 1)
+              {
+                R2_Extern.Area2_flag = 0;
+                // R2_Extern.complete_dingwei_flag = 0;
+                // R2_Extern.complete_taijie_flag = 0;
+                R2_Extern.meilin_count_flag ++;
+                R2_Extern.complete_flag = 0;
+              }
+              // R2_Extern.Area2_flag = 0;
+            
+
+
           break;
 
         case 15:
-            chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 1, 1 , 0.5);//暂时写死
+            chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 2.38, 0.57 , 1.0);//暂时写死
             R2_Extern.angle = chassic_data.angle;
             R2_Extern.speed = chassic_data.distance;
-            check_dingwei_2(visual_data.x_map, visual_data.y_map, 1, 1);
+            check_dingwei_2(visual_data.x_map, visual_data.y_map, 2.48, 0.57);
+            R2_Extern.lift_mood = 1;
             if(R2_Extern.bool_check_1_flag == 1)
             {
               R2_Extern.angle = 0;
               R2_Extern.speed = 0;
-              R2_Extern.KFS_Grap_flag = 1;
-              R2_Extern.bool_KFS_flag = 1;
-              R2_Extern.KFS_status_flag = 1;
+              // R2_Extern.lift_mood = 1;
+              // R2_Extern.KFS_Grap_flag = 1;
+              // R2_Extern.bool_KFS_flag = 1;
+              // R2_Extern.KFS_status_flag = 1;
+              R2_Extern.Area2_flag = 14;
             }
           break;
 //下台阶5到8
@@ -1538,10 +1563,19 @@ void Two_Area_Function(void *argument)
             R2_Extern.car_flag = 0;
             if(R2_Extern.Area2_flag == 13 || R2_Extern.Area2_flag == 15)
             {
-              
-              R2_Extern.complete_dingwei_flag = 1;
-              R2_Extern.complete_taijie_flag = 1;
-              R2_Extern.Area2_flag = 0;
+              // R2_Extern.complete_dingwei_flag = 1;
+              R2_Extern.complete_taijie_flag = 1;//这两行是为了让点遍历推进
+              float target_y = (R2_Extern.Track_flag == 0) ? -1.69f : 1.69f;
+              chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, 2.17f, target_y, 1.0);
+              R2_Extern.angle = chassic_data.angle;
+              R2_Extern.speed = chassic_data.distance;
+              check_dingwei_2(visual_data.x_map, visual_data.y_map, 2.17f, target_y);
+              if(R2_Extern.bool_check_1_flag == 1)
+              {
+                R2_Extern.Area2_flag = 0;
+                R2_Extern.complete_dingwei_flag = 1;
+              }
+              // R2_Extern.Area2_flag = 0;
             }
             
           }
