@@ -56,7 +56,16 @@ void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float no
 //     {1210.0f, 334.0f},
 //     {1426.0f, 334.0f}
 // };
-const float area_1_dt35[6][2] = {
+const float area_1_dt35_red[6][2] = {
+    {0.0f, 0.0f},
+    {50.0f, 204.0f},
+    {236.0f, 200.0f},
+    {435.0f, 201.0f},
+    {621.0f, 201.0f},
+    {830.0f, 218.0f}
+};
+
+const float area_1_dt35_blue[6][2] = {
     {392.0f, 216.0f},
     {590.0f, 215.0f},
     {788.0f, 219.0f},
@@ -82,8 +91,10 @@ void quzhua(float x, float y)
     float x_dist_mm = (float)dt35_data.dist[x_dist_index];
     float back_dist_mm = (float)dt35_data.dist[3];
 
-    float left_error_mm = (visual_data.hmi_color == 2) ? (x - x_dist_mm) : (x_dist_mm - x);
-    float forward_error_mm = (visual_data.hmi_color == 2) ? (y - back_dist_mm) : (back_dist_mm - y);
+    // float left_error_mm = (visual_data.hmi_color == 2) ? (x - x_dist_mm) : (x_dist_mm - x);
+    // float forward_error_mm = (visual_data.hmi_color == 2) ? (y - back_dist_mm) : (y - back_dist_mm);
+    float left_error_mm = x_dist_mm - x;
+    float forward_error_mm = y - back_dist_mm;
 
     if (fabsf(left_error_mm) <= DEADZONE_MM)
     {
@@ -116,10 +127,63 @@ void quzhua(float x, float y)
         R2_Extern.speed = MAX_SPEED_M;
     else
         R2_Extern.speed = MAX_SPEED_M * (distance_m / SLOW_DIST_M) * 2.5;
-        if(R2_Extern.speed < 0.1)
+        if(R2_Extern.speed < 0.15)
         {
-            R2_Extern.speed = 0.1;
+            R2_Extern.speed = 0.15;
         }
+}
+
+void quzhua_dui(float y, float x)
+{
+    const float DEADZONE_MM = 2.0f;
+    const float MAX_SPEED_M = 0.5f;
+    const float SLOW_DIST_M = 0.5f;
+
+    if (dt35_data.dist[3] < 10 || dt35_data.dist[3] > 5900)
+    {
+        return;
+    }
+
+    float back_dist_mm = (float)dt35_data.dist[3];
+    float left_error_mm = x;
+    float forward_error_mm = y - back_dist_mm;
+
+    if (fabsf(left_error_mm) <= DEADZONE_MM)
+    {
+        left_error_mm = 0.0f;
+    }
+
+    if (fabsf(forward_error_mm) <= DEADZONE_MM)
+    {
+        forward_error_mm = 0.0f;
+    }
+
+    if (left_error_mm == 0.0f && forward_error_mm == 0.0f)
+    {
+        R2_Extern.angle = 0.0f;
+        R2_Extern.speed = 0.0f;
+        R2_Extern.Area1_2_flag = 1;
+        return;
+    }
+    else
+    {
+        R2_Extern.Area1_2_flag = 0;
+    }
+
+    float distance_mm = sqrtf(left_error_mm * left_error_mm + forward_error_mm * forward_error_mm);
+    float distance_m = distance_mm / 1000.0f;
+
+    R2_Extern.angle = atan2f(left_error_mm, forward_error_mm) * 180.0f / PI;
+
+    if (distance_m >= SLOW_DIST_M)
+        R2_Extern.speed = MAX_SPEED_M;
+    else
+        R2_Extern.speed = MAX_SPEED_M * (distance_m / SLOW_DIST_M) * 2.5f;
+
+    if(R2_Extern.speed < 0.1f)
+    {
+        R2_Extern.speed = 0.1f;
+    }
 }
 
 
@@ -180,7 +244,7 @@ void back_keep_y(float y, float angle, float speed)
     }
 
     float back_dist_mm = (float)dt35_data.dist[3];
-    float forward_error_mm = (visual_data.hmi_color == 2) ? (y - back_dist_mm) : (back_dist_mm - y);
+    float forward_error_mm = y - back_dist_mm;
     float forward_adjust_speed = 0.0f;
 
     if (fabsf(forward_error_mm) <= DEADZONE_MM)
@@ -260,7 +324,7 @@ void fangkuang_close(void)//放矿关闭
 
 //红区
 const float area_1_red[10][2] = {
-    {0.62f,0.38f}
+    {0.62f,0.79f}
 };
 
 const float area_2_red[10][2] = {

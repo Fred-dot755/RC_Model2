@@ -37,6 +37,7 @@ typedef struct {
     float y_map;
     int target_cell;
     int targetid;
+    int dx;
     //float yaw_map;
     int i;
     uint8_t meilin_count;               // 有效点数量，最多9

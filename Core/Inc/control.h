@@ -141,6 +141,7 @@ typedef struct
     int Area1_2_flag;//激光纠偏
     int Area1_timer;
     int Area1_id;//跑点id
+    float Area1_dx;//偏移
 
 
 
@@ -188,6 +189,7 @@ void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float no
 
 
 void quzhua(float x, float y);
+void quzhua_dui(float y, float x);
 void back_keep_x(float x, float angle, float speed);
 void back_keep_y(float y, float angle, float speed);
 
@@ -203,7 +205,8 @@ void zhuazi_close(void);
 void fangkuang_open(void);
 void fangkuang_close(void);
 
-extern const float area_1_dt35[6][2];
+extern const float area_1_dt35_red[6][2];
+extern const float area_1_dt35_blue[6][2];
 extern const float area_1_red[10][2];
 extern const float area_2_red[10][2];
 extern const float area_3_red[10][2];

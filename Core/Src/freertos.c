@@ -889,10 +889,10 @@ void Angle_ring_Function(void *argument)
     while (balance_diff > 180.0f) balance_diff -= 360.0f;
     while (balance_diff < -180.0f) balance_diff += 360.0f;
 
-    if (balance_diff > 0.3f) {
-        R2_Extern.angle_balance += 0.3f;
-    } else if (balance_diff < -0.3f) {
-        R2_Extern.angle_balance -= 0.3f;
+    if (balance_diff > 0.6f) {
+        R2_Extern.angle_balance += 0.6f;
+    } else if (balance_diff < -0.6f) {
+        R2_Extern.angle_balance -= 0.6f;
     } else {
         R2_Extern.angle_balance = R2_Extern.angle_balance_target;  // 差值小于 1 度，直接到位
     }
@@ -994,11 +994,13 @@ void One_Area_Function(void *argument)
 
     if(visual_data.workl_mode == 1 && R2_Extern.Area1_1_flag == 1)
     {
+      const float (*area_1_dt35)[2] = (R2_Extern.Track_flag == 0) ? area_1_dt35_red : area_1_dt35_blue;
+
       switch(R2_Extern.Area1_flag)
       {
         case 0:
         R2_Extern.Area1_id = visual_data.targetid;
-        // R2_Extern.Area1_id = 6;
+        // R2_Extern.Area1_id = 2;
         if(R2_Extern.Area1_id == 0)
         {
           break;
@@ -1108,7 +1110,7 @@ void One_Area_Function(void *argument)
           // R2_Extern.angle = 0;
           // R2_Extern.speed = 0;
           // R2_Extern.Area1_flag = 7;
-          quzhua(area_1_dt35[2][0]+200, area_1_dt35[2][1]+600);
+          quzhua(area_1_dt35[1][0]+200, area_1_dt35[1][1]+600);
           if(R2_Extern.Area1_2_flag == 1)
           {
             R2_Extern.angle = 0;
@@ -1122,13 +1124,14 @@ void One_Area_Function(void *argument)
           if(R2_Extern.check_angle5_flag == 1)
           {
             R2_Extern.Area1_flag = 8;
-          }
+          } 
         break;
 
         case 8:
-          // back_keep_x(area_1_dt35[5][0]+200,0,0);
-          back_keep_y(area_1_dt35[R2_Extern.Area1_id-1][1]+600,0,0);
-          // quzhua(area_1_dt35[5][0]+200, area_1_dt35[5][1]+600);
+          R2_Extern.Area1_dx = -(float)(visual_data.dx) * 1.0f;
+          // back_keep_x(area_1_dt35[3][0]+200,0,0);
+          // back_keep_y(area_1_dt35[3][1]+600,0,0);
+          quzhua_dui(area_1_dt35[1][1] + 600 , -R2_Extern.Area1_dx*1.2);
         break;
 
         default:
@@ -1686,7 +1689,7 @@ void Mid360_Function(void *argument)
           case 0:
           if(R2_Extern.Area1_1_flag == 0)
           {
-            chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, area_1[0][0], area_1[0][1] , 2.0);
+            chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, area_1[0][0], area_1[0][1] , 1.0);
             R2_Extern.angle = chassic_data.angle;
             R2_Extern.speed = chassic_data.distance;
             check_dingwei_2(visual_data.x_map, visual_data.y_map, area_1[0][0], area_1[0][1]);
