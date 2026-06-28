@@ -351,14 +351,14 @@ void DM_Function(void *argument)
     DM_CAN_Enable_Motor(6);
     DM_CAN_Enable_Motor(7);
 
-    // DM_CAN_Send_PosVel_Mode(-(-R2_Extern.angle4  - unitree_pos[1] + dm4310_fb[1].position_deg) * 1.5,100,2);//上正
-    // DM_CAN_Send_PosVel_Mode(-R2_Extern.angle2,40,3);//上负    大臂电机改为8009了
-    //   // DM_CAN_Send_PosVel_Mode(R2_Extern.lift,400,4);
-    //   // DM_CAN_Send_PosVel_Mode(R2_Extern.lift-40,400,5);
-    //   DM_CAN_Send_PosVel_Mode(R2_Extern.lift,800,4);
-    //   DM_CAN_Send_PosVel_Mode(R2_Extern.lift,800,5);
-    // DM_CAN_Send_PosVel_Mode(R2_Extern.angle5,800,6);//爪子
-    // DM_CAN_Send_PosVel_Mode(R2_Extern.angle1 * 1.625f,100,7);//云台：angle1为[-180, 180)相对角度
+    DM_CAN_Send_PosVel_Mode(-(-R2_Extern.angle4  - unitree_pos[1] + dm4310_fb[1].position_deg) * 1.5,100,2);//上正
+    DM_CAN_Send_PosVel_Mode(-R2_Extern.angle2,40,3);//上负    大臂电机改为8009了
+      // DM_CAN_Send_PosVel_Mode(R2_Extern.lift,400,4);
+      // DM_CAN_Send_PosVel_Mode(R2_Extern.lift-40,400,5);
+      DM_CAN_Send_PosVel_Mode(R2_Extern.lift,800,4);
+      DM_CAN_Send_PosVel_Mode(R2_Extern.lift,800,5);
+    DM_CAN_Send_PosVel_Mode(R2_Extern.angle5,800,6);//爪子
+    DM_CAN_Send_PosVel_Mode(R2_Extern.angle1 * 1.625f,100,7);//云台：angle1为[-180, 180)相对角度
 
     //调试用
     // DM_CAN_Send_PosVel_Mode(0,0,2);
