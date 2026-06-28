@@ -32,7 +32,8 @@ typedef struct {
     int bool_graping;
     int bool_getKFS;
     float xyz_in_base[3];
-    //float wepend_offset_x;
+    float kfs_x;
+    float kfs_y;
     float x_map;
     float y_map;
     int target_cell;

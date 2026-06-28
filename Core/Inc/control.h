@@ -188,6 +188,7 @@ void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float no
 
 void quzhua(float x, float y);
 void quzhua_dui(float y, float x);
+void qukuang_move_y(float y);
 void back_keep_x(float x, float angle, float speed);
 void back_keep_y(float y, float angle, float speed);
 

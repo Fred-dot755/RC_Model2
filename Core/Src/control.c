@@ -13,6 +13,8 @@ chassic_control_t chassic_data;
 static speed_plan_t quzhua_speed_plan;
 static float quzhua_plan_target_x = 0.0f;
 static float quzhua_plan_target_y = 0.0f;
+static speed_plan_t qukuang_move_y_speed_plan;
+static float qukuang_move_y_target = 0.0f;
 
 void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float now_y, float target_x, float target_y , float max_speed)
 {
@@ -77,20 +79,92 @@ const float area_1_dt35_red[6][2] = {
 };
 
 const float area_1_dt35_blue[6][2] = {
-    {392.0f, 206.0f},
-    {590.0f, 205.0f},
-    {788.0f, 209.0f},
-    {985.0f, 202.0f},
-    {1190.0f, 324.0f},
-    {1406.0f, 324.0f}
+    {372.0f, 212.0f},
+    {570.0f, 212.0f},
+    {768.0f, 212.0f},
+    {975.0f, 212.0f},
+    {1170.0f, 212.0f},
+    {1386.0f, 339.0f}
 };
 
+// void quzhua(float x, float y)
+// {
+//     const float DEADZONE_MM = 1.0f;
+//     const float MAX_SPEED_M = 0.5f;
+//     const float MIN_SPEED_M = 0.12f;
+//     const float TARGET_EPSILON_MM = 0.5f;
+
+//     int x_dist_index = (visual_data.hmi_color == 2) ? 1 : 2;
+
+//     if (dt35_data.dist[x_dist_index] < 10 || dt35_data.dist[x_dist_index] > 5900 ||
+//         dt35_data.dist[3] < 10 || dt35_data.dist[3] > 5900)
+//     {
+//         return;
+//     }
+
+//     float x_dist_mm = (float)dt35_data.dist[x_dist_index];
+//     float back_dist_mm = (float)dt35_data.dist[3];
+
+//     float left_error_mm = (visual_data.hmi_color == 2) ? (x - x_dist_mm) : (x_dist_mm - x);
+//     float forward_error_mm = (visual_data.hmi_color == 2) ? (y - back_dist_mm) : (y - back_dist_mm);
+
+
+//     if (fabsf(left_error_mm) <= DEADZONE_MM)
+//     {
+//         left_error_mm = 0.0f;
+//     }
+
+//     if (fabsf(forward_error_mm) <= DEADZONE_MM)
+//     {
+//         forward_error_mm = 0.0f;
+//     }
+
+//     if (left_error_mm == 0.0f && forward_error_mm == 0.0f)
+//     {
+//         speed_plan_reset(&quzhua_speed_plan);
+//         R2_Extern.angle = 0.0f;
+//         R2_Extern.speed = 0.0f;
+//         R2_Extern.Area1_2_flag = 1;
+//         return;
+//     }
+//     else
+//     {
+//         R2_Extern.Area1_2_flag = 0;
+//     }
+
+//     float distance_mm = sqrtf(left_error_mm * left_error_mm + forward_error_mm * forward_error_mm);
+//     float distance_m = distance_mm / 1000.0f;
+
+//     R2_Extern.angle = atan2f(left_error_mm, forward_error_mm) * 180.0f / PI;
+
+//     uint32_t now_ms = HAL_GetTick();
+//     if (quzhua_speed_plan.active == 0U ||
+//         fabsf(quzhua_plan_target_x - x) > TARGET_EPSILON_MM ||
+//         fabsf(quzhua_plan_target_y - y) > TARGET_EPSILON_MM)
+//     {
+//         quzhua_plan_target_x = x;
+//         quzhua_plan_target_y = y;
+//         speed_plan_start(&quzhua_speed_plan,
+//                          0.0f, 0.0f,
+//                          distance_m, 0.0f,
+//                          MAX_SPEED_M,
+//                          now_ms);
+//     }
+
+//     R2_Extern.speed = speed_plan_update(&quzhua_speed_plan,
+//                                         now_ms,
+//                                         MAX_SPEED_M);
+
+//     if (R2_Extern.speed > 0.0f && R2_Extern.speed < MIN_SPEED_M)
+//     {
+//         R2_Extern.speed = MIN_SPEED_M;
+//     }
+// }
 void quzhua(float x, float y)
 {
     const float DEADZONE_MM = 1.0f;
     const float MAX_SPEED_M = 0.5f;
-    const float MIN_SPEED_M = 0.12f;
-    const float TARGET_EPSILON_MM = 0.5f;
+    const float SLOW_DIST_M = 0.5f;
 
     int x_dist_index = (visual_data.hmi_color == 2) ? 1 : 2;
 
@@ -103,10 +177,8 @@ void quzhua(float x, float y)
     float x_dist_mm = (float)dt35_data.dist[x_dist_index];
     float back_dist_mm = (float)dt35_data.dist[3];
 
-    // float left_error_mm = (visual_data.hmi_color == 2) ? (x - x_dist_mm) : (x_dist_mm - x);
-    // float forward_error_mm = (visual_data.hmi_color == 2) ? (y - back_dist_mm) : (y - back_dist_mm);
-    float left_error_mm = x_dist_mm - x;
-    float forward_error_mm = y - back_dist_mm;
+    float left_error_mm = (visual_data.hmi_color == 2) ? (x - x_dist_mm) : (x_dist_mm - x);
+    float forward_error_mm = (visual_data.hmi_color == 2) ? (y - back_dist_mm) : (back_dist_mm - y);
 
     if (fabsf(left_error_mm) <= DEADZONE_MM)
     {
@@ -120,7 +192,6 @@ void quzhua(float x, float y)
 
     if (left_error_mm == 0.0f && forward_error_mm == 0.0f)
     {
-        speed_plan_reset(&quzhua_speed_plan);
         R2_Extern.angle = 0.0f;
         R2_Extern.speed = 0.0f;
         R2_Extern.Area1_2_flag = 1;
@@ -136,28 +207,14 @@ void quzhua(float x, float y)
 
     R2_Extern.angle = atan2f(left_error_mm, forward_error_mm) * 180.0f / PI;
 
-    uint32_t now_ms = HAL_GetTick();
-    if (quzhua_speed_plan.active == 0U ||
-        fabsf(quzhua_plan_target_x - x) > TARGET_EPSILON_MM ||
-        fabsf(quzhua_plan_target_y - y) > TARGET_EPSILON_MM)
-    {
-        quzhua_plan_target_x = x;
-        quzhua_plan_target_y = y;
-        speed_plan_start(&quzhua_speed_plan,
-                         0.0f, 0.0f,
-                         distance_m, 0.0f,
-                         MAX_SPEED_M,
-                         now_ms);
-    }
-
-    R2_Extern.speed = speed_plan_update(&quzhua_speed_plan,
-                                        now_ms,
-                                        MAX_SPEED_M);
-
-    if (R2_Extern.speed > 0.0f && R2_Extern.speed < MIN_SPEED_M)
-    {
-        R2_Extern.speed = MIN_SPEED_M;
-    }
+    if (distance_m >= SLOW_DIST_M)
+        R2_Extern.speed = MAX_SPEED_M;
+    else
+        R2_Extern.speed = MAX_SPEED_M * (distance_m / SLOW_DIST_M) * 1.0;
+        if(R2_Extern.speed < 0.13)
+        {
+            R2_Extern.speed = 0.13;
+        }
 }
 
 void quzhua_dui(float y, float x)
@@ -205,7 +262,7 @@ void quzhua_dui(float y, float x)
     if (distance_m >= SLOW_DIST_M)
         R2_Extern.speed = MAX_SPEED_M;
     else
-        R2_Extern.speed = MAX_SPEED_M * (distance_m / SLOW_DIST_M) * 2.5f;
+        R2_Extern.speed = MAX_SPEED_M * (distance_m / SLOW_DIST_M) * 1.0f;
 
     if(R2_Extern.speed < 0.1f)
     {
@@ -346,6 +403,60 @@ void fangkuang_open(void) // mine release open
 void fangkuang_close(void) // close mine release
 {
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_RESET);
+}
+
+void qukuang_move_y(float y)
+{
+    const float KFS_Y_FULL_SCALE = 1024.0f;
+    const float PLAN_FULL_DISTANCE_M = 0.16f;
+    const float DEADZONE_KFS = 20.0f;
+    const float MAX_SPEED_M = 0.50f;
+    const float MIN_SPEED_M = 0.20f;
+    const float TARGET_EPSILON_KFS = 5.0f;
+    const float MOVE_SIGN = -1.0f;
+
+    float error_kfs = y - visual_data.kfs_x;
+
+    if (fabsf(error_kfs) <= DEADZONE_KFS)
+    {
+        speed_plan_reset(&qukuang_move_y_speed_plan);
+        R2_Extern.angle = 0.0f;
+        R2_Extern.speed = 0.0f;
+        R2_Extern.bool_check_1_flag = 1;
+        return;
+    }
+
+    R2_Extern.bool_check_1_flag = 0;
+    R2_Extern.angle = (error_kfs * MOVE_SIGN > 0.0f) ? 90.0f : -90.0f;
+
+    float error_ratio = fabsf(error_kfs) / KFS_Y_FULL_SCALE;
+    if (error_ratio > 1.0f)
+    {
+        error_ratio = 1.0f;
+    }
+
+    float distance_m = error_ratio * PLAN_FULL_DISTANCE_M;
+    uint32_t now_ms = HAL_GetTick();
+
+    if (qukuang_move_y_speed_plan.active == 0U ||
+        fabsf(qukuang_move_y_target - y) > TARGET_EPSILON_KFS)
+    {
+        qukuang_move_y_target = y;
+        speed_plan_start(&qukuang_move_y_speed_plan,
+                         0.0f, 0.0f,
+                         distance_m, 0.0f,
+                         MAX_SPEED_M,
+                         now_ms);
+    }
+
+    R2_Extern.speed = speed_plan_update(&qukuang_move_y_speed_plan,
+                                        now_ms,
+                                        MAX_SPEED_M);
+
+    if (R2_Extern.speed > 0.0f && R2_Extern.speed < MIN_SPEED_M)
+    {
+        R2_Extern.speed = MIN_SPEED_M;
+    }
 }
 
 // red area

@@ -1233,14 +1233,6 @@ void USAR_UART10_IDLECallback(UART_HandleTypeDef *huart)
     
     bool visual_packet_ok = meic_protocol_parse_packet(USART10_RX_BUF, USART10_RX_BUF_LENGTH, &visual_data);
 
-    if(visual_packet_ok && R2_Extern.KFS_status_flag == 1)
-    {
-      R2_Extern.x = visual_data.xyz_in_base[0] + 400;
-      R2_Extern.y = visual_data.xyz_in_base[1] + 30;
-      R2_Extern.z = visual_data.xyz_in_base[2] + 350;
-      R2_Extern.KFS_status_flag = 2;
-    }
-
     memset(USART10_RX_BUF,0,USART10_RX_BUF_LENGTH);
 
     HAL_UART_Receive_DMA(huart, (uint8_t *)USART10_RX_BUF, USART10_RX_BUF_LENGTH);

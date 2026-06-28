@@ -160,12 +160,11 @@ int main(void)
   RGB_Color_Ctrl(255,1,255);
 
   R2_Extern.work_mode = 1;
-  R2_Extern.lift_mood = 0;
+  R2_Extern.lift_mood = 1;
   R2_Extern.Track_Mode = 1;//0红，1蓝
   // visual_data.hmi_start = 1;
   
-  // R2_Extern.lift_mood = 1;
-  // R2_Extern.angle5 = 98;
+
 
   // zhuazi_open();
   // R2_Extern.angle_balance_target = -90;

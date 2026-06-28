@@ -351,14 +351,12 @@ void DM_Function(void *argument)
     DM_CAN_Enable_Motor(6);
     DM_CAN_Enable_Motor(7);
 
-    DM_CAN_Send_PosVel_Mode(-(-R2_Extern.angle4  - unitree_pos[1] + dm4310_fb[1].position_deg) * 1.5,100,2);//上正
+    DM_CAN_Send_PosVel_Mode((-R2_Extern.angle4  - unitree_pos[1] + dm4310_fb[1].position_deg) * 1.5,100,2);//上正
     DM_CAN_Send_PosVel_Mode(-R2_Extern.angle2,40,3);//上负    大臂电机改为8009了
-      // DM_CAN_Send_PosVel_Mode(R2_Extern.lift,400,4);
-      // DM_CAN_Send_PosVel_Mode(R2_Extern.lift-40,400,5);
       DM_CAN_Send_PosVel_Mode(R2_Extern.lift,800,4);
       DM_CAN_Send_PosVel_Mode(R2_Extern.lift,800,5);
     DM_CAN_Send_PosVel_Mode(R2_Extern.angle5,800,6);//爪子
-    DM_CAN_Send_PosVel_Mode(R2_Extern.angle1 * 1.625f,100,7);//云台：angle1为[-180, 180)相对角度
+    // DM_CAN_Send_PosVel_Mode(R2_Extern.angle1 * 1.625f,100,7);//云台：angle1为[-180, 180)相对角度
 
     //调试用
     // DM_CAN_Send_PosVel_Mode(0,0,2);
@@ -1000,7 +998,7 @@ void One_Area_Function(void *argument)
       {
         case 0:
         R2_Extern.Area1_id = visual_data.targetid;
-        // R2_Extern.Area1_id = 2;
+        // R2_Extern.Area1_id = 1;
         if(R2_Extern.Area1_id == 0)
         {
           break;
@@ -1057,7 +1055,7 @@ void One_Area_Function(void *argument)
           // {
           //   R2_Extern.Area1_flag = 4;
           // }
-          R2_Extern.angle5 = 95;
+          // R2_Extern.angle5 = 95;
           R2_Extern.Area1_flag = 4;
         break;
 
@@ -1192,7 +1190,7 @@ void Two_Area_Function(void *argument)
             if (R2_Extern.meilin_count_flag < visual_data.meilin_count)
             {
               MeilinPointCmd current_point = visual_data.meilin_points[R2_Extern.meilin_count_flag];
-              // R2_Extern.KFS_Grap_flag = current_point.has_true_kfs;//取矿，暂时注释
+              R2_Extern.KFS_Grap_flag = current_point.has_true_kfs;//取矿，暂时注释
               if(R2_Extern.KFS_Grap_flag == 1)
               {
                 R2_Extern.bool_KFS_flag = 1;
@@ -1502,13 +1500,13 @@ void Two_Area_Function(void *argument)
       switch(R2_Extern.KFS_status_flag)
       {
         case 0:
-        if(R2_Extern.KFS_Get_flag == 1)
+        if(R2_Extern.KFS_Get_flag == 1 && visual_data.xyz_in_base[0] <= 650)//上取下650 下取上570
         {
           R2_Extern.angle = 0;
           R2_Extern.speed = 0;
           // R2_Extern.lift_mood = 0;//降下去
           // R2_Extern.angle4 = 90;
-          R2_Extern.lift_mood = 2;
+          R2_Extern.lift_mood = 0;
           // R2_Extern.lift_mood = 1;
           R2_Extern.KFS_status_flag = 1;
           osDelay(200);
@@ -1519,28 +1517,34 @@ void Two_Area_Function(void *argument)
         }
         break;
 
-        case 2:
+        case 1:
         up_stair();
         if(unitree_pos[1]>= angle_3 - 5 && unitree_pos[1] <= angle_3 + 5 && dm4310_fb[1].position_deg >= angle_2 - 5 && dm4310_fb[1].position_deg <= angle_2 + 5)
         {
-          osDelay(1000);
+          // osDelay(1000);
           R2_Extern.KFS_status_flag = 3;
         }
+        R2_Extern.KFS_status_flag = 3;
         break;
 
         case 3:
         {
-          int target_angle1, target_angle2, target_angle3;
-          if(inverseKinematics(R2_Extern.x, R2_Extern.y, R2_Extern.z, &target_angle1, &target_angle2, &target_angle3))
+          qukuang_move_y(400);//上抓下400 下抓上400
+        
+          if(visual_data.kfs_x >= 395 && visual_data.kfs_x <= 405)//这也要改
           {
-            R2_Extern.angle1 = target_angle1;
-            R2_Extern.angle2 = target_angle2;
-            R2_Extern.angle3 = target_angle3;
+            // R2_Extern.angle1 = 0;
+            R2_Extern.angle2 = 140;
+            R2_Extern.angle3 = 146;//上取下
+            // R2_Extern.angle2 = 120;
+            // R2_Extern.angle3 = 146;//下取上
             R2_Extern.angle4 = 80;
+
+
             if(unitree_pos[1]>= R2_Extern.angle3 - 5 && unitree_pos[1] <= R2_Extern.angle3 + 5 && dm4310_fb[1].position_deg >= R2_Extern.angle2 - 5 && dm4310_fb[1].position_deg <= R2_Extern.angle2 + 5)
             {
-              osDelay(500);
-              R2_Extern.KFS_status_flag = 4;
+              // osDelay(500);
+              // R2_Extern.KFS_status_flag = 4;
             }
           }
         }
