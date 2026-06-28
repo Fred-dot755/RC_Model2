@@ -72,6 +72,12 @@ typedef enum {
 
 extern StairState_t current_state;
 
+typedef enum
+{
+    CHASSIC_PLAN_OK = 0,
+    CHASSIC_PLAN_STOP_REACHED
+} chassic_plan_status_t;
+
 typedef struct 
 {
     float now_x;
@@ -81,6 +87,13 @@ typedef struct
 
     float angle;
     float distance;
+
+    float planned_speed;
+    float last_target_x;
+    float last_target_y;
+    uint32_t last_plan_tick;
+    uint8_t initialized;
+    chassic_plan_status_t status;
 }chassic_control_t;
 
 typedef struct

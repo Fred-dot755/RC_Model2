@@ -391,6 +391,47 @@ void Chassis_Force_Control_Update(Chassis_Force_Controller_t *chassis) {
 
 #define MAX_CHASSIS_SPEED  3.0f
 #define MAX_CHASSIS_WZ     3.0f
+#define CHASSIS_TARGET_MAX_ACCEL_MPS2   2.20f
+#define CHASSIS_TARGET_MAX_DECEL_MPS2   4.80f
+#define CHASSIS_TARGET_MAX_DT           0.100f
+
+static float chassis_target_vx_ramp = 0.0f;
+static float chassis_target_vy_ramp = 0.0f;
+static uint32_t chassis_target_last_tick = 0U;
+
+static void Chassis_Target_Velocity_Ramp(float vx_cmd, float vy_cmd, float *vx_out, float *vy_out)
+{
+    uint32_t now_tick = HAL_GetTick();
+    float dt = (float)(now_tick - chassis_target_last_tick) * 0.001f;
+
+    if (chassis_target_last_tick == 0U || dt <= 0.0f || dt > CHASSIS_TARGET_MAX_DT)
+    {
+        dt = 0.005f;
+    }
+    chassis_target_last_tick = now_tick;
+
+    float dvx = vx_cmd - chassis_target_vx_ramp;
+    float dvy = vy_cmd - chassis_target_vy_ramp;
+    float dv = sqrtf(dvx * dvx + dvy * dvy);
+    float cmd_speed = sqrtf(vx_cmd * vx_cmd + vy_cmd * vy_cmd);
+    float ramp_speed = sqrtf(chassis_target_vx_ramp * chassis_target_vx_ramp +
+                             chassis_target_vy_ramp * chassis_target_vy_ramp);
+    float limit_accel = (cmd_speed > ramp_speed) ? CHASSIS_TARGET_MAX_ACCEL_MPS2 : CHASSIS_TARGET_MAX_DECEL_MPS2;
+    float max_dv = limit_accel * dt;
+
+    if (dv > max_dv && dv > 0.0001f)
+    {
+        float scale = max_dv / dv;
+        dvx *= scale;
+        dvy *= scale;
+    }
+
+    chassis_target_vx_ramp += dvx;
+    chassis_target_vy_ramp += dvy;
+
+    *vx_out = chassis_target_vx_ramp;
+    *vy_out = chassis_target_vy_ramp;
+}
 
 void RC_Data_To_Chassis_Target(void) {
     
@@ -400,8 +441,9 @@ void RC_Data_To_Chassis_Target(void) {
     // float target_angle = rc_data.angle;
 
     if (visual_data.hmi_start != 1) {
-        chassis_controller.state.target_vx = 0.0f;
-        chassis_controller.state.target_vy = 0.0f;
+        Chassis_Target_Velocity_Ramp(0.0f, 0.0f,
+                                     &chassis_controller.state.target_vx,
+                                     &chassis_controller.state.target_vy);
         chassis_controller.state.target_theta = ops.HIPNUCAngleZ * PI / 180.0f;
         return;
     }
@@ -418,8 +460,9 @@ void RC_Data_To_Chassis_Target(void) {
         vx *= scale;
         vy *= scale;
     }
-    chassis_controller.state.target_vx = vx;
-    chassis_controller.state.target_vy = vy;
+    Chassis_Target_Velocity_Ramp(vx, vy,
+                                 &chassis_controller.state.target_vx,
+                                 &chassis_controller.state.target_vy);
 
     chassis_controller.state.target_theta = R2_Extern.angle_balance * PI / 180.0f;
 }

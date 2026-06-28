@@ -1007,12 +1007,12 @@ void One_Area_Function(void *argument)
         }
         // R2_Extern.lift_mood = 1;
         // R2_Extern.angle5 = 93;
-        if(R2_Extern.Track_Mode == 0)
+        if(R2_Extern.Track_flag == 0)
         {
           R2_Extern.angle_balance_target = -90;
           // R2_Extern.span = -1;
         }
-        else if(R2_Extern.Track_Mode == 1)
+        else if(R2_Extern.Track_flag == 1)
         {
           R2_Extern.angle_balance_target = 90;
           // R2_Extern.span = 1;
@@ -1054,6 +1054,7 @@ void One_Area_Function(void *argument)
           // {
           //   R2_Extern.Area1_flag = 4;
           // }
+          R2_Extern.angle5 = 95;
           R2_Extern.Area1_flag = 4;
         break;
 
@@ -1623,11 +1624,11 @@ void Three_Area_Function(void *argument)
       switch (R2_Extern.Area3_step)
       {
       case 0:
-      if(R2_Extern.Track_Mode == 0)
+      if(R2_Extern.Track_flag == 0)
       {
         R2_Extern.angle_balance_target = 90;
       }
-      else if(R2_Extern.Track_Mode == 1)
+      else if(R2_Extern.Track_flag == 1)
       {
         R2_Extern.angle_balance_target = -90;
       }
