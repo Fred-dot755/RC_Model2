@@ -351,14 +351,14 @@ void DM_Function(void *argument)
     DM_CAN_Enable_Motor(6);
     DM_CAN_Enable_Motor(7);
 
-    DM_CAN_Send_PosVel_Mode(-(-R2_Extern.angle4  - unitree_pos[1] + dm4310_fb[1].position_deg) * 1.5,100,2);//上正
-    DM_CAN_Send_PosVel_Mode(-R2_Extern.angle2,40,3);//上负    大臂电机改为8009了
-      // DM_CAN_Send_PosVel_Mode(R2_Extern.lift,400,4);
-      // DM_CAN_Send_PosVel_Mode(R2_Extern.lift-40,400,5);
-      DM_CAN_Send_PosVel_Mode(R2_Extern.lift,800,4);
-      DM_CAN_Send_PosVel_Mode(R2_Extern.lift,800,5);
-    DM_CAN_Send_PosVel_Mode(R2_Extern.angle5,800,6);//爪子
-    DM_CAN_Send_PosVel_Mode(R2_Extern.angle1 * 1.625f,100,7);//云台：angle1为[-180, 180)相对角度
+    // DM_CAN_Send_PosVel_Mode(-(-R2_Extern.angle4  - unitree_pos[1] + dm4310_fb[1].position_deg) * 1.5,100,2);//上正
+    // DM_CAN_Send_PosVel_Mode(-R2_Extern.angle2,40,3);//上负    大臂电机改为8009了
+    //   // DM_CAN_Send_PosVel_Mode(R2_Extern.lift,400,4);
+    //   // DM_CAN_Send_PosVel_Mode(R2_Extern.lift-40,400,5);
+    //   DM_CAN_Send_PosVel_Mode(R2_Extern.lift,800,4);
+    //   DM_CAN_Send_PosVel_Mode(R2_Extern.lift,800,5);
+    // DM_CAN_Send_PosVel_Mode(R2_Extern.angle5,800,6);//爪子
+    // DM_CAN_Send_PosVel_Mode(R2_Extern.angle1 * 1.625f,100,7);//云台：angle1为[-180, 180)相对角度
 
     //调试用
     // DM_CAN_Send_PosVel_Mode(0,0,2);
@@ -1023,6 +1023,7 @@ void One_Area_Function(void *argument)
           // R2_Extern.span = 0;
           R2_Extern.Area1_flag = 1;
         }
+        R2_Extern.angle5 = 120;
         break;
 
         case 1: 
@@ -1049,6 +1050,8 @@ void One_Area_Function(void *argument)
         break;
 
         case 3:
+        R2_Extern.angle5 = 92;
+        osDelay(500);
           // quzhua(area_1_dt35[3][0], area_1_dt35[3][1]);
           // if(R2_Extern.Area1_2_flag == 1)
           // {
@@ -1111,7 +1114,7 @@ void One_Area_Function(void *argument)
           // R2_Extern.angle = 0;
           // R2_Extern.speed = 0;
           // R2_Extern.Area1_flag = 7;
-          quzhua(area_1_dt35[1][0]+200, area_1_dt35[1][1]+600);
+          quzhua(area_1_dt35[2][0]+200, area_1_dt35[2][1]+600);
           if(R2_Extern.Area1_2_flag == 1)
           {
             R2_Extern.angle = 0;
@@ -1132,7 +1135,7 @@ void One_Area_Function(void *argument)
           R2_Extern.Area1_dx = -(float)(visual_data.dx) * 1.0f;
           // back_keep_x(area_1_dt35[3][0]+200,0,0);
           // back_keep_y(area_1_dt35[3][1]+600,0,0);
-          quzhua_dui(area_1_dt35[1][1] + 600 , -R2_Extern.Area1_dx*1.2);
+          quzhua_dui(area_1_dt35[1][1] + 600 , -R2_Extern.Area1_dx*1.0);
         break;
 
         default:
