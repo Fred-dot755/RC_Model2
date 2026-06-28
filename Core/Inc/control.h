@@ -141,6 +141,8 @@ typedef struct
     int Area1_id; // waypoint id
     float Area1_dx; // offset
 
+    int Area1_qukuang_flag;
+
 
 
     //area2
@@ -160,6 +162,8 @@ typedef struct
     int KFS_Grap_flag;
     int bool_KFS_flag;
     int car_flag;
+    int qukuang_mode_flag;
+    int special_flag;
 
     //area3
     int Area3_flag;
@@ -203,6 +207,9 @@ void zhuazi_open(void);
 void zhuazi_close(void);
 void fangkuang_open(void);
 void fangkuang_close(void);
+void qibeng_open(void);
+void qibeng_close(void);
+
 
 extern const float area_1_dt35_red[6][2];
 extern const float area_1_dt35_blue[6][2];

@@ -1232,6 +1232,10 @@ void USAR_UART10_IDLECallback(UART_HandleTypeDef *huart)
     UART_InvalidateRxBuffer(USART10_RX_BUF, USART10_RX_BUF_LENGTH);
     
     bool visual_packet_ok = meic_protocol_parse_packet(USART10_RX_BUF, USART10_RX_BUF_LENGTH, &visual_data);
+    if (visual_packet_ok)
+    {
+        visual_radar_on_packet();
+    }
 
     memset(USART10_RX_BUF,0,USART10_RX_BUF_LENGTH);
 

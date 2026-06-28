@@ -16,6 +16,61 @@ ReceiveData_t visual_data;
 SendData_t visual_send_data;
 #endif
 
+static uint32_t visual_radar_last_update_tick = 0U;
+static float visual_radar_last_x = 0.0f;
+static float visual_radar_last_y = 0.0f;
+static uint8_t visual_radar_has_last = 0U;
+static uint8_t visual_radar_fault = 0U;
+
+void visual_radar_clear_fault(void)
+{
+    visual_radar_last_update_tick = 0U;
+    visual_radar_last_x = 0.0f;
+    visual_radar_last_y = 0.0f;
+    visual_radar_has_last = 0U;
+    visual_radar_fault = 0U;
+}
+
+void visual_radar_on_packet(void)
+{
+    float now_x = visual_data.x_map;
+    float now_y = visual_data.y_map;
+
+    if (visual_radar_has_last != 0U)
+    {
+        float dx = now_x - visual_radar_last_x;
+        float dy = now_y - visual_radar_last_y;
+        float step = sqrtf(dx * dx + dy * dy);
+        if (step > VISUAL_RADAR_MAX_STEP)
+        {
+            visual_radar_fault = 1U;
+        }
+    }
+
+    visual_radar_last_x = now_x;
+    visual_radar_last_y = now_y;
+    visual_radar_has_last = 1U;
+    visual_radar_last_update_tick = HAL_GetTick();
+}
+
+bool visual_radar_is_safe(void)
+{
+    uint32_t now_tick = HAL_GetTick();
+
+    if (visual_data.hmi_start != 1)
+    {
+        visual_radar_clear_fault();
+        return true;
+    }
+
+    if (visual_radar_fault != 0U || visual_radar_has_last == 0U)
+    {
+        return false;
+    }
+
+    return (now_tick - visual_radar_last_update_tick) <= VISUAL_RADAR_TIMEOUT_MS;
+}
+
 static const uint16_t CRC16_INIT = 0xffff;
 static const uint16_t CRC16_TABLE[256] = 
 {

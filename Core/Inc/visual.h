@@ -60,6 +60,8 @@ typedef struct {
 #pragma pack(pop)
 
 #define MEIC_PACKET_SIZE sizeof(ReceiveData_t)
+#define VISUAL_RADAR_TIMEOUT_MS 500U
+#define VISUAL_RADAR_MAX_STEP 10.0f
 
 uint16_t get_crc16(const uint8_t *data, uint32_t len);
 
@@ -71,5 +73,8 @@ extern ReceiveData_t visual_data;
 extern SendData_t visual_send_data;
 
 void meic_protocol_send_packet_dma(UART_HandleTypeDef *huart, int pitch ,int yaw ,int work_mode);
+void visual_radar_on_packet(void);
+bool visual_radar_is_safe(void);
+void visual_radar_clear_fault(void);
 
 #endif

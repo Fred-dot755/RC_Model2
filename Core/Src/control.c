@@ -71,11 +71,11 @@ void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float no
 // };
 const float area_1_dt35_red[6][2] = {
     {0.0f, 0.0f},
-    {50.0f, 204.0f},
-    {236.0f, 200.0f},
-    {435.0f, 201.0f},
-    {621.0f, 201.0f},
-    {830.0f, 218.0f}
+    {70.0f, 224.0f},
+    {256.0f, 220.0f},
+    {455.0f, 221.0f},
+    {641.0f, 221.0f},
+    {850.0f, 215.0f}
 };
 
 const float area_1_dt35_blue[6][2] = {
@@ -164,7 +164,7 @@ void quzhua(float x, float y)
 {
     const float DEADZONE_MM = 1.0f;
     const float MAX_SPEED_M = 0.5f;
-    const float SLOW_DIST_M = 0.5f;
+    const float SLOW_DIST_M = 0.2f;
 
     int x_dist_index = (visual_data.hmi_color == 2) ? 1 : 2;
 
@@ -177,8 +177,10 @@ void quzhua(float x, float y)
     float x_dist_mm = (float)dt35_data.dist[x_dist_index];
     float back_dist_mm = (float)dt35_data.dist[3];
 
-    float left_error_mm = (visual_data.hmi_color == 2) ? (x - x_dist_mm) : (x_dist_mm - x);
-    float forward_error_mm = (visual_data.hmi_color == 2) ? (y - back_dist_mm) : (back_dist_mm - y);
+    // float left_error_mm = (visual_data.hmi_color == 2) ? (x - x_dist_mm) : (x_dist_mm - x);
+    // float forward_error_mm = (visual_data.hmi_color == 2) ? (y - back_dist_mm) : (back_dist_mm - y);
+    float left_error_mm = x_dist_mm - x;
+    float forward_error_mm = y - back_dist_mm;
 
     if (fabsf(left_error_mm) <= DEADZONE_MM)
     {
@@ -211,9 +213,9 @@ void quzhua(float x, float y)
         R2_Extern.speed = MAX_SPEED_M;
     else
         R2_Extern.speed = MAX_SPEED_M * (distance_m / SLOW_DIST_M) * 1.0;
-        if(R2_Extern.speed < 0.13)
+        if(R2_Extern.speed < 0.10)
         {
-            R2_Extern.speed = 0.13;
+            R2_Extern.speed = 0.10;
         }
 }
 
@@ -221,7 +223,7 @@ void quzhua_dui(float y, float x)
 {
     const float DEADZONE_MM = 2.0f;
     const float MAX_SPEED_M = 0.5f;
-    const float SLOW_DIST_M = 0.5f;
+    const float SLOW_DIST_M = 0.2f;
 
     if (dt35_data.dist[3] < 10 || dt35_data.dist[3] > 5900)
     {
@@ -404,13 +406,20 @@ void fangkuang_close(void) // close mine release
 {
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_RESET);
 }
-
+void qibeng_open(void)
+{
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+}
+void qibeng_close(void)
+{
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
+}
 void qukuang_move_y(float y)
 {
     const float KFS_Y_FULL_SCALE = 1024.0f;
     const float PLAN_FULL_DISTANCE_M = 0.16f;
     const float DEADZONE_KFS = 20.0f;
-    const float MAX_SPEED_M = 0.50f;
+    const float MAX_SPEED_M = 0.70f;
     const float MIN_SPEED_M = 0.20f;
     const float TARGET_EPSILON_KFS = 5.0f;
     const float MOVE_SIGN = -1.0f;
@@ -465,8 +474,8 @@ const float area_1_red[10][2] = {
 };
 
 const float area_2_red[10][2] = {
-    {8.32f,-4.0f},
-    {11.02f,-4.24f}
+    {7.93f,-4.40f},
+    {10.80f,-4.77f}
 };
 
 const float area_3_red[10][2] = {
@@ -490,18 +499,18 @@ const float area_3_blue[10][2] = {
 
 
 const float data_table_red[12][2] = {
-    {3.27f, -0.47f},//1
-    {3.27f, -1.64f},//2
-    {3.28f, -2.85f},//3
-    {4.50f, -0.50f},//4
-    {4.50f, -1.66f},//5
-    {4.47f, -2.88f},//6
-    {5.67f, -0.50f},//7
-    {5.71f, -1.72f},//8
-    {5.71f, -2.87f},//9
-    {6.94f, -0.60f},//10
-    {6.90f, -1.78f},//11
-    {6.89f, -2.95f}//12
+    {3.22f, -0.67f},//1
+    {3.14f, -1.82f},//2
+    {3.02f, -3.04f},//3
+    {4.41f, -0.64f},//4
+    {4.36f, -1.84f},//5
+    {4.30f, -3.15f},//6
+    {5.65f, -0.76f},//7
+    {5.36f, -1.94f},//8
+    {5.38f, -3.12f},//9
+    {6.80f, -0.84f},//10
+    {6.79f, -2.04f},//11
+    {6.66f, -3.20f}//12
 };
 
 const float data_table_blue[12][2] = {
@@ -535,7 +544,7 @@ void check_dingwei(float current_x, float current_y, int cell_index)
     float dy = current_y - table[cell_index][1];
     float dist = sqrtf(dx * dx + dy * dy);
 
-    R2_Extern.complete_dingwei_flag = (dist <= 0.05f) ? 1 : 0;
+    R2_Extern.complete_dingwei_flag = (dist <= 0.10f) ? 1 : 0;
 }
 
 void check_dingwei_2(float current_x, float current_y, float target_x, float target_y)

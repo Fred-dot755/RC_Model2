@@ -1,7 +1,7 @@
 #include "speed_plan.h"
 #include <math.h>
 
-#define SPEED_PLAN_MIN_DURATION_S 0.25f
+#define SPEED_PLAN_MIN_DURATION_S 0.15f
 #define SPEED_PLAN_TARGET_EPSILON 0.001f
 
 static float speed_plan_absf(float value)

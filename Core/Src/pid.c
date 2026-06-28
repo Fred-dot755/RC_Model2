@@ -440,7 +440,7 @@ void RC_Data_To_Chassis_Target(void) {
     // float target_speed = rc_data.distance * 3;
     // float target_angle = rc_data.angle;
 
-    if (visual_data.hmi_start != 1) {
+    if (visual_data.hmi_start != 1 || !visual_radar_is_safe()) {
         Chassis_Target_Velocity_Ramp(0.0f, 0.0f,
                                      &chassis_controller.state.target_vx,
                                      &chassis_controller.state.target_vy);
