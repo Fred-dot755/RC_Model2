@@ -1023,6 +1023,7 @@ void One_Area_Function(void *argument)
           // R2_Extern.span = 0;
           R2_Extern.Area1_flag = 1;
         }
+        R2_Extern.angle5 = 120;
         break;
 
         case 1: 
@@ -1049,6 +1050,8 @@ void One_Area_Function(void *argument)
         break;
 
         case 3:
+        R2_Extern.angle5 = 92;
+        osDelay(500);
           // quzhua(area_1_dt35[3][0], area_1_dt35[3][1]);
           // if(R2_Extern.Area1_2_flag == 1)
           // {
@@ -1110,7 +1113,7 @@ void One_Area_Function(void *argument)
           // R2_Extern.angle = 0;
           // R2_Extern.speed = 0;
           // R2_Extern.Area1_flag = 7;
-          quzhua(area_1_dt35[1][0]+200, area_1_dt35[1][1]+600);
+          quzhua(area_1_dt35[2][0]+200, area_1_dt35[2][1]+600);
           if(R2_Extern.Area1_2_flag == 1)
           {
             R2_Extern.angle = 0;
@@ -1131,7 +1134,7 @@ void One_Area_Function(void *argument)
           R2_Extern.Area1_dx = -(float)(visual_data.dx) * 1.0f;
           // back_keep_x(area_1_dt35[3][0]+200,0,0);
           // back_keep_y(area_1_dt35[3][1]+600,0,0);
-          quzhua_dui(area_1_dt35[1][1] + 600 , -R2_Extern.Area1_dx*1.2);
+          quzhua_dui(area_1_dt35[1][1] + 600 , -R2_Extern.Area1_dx*1.0);
         break;
 
         default:

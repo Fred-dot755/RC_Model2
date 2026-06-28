@@ -4,15 +4,15 @@
 #define __CONTROL_H
 
 #include "main.h"
+#include "speed_plan.h"
 
 #define guangdian_down_1  HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_13)
 #define guangdian_down_2  HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_2)
 #define guangdian_up_1  HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_9)
 #define guangdian_up_2  HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0)
 
-#define LIFT_TOP_POS    490  // 上升最高位置
-#define LIFT_BOT_POS    10   // 下降最低位置
-
+#define LIFT_TOP_POS    490  // lift top position
+#define LIFT_BOT_POS    10   // lift bottom position
 #define guangdian HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_13)
 
 typedef struct
@@ -24,8 +24,7 @@ typedef struct
     uint8_t btn_3;     
     uint8_t btn_4;     
     uint8_t update_flag;
-    //遥控器
-
+    // remote controller
     float HIPNUCAngleX;
 	float HIPNUCAngleY;
 	float HIPNUCAngleZ;
@@ -39,15 +38,13 @@ typedef struct
 	float HIPNUCaccelerationX;
 	float HIPNUCaccelerationY;
 	float HIPNUCaccelerationZ;
-    //陀螺仪
-
+    // IMU
     int laser_adc[4];
     //DT35
 
     int32_t work_mode;
     float xyz_in_base[3];
-    //视觉摄像头通信
-
+    // vision camera communication
 
 
 }monitor_data;
@@ -81,6 +78,7 @@ typedef struct
 
     float angle;
     float distance;
+    speed_plan_t speed_plan;
 }chassic_control_t;
 
 typedef struct
@@ -93,7 +91,7 @@ typedef struct
 
 
     float angle_balance;
-    float angle_balance_target;  // angle_balance 的目标值，用于逐度逼近
+    float angle_balance_target;  // target of angle_balance
     float error_balance;
 
 
@@ -137,11 +135,11 @@ typedef struct
     int Area1_flag;
     int Area1_step;
 
-    int Area1_1_flag;//开始跑点
-    int Area1_2_flag;//激光纠偏
+    int Area1_1_flag; // start waypoint flag
+    int Area1_2_flag; // laser align flag
     int Area1_timer;
-    int Area1_id;//跑点id
-    float Area1_dx;//偏移
+    int Area1_id; // waypoint id
+    float Area1_dx; // offset
 
 
 

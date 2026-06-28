@@ -10,44 +10,55 @@ StairState_t current_state = STATE_SIX;
 
 
 chassic_control_t chassic_data;
+static speed_plan_t quzhua_speed_plan;
+static float quzhua_plan_target_x = 0.0f;
+static float quzhua_plan_target_y = 0.0f;
 
 void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float now_y, float target_x, float target_y , float max_speed)
 {
+    const float DEADZONE = 0.02f;
+    const float TARGET_EPSILON = 0.005f;
+
     chassic_data->now_x = now_x;
     chassic_data->now_y = now_y;
     chassic_data->target_x = target_x;
     chassic_data->target_y = target_y;
 
-    double dx = (double)(target_x - now_x);
-    double dy = (double)(target_y - now_y);
-    double real_distance = sqrt(dx * dx + dy * dy);
+    float dx = target_x - now_x;
+    float dy = target_y - now_y;
+    float real_distance = sqrtf(dx * dx + dy * dy);
 
-    int raw_angle = (int)(atan2(dy, dx) * 180.0 / PI);
-     if (raw_angle > 180) {
+    int raw_angle = (int)(atan2f(dy, dx) * 180.0f / PI);
+    if (raw_angle > 180) {
         raw_angle -= 360;
     }
     chassic_data->angle = -raw_angle;
-    
-    float MAX_SPEED = max_speed; 
-    double ONE_METER = 1.0;
-    double DEADZONE = 0.02;
 
-    if (real_distance < DEADZONE) 
+    if (real_distance < DEADZONE || max_speed <= 0.0f)
     {
-        chassic_data->distance = 0; 
+        speed_plan_reset(&chassic_data->speed_plan);
+        chassic_data->distance = 0.0f;
+        return;
     }
-    else if (real_distance >= ONE_METER) 
+
+    uint32_t now_ms = HAL_GetTick();
+    if (speed_plan_need_replan(&chassic_data->speed_plan,
+                               target_x, target_y,
+                               TARGET_EPSILON))
     {
-        chassic_data->distance = MAX_SPEED; 
+        speed_plan_start(&chassic_data->speed_plan,
+                         now_x, now_y,
+                         target_x, target_y,
+                         max_speed,
+                         now_ms);
     }
-    else 
-    {
-        chassic_data->distance = 1.0 * (real_distance/ ONE_METER) * MAX_SPEED;
-    }
+
+    chassic_data->distance = speed_plan_update(&chassic_data->speed_plan,
+                                               now_ms,
+                                               max_speed);
 }
 
-
-//1区控制
+// area1 control
 // const float area_1_dt35[6][2] = {
 //     {412.0f, 216.0f},
 //     {610.0f, 215.0f},
@@ -66,19 +77,20 @@ const float area_1_dt35_red[6][2] = {
 };
 
 const float area_1_dt35_blue[6][2] = {
-    {392.0f, 216.0f},
-    {590.0f, 215.0f},
-    {788.0f, 219.0f},
-    {985.0f, 212.0f},
-    {1190.0f, 334.0f},
-    {1406.0f, 334.0f}
+    {392.0f, 206.0f},
+    {590.0f, 205.0f},
+    {788.0f, 209.0f},
+    {985.0f, 202.0f},
+    {1190.0f, 324.0f},
+    {1406.0f, 324.0f}
 };
 
 void quzhua(float x, float y)
 {
     const float DEADZONE_MM = 1.0f;
     const float MAX_SPEED_M = 0.5f;
-    const float SLOW_DIST_M = 0.5f;
+    const float MIN_SPEED_M = 0.12f;
+    const float TARGET_EPSILON_MM = 0.5f;
 
     int x_dist_index = (visual_data.hmi_color == 2) ? 1 : 2;
 
@@ -108,6 +120,7 @@ void quzhua(float x, float y)
 
     if (left_error_mm == 0.0f && forward_error_mm == 0.0f)
     {
+        speed_plan_reset(&quzhua_speed_plan);
         R2_Extern.angle = 0.0f;
         R2_Extern.speed = 0.0f;
         R2_Extern.Area1_2_flag = 1;
@@ -123,14 +136,28 @@ void quzhua(float x, float y)
 
     R2_Extern.angle = atan2f(left_error_mm, forward_error_mm) * 180.0f / PI;
 
-    if (distance_m >= SLOW_DIST_M)
-        R2_Extern.speed = MAX_SPEED_M;
-    else
-        R2_Extern.speed = MAX_SPEED_M * (distance_m / SLOW_DIST_M) * 2.5;
-        if(R2_Extern.speed < 0.15)
-        {
-            R2_Extern.speed = 0.15;
-        }
+    uint32_t now_ms = HAL_GetTick();
+    if (quzhua_speed_plan.active == 0U ||
+        fabsf(quzhua_plan_target_x - x) > TARGET_EPSILON_MM ||
+        fabsf(quzhua_plan_target_y - y) > TARGET_EPSILON_MM)
+    {
+        quzhua_plan_target_x = x;
+        quzhua_plan_target_y = y;
+        speed_plan_start(&quzhua_speed_plan,
+                         0.0f, 0.0f,
+                         distance_m, 0.0f,
+                         MAX_SPEED_M,
+                         now_ms);
+    }
+
+    R2_Extern.speed = speed_plan_update(&quzhua_speed_plan,
+                                        now_ms,
+                                        MAX_SPEED_M);
+
+    if (R2_Extern.speed > 0.0f && R2_Extern.speed < MIN_SPEED_M)
+    {
+        R2_Extern.speed = MIN_SPEED_M;
+    }
 }
 
 void quzhua_dui(float y, float x)
@@ -275,56 +302,55 @@ void back_keep_y(float y, float angle, float speed)
     R2_Extern.angle = atan2f(-left_speed, forward_speed) * 180.0f / PI;
     R2_Extern.speed = sqrtf(forward_speed * forward_speed + left_speed * left_speed);
 }
-//2区控制
-
-void chassic_up(void)//整体上升
+// area2 control
+void chassic_up(void) // lift up
 {
     R2_Extern.lift_mood = 1;
 }
 
-void chassic_down(void)//整体下降
+void chassic_down(void) // lift down
 {
     R2_Extern.lift_mood = 0;
 }
 
 //PD10 PB11
-void chsaaic_behind_up(void)//后轮下降
+void chsaaic_behind_up(void) // rear wheel down
 {
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_11, GPIO_PIN_SET);
 }
-void chsaaic_behind_down(void)//后轮上升
+void chsaaic_behind_down(void) // rear wheel up
 {
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_11, GPIO_PIN_RESET);
 }
-void chsaaic_front_up(void)//前轮下降
+void chsaaic_front_up(void) // front wheel down
 {
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_10, GPIO_PIN_SET);
 }
-void chsaaic_front_down(void)//前轮上升
+void chsaaic_front_down(void) // front wheel up
 {
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_10, GPIO_PIN_RESET);
 }
 //PB10 PD7 PB4 PB3 PE15
-void zhuazi_open(void)//爪子打开
+void zhuazi_open(void) // claw open
 {
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_SET);
 }
-void zhuazi_close(void)//爪子关闭
+void zhuazi_close(void) // claw close
 {
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_RESET);
 }
-void fangkuang_open(void)//放矿
+void fangkuang_open(void) // mine release open
 {
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_SET);
 }
-void fangkuang_close(void)//放矿关闭
+void fangkuang_close(void) // close mine release
 {
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_RESET);
 }
 
-//红区
+// red area
 const float area_1_red[10][2] = {
-    {0.62f,0.79f}
+    {0.62f,0.39f}
 };
 
 const float area_2_red[10][2] = {
@@ -336,9 +362,9 @@ const float area_3_red[10][2] = {
     {8.32f,-4.0f}
 };
 
-//蓝区
+// blue area
 const float area_1_blue[10][2] = {
-    {0.62f,-0.79f}
+    {0.62f,-0.39f}
 };
 
 const float area_2_blue[10][2] = {
@@ -385,7 +411,7 @@ const float data_table_blue[12][2] = {
 
 void check_dingwei(float current_x, float current_y, int cell_index)
 {
-    // cell_index: 0~11，对应 data_table[0]~data_table[11]
+    // cell_index: 0~11, maps to data_table[0]~data_table[11]
     if (cell_index < 0 || cell_index >= 12)
     {
         R2_Extern.complete_dingwei_flag = 0;
@@ -410,7 +436,7 @@ void check_dingwei_2(float current_x, float current_y, float target_x, float tar
     R2_Extern.bool_check_1_flag = (dist <= 0.07f) ? 1 : 0;
 }
 
-//3区控制
+// area3 control
 const float area_3_dt35[6][2] = {
     {460.0,0},
     {962.0,0},
