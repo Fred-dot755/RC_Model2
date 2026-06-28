@@ -162,6 +162,7 @@ int main(void)
   R2_Extern.work_mode = 1;
   R2_Extern.lift_mood = 0;
   R2_Extern.Track_Mode = 1;//0红，1蓝
+  R2_Extern.Track_Mode = 1;//0红，1蓝
   // visual_data.hmi_start = 1;
   
   // R2_Extern.lift_mood = 1;
