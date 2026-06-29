@@ -391,8 +391,8 @@ void Chassis_Force_Control_Update(Chassis_Force_Controller_t *chassis) {
 
 #define MAX_CHASSIS_SPEED  3.0f
 #define MAX_CHASSIS_WZ     3.0f
-#define CHASSIS_TARGET_MAX_ACCEL_MPS2   2.20f
-#define CHASSIS_TARGET_MAX_DECEL_MPS2   4.80f
+#define CHASSIS_TARGET_MAX_ACCEL_MPS2   3.20f
+#define CHASSIS_TARGET_MAX_DECEL_MPS2   3.80f
 #define CHASSIS_TARGET_MAX_DT           0.100f
 
 static float chassis_target_vx_ramp = 0.0f;

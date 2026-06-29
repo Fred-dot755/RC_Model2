@@ -15,6 +15,8 @@
 #define LIFT_BOT_POS    10   // lift bottom position
 #define guangdian HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_13)
 
+#define Max_KFS 1
+
 typedef struct
 {
     float angle;         
@@ -164,6 +166,8 @@ typedef struct
     int car_flag;
     int qukuang_mode_flag;
     int special_flag;
+
+    int kfs_count;
 
     //area3
     int Area3_flag;

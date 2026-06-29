@@ -32,16 +32,16 @@ typedef struct {
     int bool_graping;
     int bool_getKFS;
     float xyz_in_base[3];
-    float kfs_x;
-    float kfs_y;
-    float x_map;
-    float y_map;
+    float kfs_x;///取矿偏移
+    float kfs_y;//取矿偏移
+    float x_map;//雷达
+    float y_map;//雷达
     int target_cell;
     int targetid;
-    int dx;
+    int dx;//对武器偏移
     //float yaw_map;
     int i;
-    uint8_t meilin_count;               // 有效点数量，最多9
+    uint8_t meilin_count;               // 有效点数量，最多10
     MeilinPointCmd meilin_points[10];   // 不足10个填{0,0,0}
     int hmi_start;
     int hmi_color;

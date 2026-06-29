@@ -16,6 +16,19 @@ static float quzhua_plan_target_y = 0.0f;
 static speed_plan_t qukuang_move_y_speed_plan;
 static float qukuang_move_y_target = 0.0f;
 
+static float normalize_angle_deg(float angle)
+{
+    while (angle > 180.0f)
+    {
+        angle -= 360.0f;
+    }
+    while (angle < -180.0f)
+    {
+        angle += 360.0f;
+    }
+    return angle;
+}
+
 void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float now_y, float target_x, float target_y , float max_speed)
 {
     const float DEADZONE = 0.02f;
@@ -30,11 +43,8 @@ void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float no
     float dy = target_y - now_y;
     float real_distance = sqrtf(dx * dx + dy * dy);
 
-    int raw_angle = (int)(atan2f(dy, dx) * 180.0f / PI);
-    if (raw_angle > 180) {
-        raw_angle -= 360;
-    }
-    chassic_data->angle = -raw_angle;
+    float map_angle = atan2f(dy, dx) * 180.0f / PI;
+    chassic_data->angle = -normalize_angle_deg(map_angle - R2_Extern.angle_balance);
 
     if (real_distance < DEADZONE || max_speed <= 0.0f)
     {
@@ -164,7 +174,7 @@ void quzhua(float x, float y)
 {
     const float DEADZONE_MM = 1.0f;
     const float MAX_SPEED_M = 0.5f;
-    const float SLOW_DIST_M = 0.2f;
+    const float SLOW_DIST_M = 0.3f;
 
     int x_dist_index = (visual_data.hmi_color == 2) ? 1 : 2;
 
@@ -177,9 +187,9 @@ void quzhua(float x, float y)
     float x_dist_mm = (float)dt35_data.dist[x_dist_index];
     float back_dist_mm = (float)dt35_data.dist[3];
 
-    // float left_error_mm = (visual_data.hmi_color == 2) ? (x - x_dist_mm) : (x_dist_mm - x);
+    float left_error_mm = (visual_data.hmi_color == 2) ? (x - x_dist_mm) : (x_dist_mm - x);
     // float forward_error_mm = (visual_data.hmi_color == 2) ? (y - back_dist_mm) : (back_dist_mm - y);
-    float left_error_mm = x_dist_mm - x;
+    // float left_error_mm = x_dist_mm - x;
     float forward_error_mm = y - back_dist_mm;
 
     if (fabsf(left_error_mm) <= DEADZONE_MM)
@@ -494,7 +504,7 @@ const float area_2_blue[10][2] = {
 
 
 const float area_3_blue[10][2] = {
-    {8.32f,4.0f}
+    {10.53f,0.64f}
 };
 
 
@@ -532,7 +542,7 @@ const float data_table_blue[12][2] = {
 void check_dingwei(float current_x, float current_y, int cell_index)
 {
     // cell_index: 0~11, maps to data_table[0]~data_table[11]
-    if (cell_index < 0 || cell_index >= 12)
+    if (cell_index < 0 || cell_index >= 15)
     {
         R2_Extern.complete_dingwei_flag = 0;
         return;
