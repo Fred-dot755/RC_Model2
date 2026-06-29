@@ -172,6 +172,7 @@ typedef struct
     //area3
     int Area3_flag;
     int Area3_step;
+    int Area3_cell;
 
     int lingshi_flag;
 
@@ -196,6 +197,7 @@ void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float no
 
 void quzhua(float x, float y);
 void quzhua_dui(float y, float x);
+void fangkuang(float x, float y);
 void qukuang_move_y(float y);
 void back_keep_x(float x, float angle, float speed);
 void back_keep_y(float y, float angle, float speed);
@@ -217,6 +219,8 @@ void qibeng_close(void);
 
 extern const float area_1_dt35_red[6][2];
 extern const float area_1_dt35_blue[6][2];
+extern const float area_3_dt35_red[3][2];
+extern const float area_3_dt35_blue[3][2];
 extern const float area_1_red[10][2];
 extern const float area_2_red[10][2];
 extern const float area_3_red[10][2];

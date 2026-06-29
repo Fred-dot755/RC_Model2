@@ -97,6 +97,18 @@ const float area_1_dt35_blue[6][2] = {
     {1386.0f, 339.0f}
 };
 
+const float area_3_dt35_red[3][2] = {
+    {},
+    {},
+    {}
+};
+
+const float area_3_dt35_blue[3][2] = {
+    {},
+    {},
+    {}
+};
+
 // void quzhua(float x, float y)
 // {
 //     const float DEADZONE_MM = 1.0f;
@@ -191,6 +203,63 @@ void quzhua(float x, float y)
     // float forward_error_mm = (visual_data.hmi_color == 2) ? (y - back_dist_mm) : (back_dist_mm - y);
     // float left_error_mm = x_dist_mm - x;
     float forward_error_mm = y - back_dist_mm;
+
+    if (fabsf(left_error_mm) <= DEADZONE_MM)
+    {
+        left_error_mm = 0.0f;
+    }
+
+    if (fabsf(forward_error_mm) <= DEADZONE_MM)
+    {
+        forward_error_mm = 0.0f;
+    }
+
+    if (left_error_mm == 0.0f && forward_error_mm == 0.0f)
+    {
+        R2_Extern.angle = 0.0f;
+        R2_Extern.speed = 0.0f;
+        R2_Extern.Area1_2_flag = 1;
+        return;
+    }
+    else
+    {
+        R2_Extern.Area1_2_flag = 0;
+    }
+
+    float distance_mm = sqrtf(left_error_mm * left_error_mm + forward_error_mm * forward_error_mm);
+    float distance_m = distance_mm / 1000.0f;
+
+    R2_Extern.angle = atan2f(left_error_mm, forward_error_mm) * 180.0f / PI;
+
+    if (distance_m >= SLOW_DIST_M)
+        R2_Extern.speed = MAX_SPEED_M;
+    else
+        R2_Extern.speed = MAX_SPEED_M * (distance_m / SLOW_DIST_M) * 1.0;
+        if(R2_Extern.speed < 0.10)
+        {
+            R2_Extern.speed = 0.10;
+        }
+}
+
+void fangkuang(float x, float y)
+{
+    const float DEADZONE_MM = 1.0f;
+    const float MAX_SPEED_M = 0.5f;
+    const float SLOW_DIST_M = 0.3f;
+
+    int x_dist_index = (visual_data.hmi_color == 2) ? 1 : 2;
+
+    if (dt35_data.dist[x_dist_index] < 10 || dt35_data.dist[x_dist_index] > 5900 ||
+        dt35_data.dist[0] < 10 || dt35_data.dist[0] > 5900)
+    {
+        return;
+    }
+
+    float x_dist_mm = (float)dt35_data.dist[x_dist_index];
+    float front_dist_mm = (float)dt35_data.dist[0];
+
+    float left_error_mm = (visual_data.hmi_color == 2) ? (x - x_dist_mm) : (x_dist_mm - x);
+    float forward_error_mm = y - front_dist_mm;
 
     if (fabsf(left_error_mm) <= DEADZONE_MM)
     {

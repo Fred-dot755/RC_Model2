@@ -1778,33 +1778,17 @@ void Three_Area_Function(void *argument)
         break;
         
       case 1:
-      if(R2_Extern.chack_yaw_flag == 1)
-      {
-        R2_Extern.angle = 0;
-        R2_Extern.speed = 0.5;
-        osDelay(3000);
-        R2_Extern.Area3_step = 2;
-      }
+      if(R2_Extern.Area3_flag == 1)
+        {
+          R2_Extern.Area3_step = 2;
+        }
       break;
       case 2:
-        // R2_Extern.angle1 = 0;
-        // R2_Extern.angle2 = 60;
-        // R2_Extern.angle3 = 150;
-        // R2_Extern.angle4 = 0;
-        // R2_Extern.pitch_angle = -10;
-        chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, area_3_blue[0][0], area_3_blue[0][1] , 0.5);
-        R2_Extern.angle = chassic_data.angle;
-        R2_Extern.speed = chassic_data.distance;
-        check_dingwei_2(visual_data.x_map, visual_data.y_map, area_3_blue[0][0], area_3_blue[0][1]);
-        if(R2_Extern.bool_check_1_flag == 1)
-        {
-          R2_Extern.Area3_step = 3;
-        }
+        R2_Extern.Area3_cell = visual_data.target_cell;
+        R2_Extern.Area3_step = 3;
         break;
       case 3:
-        R2_Extern.angle = 0;
-        R2_Extern.speed = 0;
-        fangkuang_close();
+        
         break;
       case 4:
 
@@ -1948,10 +1932,19 @@ void Mid360_Function(void *argument)
 
       if(visual_data.workl_mode == 3)
       {
-        //10.74 -2.20
-        //10.65 0.66
-        //10.10 0.66
-        //9.60  0.66
+        if(R2_Extern.Area3_flag == 0 && R2_Extern.Area3_step == 1)
+        {
+          chassic_control_auto(&chassic_data, visual_data.x_map, visual_data.y_map, area_3_blue[0][0], area_3_blue[0][1] , 0.5);
+          R2_Extern.angle = chassic_data.angle;
+          R2_Extern.speed = chassic_data.distance;
+          check_dingwei_2(visual_data.x_map, visual_data.y_map, area_3_blue[0][0], area_3_blue[0][1]);
+          {
+            if(R2_Extern.bool_check_1_flag == 1)
+            {
+              R2_Extern.Area3_flag =1;
+            }
+          }
+        }
       }
 
     }
