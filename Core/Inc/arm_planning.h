@@ -4,7 +4,7 @@
 #include "main.h"
 
 #define angle_2 60
-#define angle_3 90
+#define angle_3 110
 
 typedef struct {
     int angle1;

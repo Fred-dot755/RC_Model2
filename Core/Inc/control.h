@@ -15,7 +15,7 @@
 #define LIFT_BOT_POS    10   // lift bottom position
 #define guangdian HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_13)
 
-#define Max_KFS 1
+#define Max_KFS 2
 
 typedef struct
 {
@@ -168,11 +168,13 @@ typedef struct
     int special_flag;
 
     int kfs_count;
+    int kfs_count_total;
 
     //area3
     int Area3_flag;
     int Area3_step;
     int Area3_cell;
+    int Area3_2_flag;
 
     int lingshi_flag;
 
@@ -211,8 +213,10 @@ void chsaaic_front_up(void);
 void chsaaic_front_down(void);
 void zhuazi_open(void);
 void zhuazi_close(void);
-void fangkuang_open(void);
-void fangkuang_close(void);
+void fangkuang_open_1(void);
+void fangkuang_close_1(void);
+void fangkuang_open_2(void);
+void fangkuang_close_2(void);
 void qibeng_open(void);
 void qibeng_close(void);
 

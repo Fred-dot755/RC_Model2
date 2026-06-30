@@ -36,8 +36,9 @@ extern "C" {
 #define DM_FEEDBACK_ID         0x00   // 默认反馈ID，若修改需同步调整
 #define DM_FIRST_MOTOR_ID      0x02U
 #define DM_MOTOR_COUNT         6U
-#define DM_ACTIVE_MOTOR_MASK   ((1UL << 2) | (1UL << 3) | (1UL << 6) | (1UL << 7))
+// #define DM_ACTIVE_MOTOR_MASK   ((1UL << 2) | (1UL << 3) | (1UL << 6) | (1UL << 7))
 #define DM_MOTOR_IS_ACTIVE(id) ((DM_ACTIVE_MOTOR_MASK & (1UL << (id))) != 0U)
+#define DM_ACTIVE_MOTOR_MASK   ((1UL << 2) | (1UL << 3) | (1UL << 4) | (1UL << 5) | (1UL << 6) | (1UL << 7))
 
 #define DM_PI 3.1415926535f
 

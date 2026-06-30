@@ -159,11 +159,13 @@ int main(void)
   //RGB变白，顺利启动
   RGB_Color_Ctrl(255,1,255);
 
-  R2_Extern.work_mode = 3;
+  R2_Extern.work_mode = 1;
   R2_Extern.lift_mood = 1;
-  fangkuang_open();
-  R2_Extern.Track_Mode = 1;//0红，1蓝
-  R2_Extern.Track_flag = 1;
+  fangkuang_open_1();
+  fangkuang_open_2();
+  // qibeng_open();
+  R2_Extern.Track_Mode = 0;//0红，1蓝
+  R2_Extern.Track_flag = 0;
   // visual_data.hmi_start = 1;
   
 

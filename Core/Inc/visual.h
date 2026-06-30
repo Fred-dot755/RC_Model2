@@ -61,7 +61,7 @@ typedef struct {
 
 #define MEIC_PACKET_SIZE sizeof(ReceiveData_t)
 #define VISUAL_RADAR_TIMEOUT_MS 500U
-#define VISUAL_RADAR_MAX_STEP 10.0f
+#define VISUAL_RADAR_MAX_STEP 2.0f
 
 uint16_t get_crc16(const uint8_t *data, uint32_t len);
 

@@ -98,10 +98,10 @@ const float area_1_dt35_blue[6][2] = {
 };
 
 const float area_3_dt35_red[3][2] = {
-    {},
-    {},
-    {}
-};
+    {1473.0f, 307.0f},
+    {971.0f, 307.0f},
+    {414.0f, 307.0f}
+};//左到右
 
 const float area_3_dt35_blue[3][2] = {
     {},
@@ -259,7 +259,7 @@ void fangkuang(float x, float y)
     float front_dist_mm = (float)dt35_data.dist[0];
 
     float left_error_mm = (visual_data.hmi_color == 2) ? (x - x_dist_mm) : (x_dist_mm - x);
-    float forward_error_mm = y - front_dist_mm;
+    float forward_error_mm = front_dist_mm - y;
 
     if (fabsf(left_error_mm) <= DEADZONE_MM)
     {
@@ -275,12 +275,12 @@ void fangkuang(float x, float y)
     {
         R2_Extern.angle = 0.0f;
         R2_Extern.speed = 0.0f;
-        R2_Extern.Area1_2_flag = 1;
+        R2_Extern.Area3_2_flag = 1;
         return;
     }
     else
     {
-        R2_Extern.Area1_2_flag = 0;
+        R2_Extern.Area3_2_flag = 0;
     }
 
     float distance_mm = sqrtf(left_error_mm * left_error_mm + forward_error_mm * forward_error_mm);
@@ -477,21 +477,29 @@ void zhuazi_close(void) // claw close
 {
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_RESET);
 }
-void fangkuang_open(void) // mine release open
+void fangkuang_open_1(void) // mine release open
 {
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_SET);
 }
-void fangkuang_close(void) // close mine release
+void fangkuang_close_1(void) // close mine release
 {
     HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_RESET);
 }
-void qibeng_open(void)
+void fangkuang_open_2(void) // mine release open
 {
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
 }
-void qibeng_close(void)
+void fangkuang_close_2(void) // close mine release
 {
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
+}
+void qibeng_open(void)
+{
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_SET);
+}
+void qibeng_close(void)
+{
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_RESET);
 }
 void qukuang_move_y(float y)
 {
@@ -558,7 +566,7 @@ const float area_2_red[10][2] = {
 };
 
 const float area_3_red[10][2] = {
-    {8.32f,-4.0f}
+    {10.23f,-1.60f}
 };
 
 // blue area
@@ -577,20 +585,38 @@ const float area_3_blue[10][2] = {
 };
 
 
+// const float data_table_red[12][2] = {
+//     {3.22f, -0.67f},//1
+//     {3.14f, -1.82f},//2
+//     {3.02f, -3.04f},//3
+//     {4.41f, -0.64f},//4
+//     {4.36f, -1.84f},//5
+//     {4.30f, -3.15f},//6
+//     {5.65f, -0.76f},//7
+//     {5.36f, -1.94f},//8
+//     {5.38f, -3.12f},//9
+//     {6.80f, -0.84f},//10
+//     {6.79f, -2.04f},//11
+//     {6.66f, -3.20f}//12
+// };
+
 const float data_table_red[12][2] = {
     {3.22f, -0.67f},//1
-    {3.14f, -1.82f},//2
+    {3.35f, -1.65f},//2
     {3.02f, -3.04f},//3
     {4.41f, -0.64f},//4
-    {4.36f, -1.84f},//5
-    {4.30f, -3.15f},//6
+    {4.55f, -1.63f},//5
+    {4.60f, -2.86f},//6
     {5.65f, -0.76f},//7
     {5.36f, -1.94f},//8
-    {5.38f, -3.12f},//9
+    {5.78f, -2.86f},//9
     {6.80f, -0.84f},//10
     {6.79f, -2.04f},//11
-    {6.66f, -3.20f}//12
-};
+    {7.00f, -2.84f}//12
+};//里程计
+//2.02 -1.64
+//8.39 -4.0
+//11.06 -4.02
 
 const float data_table_blue[12][2] = {
     {3.48f, 0.72f},//1
