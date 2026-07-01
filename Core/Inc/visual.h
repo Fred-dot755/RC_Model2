@@ -39,6 +39,7 @@ typedef struct {
     int target_cell;
     int targetid;
     int dx;//对武器偏移
+    int usblightid;
     //float yaw_map;
     int i;
     uint8_t meilin_count;               // 有效点数量，最多10

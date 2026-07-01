@@ -81,32 +81,32 @@ void chassic_control_auto(chassic_control_t *chassic_data, float now_x, float no
 // };
 const float area_1_dt35_red[6][2] = {
     {0.0f, 0.0f},
-    {70.0f, 224.0f},
-    {256.0f, 220.0f},
-    {455.0f, 221.0f},
-    {641.0f, 221.0f},
-    {850.0f, 215.0f}
+    {98.0f, 210.0f},
+    {290.0f, 210.0f},
+    {494.0f, 211.0f},
+    {697.0f, 211.0f},
+    {909.0f, 211.0f}
 };
 
 const float area_1_dt35_blue[6][2] = {
-    {372.0f, 212.0f},
-    {570.0f, 212.0f},
-    {768.0f, 212.0f},
-    {975.0f, 212.0f},
-    {1170.0f, 212.0f},
+    {372.0f, 222.0f},
+    {570.0f, 222.0f},
+    {768.0f, 222.0f},
+    {975.0f, 222.0f},
+    {1170.0f, 222.0f},
     {1386.0f, 339.0f}
 };
 
 const float area_3_dt35_red[3][2] = {
-    {1473.0f, 307.0f},
-    {971.0f, 307.0f},
-    {414.0f, 307.0f}
+    {1373.0f, 657.0f},
+    {871.0f, 657.0f},
+    {314.0f, 657.0f}
 };//左到右
 
 const float area_3_dt35_blue[3][2] = {
-    {},
-    {},
-    {}
+    {1373.0f, 657.0f},
+    {871.0f, 657.0f},
+    {314.0f, 657.0f}
 };
 
 // void quzhua(float x, float y)
@@ -201,7 +201,7 @@ void quzhua(float x, float y)
 
     float left_error_mm = (visual_data.hmi_color == 2) ? (x - x_dist_mm) : (x_dist_mm - x);
     // float forward_error_mm = (visual_data.hmi_color == 2) ? (y - back_dist_mm) : (back_dist_mm - y);
-    // float left_error_mm = x_dist_mm - x;
+    // float left_error_mm = x - x_dist_mm;
     float forward_error_mm = y - back_dist_mm;
 
     if (fabsf(left_error_mm) <= DEADZONE_MM)
@@ -235,9 +235,9 @@ void quzhua(float x, float y)
         R2_Extern.speed = MAX_SPEED_M;
     else
         R2_Extern.speed = MAX_SPEED_M * (distance_m / SLOW_DIST_M) * 1.0;
-        if(R2_Extern.speed < 0.10)
+        if(R2_Extern.speed < 0.15)
         {
-            R2_Extern.speed = 0.10;
+            R2_Extern.speed = 0.15  ;
         }
 }
 
@@ -258,8 +258,11 @@ void fangkuang(float x, float y)
     float x_dist_mm = (float)dt35_data.dist[x_dist_index];
     float front_dist_mm = (float)dt35_data.dist[0];
 
-    float left_error_mm = (visual_data.hmi_color == 2) ? (x - x_dist_mm) : (x_dist_mm - x);
+    // float left_error_mm = (visual_data.hmi_color == 2) ? (x - x_dist_mm) : (x_dist_mm - x);
+    // float left_error_mm = x - x_dist_mm;
+    float left_error_mm = x_dist_mm - x;
     float forward_error_mm = front_dist_mm - y;
+    // float forward_error_mm = (visual_data.hmi_color == 2) ? (y - front_dist_mm) : (front_dist_mm - y);
 
     if (fabsf(left_error_mm) <= DEADZONE_MM)
     {
@@ -561,12 +564,18 @@ const float area_1_red[10][2] = {
 };
 
 const float area_2_red[10][2] = {
-    {7.93f,-4.40f},
-    {10.80f,-4.77f}
+    {8.31f,-3.93f},
+    {11.02f,-4.16f}
+};
+
+const float area_2_special_red[3][2] = {
+    {2.04f, -0.50f}, // 13
+    {2.06f, -1.66f}, // 14
+    {2.11f, -2.88f}  // 15
 };
 
 const float area_3_red[10][2] = {
-    {10.23f,-1.60f}
+    {10.27f,-1.49f}
 };
 
 // blue area
@@ -575,13 +584,18 @@ const float area_1_blue[10][2] = {
 };
 
 const float area_2_blue[10][2] = {
-    {7.89f,4.89f},
-    {10.60f,5.54f}
+    {8.31f,3.93f},
+    {11.02f,4.16f}
 };
 
+const float area_2_special_blue[3][2] = {
+    {2.04f, 0.50f}, // 13
+    {2.06f, 1.66f}, // 14
+    {2.11f, 2.88f}  // 15
+};
 
 const float area_3_blue[10][2] = {
-    {10.53f,0.64f}
+    {10.27f,1.49f}
 };
 
 
@@ -598,39 +612,37 @@ const float area_3_blue[10][2] = {
 //     {6.80f, -0.84f},//10
 //     {6.79f, -2.04f},//11
 //     {6.66f, -3.20f}//12
-// };
+// };//slam
 
 const float data_table_red[12][2] = {
-    {3.22f, -0.67f},//1
-    {3.35f, -1.65f},//2
-    {3.02f, -3.04f},//3
-    {4.41f, -0.64f},//4
-    {4.55f, -1.63f},//5
-    {4.60f, -2.86f},//6
-    {5.65f, -0.76f},//7
-    {5.36f, -1.94f},//8
-    {5.78f, -2.86f},//9
-    {6.80f, -0.84f},//10
-    {6.79f, -2.04f},//11
-    {7.00f, -2.84f}//12
-};//里程计
-//2.02 -1.64
-//8.39 -4.0
-//11.06 -4.02
+    {3.39f, -0.53f},//1
+    {3.35f, -1.67f},//2
+    {3.34f, -2.92f},//3   
+    {4.53f, -0.55f},//4
+    {4.54f, -1.71f},//5
+    {4.54f, -2.92f},//6
+    {5.75f, -0.48f},//7
+    {5.75f, -1.71f},//8
+    {5.75f, -2.93f},//9
+    {6.95f, -0.50f},//10
+    {6.94f, -1.70f},//11
+    {6.96f, -2.90f}//12
+};
+
 
 const float data_table_blue[12][2] = {
-    {3.48f, 0.72f},//1
-    {3.29f, 1.90f},//2
-    {3.14f, 3.09f},//3   
-    {4.34f, 3.32f},//6
-    {4.44f, 2.14f},//5
-    {4.67f, 0.90f},//4
-    {5.51f, 3.49f},//9
-    {5.69f, 2.27f},//8
-    {5.81f, 1.12f},//7
-    {6.65f, 3.67f},//12
-    {6.84f, 2.53f},//11
-    {7.06f, 1.34f}//10
+    {3.39f, 0.53f},//1
+    {3.35f, 1.67f},//2
+    {3.34f, 2.92f},//3   
+    {4.54f, 2.92f},//6
+    {4.54f, 1.71f},//5
+    {4.53f, 0.55f},//4
+    {5.75f, 2.93f},//9
+    {5.75f, 1.71f},//8
+    {5.75f, 0.48f},//7
+    {6.96f, 2.90f},//12
+    {6.94f, 1.70f},//11
+    {6.95f, 0.50f}//10
 };
 
 

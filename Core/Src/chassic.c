@@ -81,11 +81,18 @@ void chassic_small(void)
         result.motor7.out = 0;
         result.motor8.out = 0;
     }
-    else
+    else if(now_mood.mood == 1)
     {
         result.motor5.out = -3000;
         result.motor6.out = -3000;
         result.motor7.out = -3000;
         result.motor8.out = -3000;
+    }
+    else if(now_mood.mood == 2)
+    {
+        result.motor5.out = -8000;
+        result.motor6.out = -8000;
+        result.motor7.out = -8000;
+        result.motor8.out = -8000;
     }
 }

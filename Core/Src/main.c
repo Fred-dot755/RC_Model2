@@ -144,12 +144,12 @@ int main(void)
   
   unitree_init();
 
-  // while(unitree_angle_init[3] == 0)
-  // {
-  //   unitree_cmd_create(&unitree_cmd[3], 3, 1, 0.0, 0.0, 0, 0.0, 0.0);
-  //   unitree_communicate(3);
-  //   HAL_Delay(100);
-  // }
+  while(unitree_angle_init[3] == 0)
+  {
+    unitree_cmd_create(&unitree_cmd[3], 3, 1, 0.0, 0.0, 0, 0.0, 0.0);
+    unitree_communicate(3);
+    HAL_Delay(100);
+  }
   // arm_unitree_planning_init();
 
   DM_Motor_Init();
@@ -163,6 +163,9 @@ int main(void)
   R2_Extern.lift_mood = 1;
   fangkuang_open_1();
   fangkuang_open_2();
+  chsaaic_front_up();
+  chsaaic_behind_up();
+  R2_Extern.angle_balance_target = 0;
   // qibeng_open();
   R2_Extern.Track_Mode = 0;//0红，1蓝
   R2_Extern.Track_flag = 0;
