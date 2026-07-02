@@ -89,12 +89,12 @@ const float area_1_dt35_red[6][2] = {
 };
 
 const float area_1_dt35_blue[6][2] = {
-    {372.0f, 222.0f},
-    {570.0f, 222.0f},
-    {768.0f, 222.0f},
-    {975.0f, 222.0f},
-    {1170.0f, 222.0f},
-    {1386.0f, 339.0f}
+    {428.0f, 212.0f},
+    {640.0f, 212.0f},
+    {863.0f, 212.0f},
+    {1031.0f, 212.0f},
+    {1226.0f, 212.0f},
+    {1423.0f, 339.0f}
 };
 
 const float area_3_dt35_red[3][2] = {
@@ -186,7 +186,7 @@ void quzhua(float x, float y)
 {
     const float DEADZONE_MM = 1.0f;
     const float MAX_SPEED_M = 0.5f;
-    const float SLOW_DIST_M = 0.3f;
+    const float SLOW_DIST_M = 0.1f;
 
     int x_dist_index = (visual_data.hmi_color == 2) ? 1 : 2;
 
@@ -235,9 +235,9 @@ void quzhua(float x, float y)
         R2_Extern.speed = MAX_SPEED_M;
     else
         R2_Extern.speed = MAX_SPEED_M * (distance_m / SLOW_DIST_M) * 1.0;
-        if(R2_Extern.speed < 0.15)
+        if(R2_Extern.speed < 0.10)
         {
-            R2_Extern.speed = 0.15  ;
+            R2_Extern.speed = 0.10;
         }
 }
 
@@ -245,7 +245,7 @@ void fangkuang(float x, float y)
 {
     const float DEADZONE_MM = 1.0f;
     const float MAX_SPEED_M = 0.5f;
-    const float SLOW_DIST_M = 0.3f;
+    const float SLOW_DIST_M = 0.1f;
 
     int x_dist_index = (visual_data.hmi_color == 2) ? 1 : 2;
 
@@ -258,9 +258,9 @@ void fangkuang(float x, float y)
     float x_dist_mm = (float)dt35_data.dist[x_dist_index];
     float front_dist_mm = (float)dt35_data.dist[0];
 
-    // float left_error_mm = (visual_data.hmi_color == 2) ? (x - x_dist_mm) : (x_dist_mm - x);
+    float left_error_mm = (visual_data.hmi_color == 2) ? (x - x_dist_mm) : (x_dist_mm - x);
     // float left_error_mm = x - x_dist_mm;
-    float left_error_mm = x_dist_mm - x;
+    // float left_error_mm = x_dist_mm - x;//红能用
     float forward_error_mm = front_dist_mm - y;
     // float forward_error_mm = (visual_data.hmi_color == 2) ? (y - front_dist_mm) : (front_dist_mm - y);
 
